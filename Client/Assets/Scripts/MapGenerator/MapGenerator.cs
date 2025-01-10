@@ -1,6 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using DataSequence.Tree;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameEngine.MapGenerator
 {
@@ -25,7 +27,7 @@ namespace GameEngine.MapGenerator
             {
                 RectInt size = treeNode.RoomSize; //이전 트리의 범위 값 저장, 사각형의 범위를 담기 위해 Rect 사용
                 int length = size.width >= size.height ? size.width : size.height; //사각형의 가로와 세로 중 길이가 긴 축을, 트리를 반으로 나누는 기준선으로 사용
-                int split = Random.Range(3, length - 3); //기준선 위에서 최소 범위와 최대 범위 사이의 값을 무작위로 선택
+                int split = Random.Range(7, Math.Max(7, length - 7)); //기준선 위에서 최소 범위와 최대 범위 사이의 값을 무작위로 선택
                 Debug.Log(treeNode.RoomSize);
                 if (size.width >= size.height) //가로
                 {

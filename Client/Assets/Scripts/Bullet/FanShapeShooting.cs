@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class FanShapeShooting : MonoBehaviour
@@ -6,6 +7,13 @@ public class FanShapeShooting : MonoBehaviour
     public int bulletCount = 3;      // 발사할 탄환 수
     public float spreadAngle = 60f;  // 부채꼴 각도
     public float bulletSpeed = 5f;   // 탄환 속도
+
+    private CharacterController player;
+    
+    private void Start()
+    {
+        player = GameObject.FindObjectOfType<CharacterController>();
+    }
 
     void Shoot(Vector2 targetPosition)
     {
@@ -30,13 +38,17 @@ public class FanShapeShooting : MonoBehaviour
         }
     }
 
+    private float timeInterval = 3f;
+    private float curTime = 0f;
+    
     void Update()
     {
-        // 마우스 좌클릭 시 발사
-        if (Input.GetMouseButtonDown(0))
+        if (curTime < timeInterval)
+            curTime += Time.deltaTime;
+        else
         {
-            // 마우스 클릭 위치를 월드 좌표로 변환
-            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            curTime = 0;
+            Vector2 mousePosition = player.transform.position;
             Shoot(mousePosition);
         }
     }
