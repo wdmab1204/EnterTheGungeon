@@ -10,7 +10,7 @@ namespace DefaultNamespace
     {
         [SerializeField] private Vector2Int mapSize;
         
-        private void Awake()
+        public void Build()
         {
             MapGenerator generator = new();
             MapRenderer renderer = GetComponentInChildren<MapRenderer>();
