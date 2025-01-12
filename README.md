@@ -28,20 +28,22 @@
   - 대량의 CSV파일을 읽을 때 속도가 많이 느려 게임을 켜는데 많은 시간이 걸렸습니다.
 - 해결점
   - CSV를 Bytes파일로 변환하고 기존 Parsing의 문제점을 보완하여 시간을 단축시켰습니다. 그리고 파일 변환 툴을 별도로 제작하여 프로젝트를 열지 않고 파일을 조작할 수 있습니다.
+- [[코드 링크]](https://github.com/wdmab1204/EnterTheGungeon/tree/main/Client/Assets/Scripts/ScriptLoader)
+- [[툴 링크]](https://github.com/wdmab1204/EnterTheGungeon/tree/main/Tool)
 
 #### 퀘스트UI 최적화
 - 문제점
   - ScrollView를 사용하면 프레임이 급격하게 낮아져 버벅거리는 현상이 있었습니다.
 - 해결점
   - 게임오브젝트를 재사용하여 Scroll 연산 비용을 절감했습니다.
-- [[코드링크]](https://github.com/wdmab1204/EnterTheGungeon/tree/main/Client/Assets/Scripts/UI)
+- [[코드 링크]](https://github.com/wdmab1204/EnterTheGungeon/tree/main/Client/Assets/Scripts/UI)
 
 #### 컴포넌트를 활용하여 중복 코드를 제거하고 재사용 했습니다.
 - 문제점
   - 몬스터 패턴을 구현할 때 마다 똑같은 기능을 여러번 만들어 중복 코드가 많아지고 유지보수에 어려움을 느꼈습니다.
 - 해결점
   - 기능을 컴포넌트로 묶어 중복되는 코드를 줄였고 인스펙터로 세밀한 패턴 조작을 할 수 있도록 구조를 개선했습니다.
-- [[코드링크]](https://github.com/wdmab1204/EnterTheGungeon/blob/main/Client/Assets/Scripts/Bullet/FanShapeShooting.cs)
+- [[코드 링크]](https://github.com/wdmab1204/EnterTheGungeon/blob/main/Client/Assets/Scripts/Bullet/FanShapeShooting.cs)
 
 ### 주요 내용
 #### 1. byte배열 역직렬화 로직 구현
