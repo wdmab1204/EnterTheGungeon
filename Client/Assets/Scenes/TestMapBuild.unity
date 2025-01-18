@@ -4076,6 +4076,18 @@ MonoBehaviour:
   bulletCount: 5
   spreadAngle: 45
   bulletSpeed: 10
+--- !u!114 &1923154876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1923154871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96626f75d6e04a74a28af52d821d0507, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2002522400
 GameObject:
   m_ObjectHideFlags: 0
@@ -4785,13 +4797,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Monster
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5152560296960513374, guid: aa194a6a8b1b55e43b3b1a833a73977b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6608021505465472060, guid: aa194a6a8b1b55e43b3b1a833a73977b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1923154875}
+    - targetCorrespondingSourceObject: {fileID: 6608021505465472060, guid: aa194a6a8b1b55e43b3b1a833a73977b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1923154876}
   m_SourcePrefab: {fileID: 100100000, guid: aa194a6a8b1b55e43b3b1a833a73977b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
