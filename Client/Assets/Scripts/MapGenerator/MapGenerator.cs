@@ -66,8 +66,8 @@ namespace GameEngine.MapGenerator
             if (depth == maxDepth) //노드가 최하위일 때만 조건문 실행
             {
                 RectInt size = treeNode.RoomSize;
-                int width = Mathf.Max(Random.Range(size.width / 2, size.width - 1)); //트리 범위 내에서 무작위 크기 선택, 최소 크기 : width / 2
-                int height = Mathf.Max(Random.Range(size.height / 2, size.height - 1));
+                int width = Mathf.Max(Random.Range((int)(size.width / 1.3f), size.width - 1)); //트리 범위 내에서 무작위 크기 선택, 최소 크기 : width / 2
+                int height = Mathf.Max(Random.Range((int)(size.height / 1.3f), size.height - 1));
                 int x = treeNode.RoomSize.x + Random.Range(1, size.width - width); //최대 크기 : width / 2
                 int y = treeNode.RoomSize.y + Random.Range(1, size.height - height);
                 mapRenderer.DrawDungeon(x, y, width, height); //던전 렌더링
@@ -81,7 +81,7 @@ namespace GameEngine.MapGenerator
         public void GenerateRoad(TreeNode treeNode, int n) //길 연결
         {
             if (n == maxDepth) return; 
-            var leftNodeCenter = (Vector2Int)treeNode.LeftNode.DungeonSize.GetCenterInt(); 
+            var leftNodeCenter = treeNode.LeftNode.DungeonSize.GetCenterInt(); 
             var rightNodeCenter = treeNode.RightNode.DungeonSize.GetCenterInt(); 
             mapRenderer.DrawRoad(leftNodeCenter, rightNodeCenter);
             GenerateRoad(treeNode.LeftNode, n + 1);

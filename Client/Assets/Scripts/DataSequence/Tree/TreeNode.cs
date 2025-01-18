@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace DataSequence.Tree
 {
@@ -9,6 +10,8 @@ namespace DataSequence.Tree
         public TreeNode ParentNode { get; set; }
         public RectInt RoomSize;
         public RectInt DungeonSize { get; set; }
+
+        public List<Vector2Int> DoorList { get; set; } = new();
 
         public TreeNode(int x, int y, int width, int height)
         {
