@@ -16,8 +16,9 @@ namespace GameEngine.Characters.State
             this.changeState = changeState;
         }
         
-        public abstract void Enter();
-        public abstract void Exit();
-        public abstract void TickUpdate(float time);
+        public virtual void Enter(){}
+        public virtual void Exit(){}
+        public virtual void TickUpdate(float time){}
+        public virtual void FixedUpdate(float time){}
     }
 }

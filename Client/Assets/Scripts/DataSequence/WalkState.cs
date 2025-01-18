@@ -6,29 +6,32 @@ namespace DataSequence
 {
     public class WalkState : UnitState
     {
-        private Func<Vector2> getDirection;
+        private Func<Vector2> getDistance;
         private float speed = 1;
         private float atkRange = 5;
+        private Rigidbody2D rb;
         
-        public WalkState(Func<Vector2> getDirection)
+        public WalkState(Func<Vector2> getDistance)
         {
-            this.getDirection = getDirection;
+            this.getDistance = getDistance;
         }
-        
+
         public override void Enter()
         {
+            if (rb == null)
+                rb = transform.GetComponent<Rigidbody2D>();
         }
 
-        public override void Exit()
+        public override void FixedUpdate(float time)
         {
-        }
-
-        public override void TickUpdate(float time)
-        {
-            Vector2 direction = getDirection();
-            transform.Translate(direction * speed * time);
-            if (atkRange >= direction.magnitude)
+            Vector2 distance = getDistance();
+            if (atkRange >= distance.magnitude)
+            {
                 changeState(typeof(ShootState));
+                return;
+            }
+               
+            rb.MovePosition(rb.position + distance.normalized * speed * Time.fixedDeltaTime);
         }
     }
 }

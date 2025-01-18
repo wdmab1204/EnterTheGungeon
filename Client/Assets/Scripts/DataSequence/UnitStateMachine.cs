@@ -8,7 +8,7 @@ namespace GameEngine.Characters.State
 {
     public class UnitStateMachine
     {
-        private IState currentState;
+        private UnitState currentState;
 
         private Dictionary<Type, IState> stateDict = new();
 
@@ -47,7 +47,7 @@ namespace GameEngine.Characters.State
             
             newState.Enter();
 
-            currentState = newState;
+            currentState = (UnitState)newState;
 
             Debug.Log($"[{transform.name}] current state : {currentState.GetType().Name}");
         }
@@ -55,6 +55,11 @@ namespace GameEngine.Characters.State
         public void Update()
         {
             currentState?.TickUpdate(Time.deltaTime);
+        }
+        
+        public void FixedUpdate()
+        {
+            currentState?.FixedUpdate(Time.fixedDeltaTime);
         }
     }
 }

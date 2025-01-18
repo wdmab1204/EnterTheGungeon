@@ -16,7 +16,7 @@ namespace GameEngine
             player = GameObject.FindObjectOfType<CharacterController>();
             shootPattern = GetComponent<FanShapeShooting>();
             sm = new(this.transform);
-            sm.AddState(new WalkState(GetDirection), new ShootState(Shoot));
+            sm.AddState(new WalkState(GetDistance), new ShootState(Shoot));
             sm.ChangeState(typeof(WalkState));
         }
 
@@ -25,7 +25,12 @@ namespace GameEngine
             sm.Update();
         }
 
-        private Vector2 GetDirection() => player.transform.position - transform.position;
+        private void FixedUpdate()
+        {
+            sm.FixedUpdate();
+        }
+
+        private Vector2 GetDistance() => player.transform.position - transform.position;
 
         private void Shoot()
         {
