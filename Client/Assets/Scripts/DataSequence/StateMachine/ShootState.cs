@@ -1,7 +1,6 @@
-﻿using GameEngine.Characters.State;
-using System;
+﻿using System;
 
-namespace DataSequence
+namespace GameEngine.DataSequence.StateMachine
 {
     public class ShootState : UnitState
     {

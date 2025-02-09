@@ -1,6 +1,4 @@
-﻿using System;
-using DataSequence;
-using GameEngine.Characters.State;
+﻿using GameEngine.DataSequence.StateMachine;
 using UnityEngine;
 
 namespace GameEngine

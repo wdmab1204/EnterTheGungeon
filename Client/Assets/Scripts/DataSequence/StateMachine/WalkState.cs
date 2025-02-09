@@ -1,8 +1,7 @@
 ﻿using System;
-using GameEngine.Characters.State;
 using UnityEngine;
 
-namespace DataSequence
+namespace GameEngine.DataSequence.StateMachine
 {
     public class WalkState : UnitState
     {

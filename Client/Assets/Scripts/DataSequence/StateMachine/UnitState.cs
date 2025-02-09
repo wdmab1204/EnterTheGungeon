@@ -1,8 +1,7 @@
 using System;
-using GameEngine.DataSequence;
 using UnityEngine;
 
-namespace GameEngine.Characters.State
+namespace GameEngine.DataSequence.StateMachine
 {
     public abstract class UnitState : IState
     {

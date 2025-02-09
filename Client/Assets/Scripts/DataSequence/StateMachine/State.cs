@@ -1,4 +1,4 @@
-namespace GameEngine.DataSequence
+namespace GameEngine.DataSequence.StateMachine
 {
     public interface IState
     {

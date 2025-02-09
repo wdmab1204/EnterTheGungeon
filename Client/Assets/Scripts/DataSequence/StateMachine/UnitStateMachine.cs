@@ -4,7 +4,7 @@ using GameEngine.DataSequence;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameEngine.Characters.State
+namespace GameEngine.DataSequence.StateMachine
 {
     public class UnitStateMachine
     {
