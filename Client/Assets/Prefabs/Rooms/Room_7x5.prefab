@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2544207248134762248, guid: 12f1621c437d7bb42b1e7c39a02e8d04, type: 3}
       propertyPath: m_Size.y
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2544207248134762248, guid: 12f1621c437d7bb42b1e7c39a02e8d04, type: 3}
       propertyPath: m_Origin.x
@@ -82,7 +82,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2544207248134762248, guid: 12f1621c437d7bb42b1e7c39a02e8d04, type: 3}
       propertyPath: m_Origin.y
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2544207248134762248, guid: 12f1621c437d7bb42b1e7c39a02e8d04, type: 3}
       propertyPath: m_Tiles.Array.size

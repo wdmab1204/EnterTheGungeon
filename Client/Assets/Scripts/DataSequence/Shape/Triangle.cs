@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameEngine.DataSequence.Shape
@@ -10,6 +11,11 @@ namespace GameEngine.DataSequence.Shape
         // /      \
         //a- - - - b
         public Vector3 a, b, c;
+
+        public Triangle(Vector3 a, Vector3 b, Vector3 c)
+        {
+            this.a = a; this.b = b; this.c = c;
+        }
 
         public Circle GetCircumCircle()
         {

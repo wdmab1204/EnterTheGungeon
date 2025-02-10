@@ -35,7 +35,10 @@ namespace GameEngine
             var pipelineItems = new List<IPipelineTask<DungeonGeneratorPayLoad>>()
             {
                 new DungeonGeneratorTask(RoomCount),
-                new TilemapRenderingTask()
+                new TilemapRenderingTask(),
+#if UNITY_EDITOR
+                new GraphRenderingTask()
+#endif
             };
             return pipelineItems;
         }

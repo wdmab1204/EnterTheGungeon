@@ -1,13 +1,20 @@
 namespace GameEngine.DataSequence.Graph
 {
-    public interface IEdge
+    public interface IEdge<in TNode> where TNode : INode
     {
-        INode To { get; set; } 
+        TNode From { set; }
+        TNode To { set; } 
     }
 
-    public class WeightEdge : IEdge
+    public interface IGeomeryEdge<in TNode> : IEdge<TNode> where TNode : IGeomertyNode
     {
-        public INode To { get; set; }
-        public int weight;
+        int Weight { get; set; }
+    }
+
+    public class WeightEdge : IGeomeryEdge<GeomertyNode>
+    {
+        public GeomertyNode From { get; set; }
+        public GeomertyNode To { get; set; }
+        public int Weight { get; set; }
     }
 }

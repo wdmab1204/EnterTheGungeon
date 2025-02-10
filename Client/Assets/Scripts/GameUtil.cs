@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameEngine.DataSequence.Graph;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -22,5 +23,8 @@ namespace GameEngine
             var bytesInStrHex = $"0x{bytesInStr}";
             return bytesInStrHex;
         }
+
+        public static UnityEngine.Vector3 ToVector3(this IGeomertyNode node)
+            => new(node.X, node.Y);
     }
 }

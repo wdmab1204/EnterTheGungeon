@@ -7,9 +7,16 @@ namespace GameEngine.DataSequence.Graph
 
     public interface IGeomertyNode  : INode
     {
-        float X { get; }
-        float Y { get; }
+        float X { get; set; }
+        float Y { get; set; }
+    }
 
+    public class GeomertyNode : IGeomertyNode
+    {
+        public float X { get; set; }
 
+        public float Y { get; set; }
+
+        public int ID { get; set; }
     }
 }

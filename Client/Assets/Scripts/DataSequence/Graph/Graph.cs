@@ -1,27 +1,31 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameEngine.DataSequence.Graph
 {
     public class Graph<TNode, TEdge>
         where TNode : INode
-        where TEdge : IEdge, new()
+        where TEdge : IEdge<TNode>, new()
     {
         protected HashSet<TNode> nodeSet = new();
         protected Dictionary<TNode, List<TEdge>> adjacencyMap = new();
 
-        public virtual void AddNode(TNode node)
+        public virtual TNode AddNode(TNode node)
         {
             nodeSet.Add(node);
+            return node;
         }
 
-        public virtual void AddEdge(TNode from, TNode to)
+        public virtual void AddEdge(TNode from, TNode to, bool isTwoWay = false)
         {
-            TEdge edge = new()
-            {
-                To = to,
-            };
+            TEdge edge = new();
+            edge.From = from;
+            edge.To = to;
 
             AddEdge(from, edge);
+
+            if (isTwoWay)
+                AddEdge(to, from, false);
         }
 
         public void AddEdge(TNode node, TEdge edge)
@@ -34,6 +38,15 @@ namespace GameEngine.DataSequence.Graph
             {
                 list.Add(edge);
             }
+        }
+
+        public List<TEdge> AllGetEdges()
+        {
+            List<TEdge> edgeList = new();
+            foreach (var edges in adjacencyMap.Values)
+                edgeList.AddRange(edges);
+
+            return edgeList;
         }
 
         public void BFS(TNode node) => throw new System.NotImplementedException();

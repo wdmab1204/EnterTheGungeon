@@ -70,7 +70,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2544207248134762248, guid: 12f1621c437d7bb42b1e7c39a02e8d04, type: 3}
       propertyPath: m_Size.x
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2544207248134762248, guid: 12f1621c437d7bb42b1e7c39a02e8d04, type: 3}
       propertyPath: m_Size.y

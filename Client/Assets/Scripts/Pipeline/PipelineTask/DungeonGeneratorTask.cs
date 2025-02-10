@@ -1,3 +1,4 @@
+using GameEngine.DataSequence.Graph;
 using GameEngine.DataSequence.Shape;
 using GameEngine.MapGenerator.Room;
 using System.Collections;
@@ -12,12 +13,23 @@ namespace GameEngine.Pipeline
         public DungeonGeneratorPayLoad PayLoad { get; set; }
         private int roomCount;
 
+        private DungeonGraph DungeonGraph => PayLoad.DungeonGraph;
+
         public DungeonGeneratorTask(int roomCount)
         {
             this.roomCount = roomCount;
         }
 
         public IEnumerator Process()
+        {
+            CreateRandomRoom();
+            yield return null;
+
+            AutoBuildEdges();
+            yield return null;
+        }
+
+        private void CreateRandomRoom()
         {
             var rand = PayLoad.Random;
             int sample = roomCount;
@@ -41,6 +53,7 @@ namespace GameEngine.Pipeline
                 if (CanBuild(roomShapes, rect))
                 {
                     roomShapes.Add((rect, room));
+                    DungeonGraph.AddNode(center.x, center.y);
                     sample--;
                 }
                 else
@@ -48,8 +61,18 @@ namespace GameEngine.Pipeline
             }
 
             PayLoad.RoomShapes = roomShapes;
+        }
 
-            yield return null;
+        private void AutoBuildEdges()
+        {
+            DungeonGraph.AutoCreateEdges();
+
+            foreach(var edge in DungeonGraph.AllGetEdges())
+            {
+                var to = (GeomertyNode)edge.To;
+
+                Debug.Log($"{to.X},{to.Y}");
+            }
         }
 
         private bool CanBuild(List<(Rectangle rect, Room room)> roomShapes, Rectangle rect)
