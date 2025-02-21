@@ -1,6 +1,6 @@
 ﻿namespace GameEngine.DataSequence.Graph
 {
-    public class DungeonGraph : GeomertyGraph<RoomNode, WeightEdge>
+    public class DungeonGraph : GeomertyGraph<RoomNode, RoomEdge>
     {
     }
 }

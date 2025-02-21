@@ -17,6 +17,7 @@ namespace GameEngine.Pipeline
                 var rect = pair.rect;
 
                 var clone = Object.Instantiate(room.gameObject);
+                clone.transform.parent = PayLoad.RootGameObject.transform;
                 clone.SetActive(true);
                 clone.transform.position = rect.Center;
 

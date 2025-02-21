@@ -1,8 +1,10 @@
+using GameEngine.DataSequence.Geometry;
 using GameEngine.DataSequence.Graph;
-using GameEngine.DataSequence.Shape;
+using GameEngine.DataSequence.Tree;
 using GameEngine.MapGenerator.Room;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -41,10 +43,8 @@ namespace GameEngine.Pipeline
             {
                 Vector2 center = new((int)rand.NextDouble(), (int)rand.NextDouble());
                 var room = roomList[Random.Range(0, roomList.Count)].GetComponent<Room>();
-
                 var tilemap = room.GetComponentInChildren<Tilemap>();
                 tilemap.CompressBounds();
-                Debug.Log(tilemap.cellBounds);
 
                 float width = room.width;
                 float height = room.height;
@@ -65,13 +65,32 @@ namespace GameEngine.Pipeline
 
         private void AutoBuildEdges()
         {
-            DungeonGraph.AutoCreateEdges();
-
-            foreach(var edge in DungeonGraph.AllGetEdges())
+            //var triangles = Triangulation.TriangulatePoints(DungeonGraph.Vertices.Select(v => new Vertex(v.ToVector3())).ToList());
+            var triangles = Triangulation.TriangulateByFlippingEdges(DungeonGraph.Vertices.Select(v => v.ToVector3()).ToList());
+            HashSet<RoomEdge> edges = new();
+            var graph = PayLoad.DungeonGraph;
+            foreach(var tri in triangles)
             {
-                var to = (GeomertyNode)edge.To;
+                var v1Pos = tri.v1.position;
+                var v2Pos = tri.v2.position;
+                var v3Pos = tri.v3.position;
 
-                Debug.Log($"{to.X},{to.Y}");
+                graph.AddNode(new (v1Pos));
+                graph.AddNode(new (v2Pos));
+                graph.AddNode(new (v3Pos));
+
+                edges.Add(new RoomEdge(new(v1Pos), new(v2Pos), Vector3.Distance(v1Pos, v2Pos)));
+                edges.Add(new RoomEdge(new(v2Pos), new(v1Pos), Vector3.Distance(v1Pos, v2Pos)));
+                edges.Add(new RoomEdge(new(v2Pos), new(v3Pos), Vector3.Distance(v2Pos, v3Pos)));
+                edges.Add(new RoomEdge(new(v3Pos), new(v2Pos), Vector3.Distance(v2Pos, v3Pos)));
+                edges.Add(new RoomEdge(new(v3Pos), new(v1Pos), Vector3.Distance(v1Pos, v3Pos)));
+                edges.Add(new RoomEdge(new(v1Pos), new(v3Pos), Vector3.Distance(v1Pos, v3Pos)));
+            }
+
+            var treeEdges =  SpanningTree.TransformMininum(graph.Vertices, edges);
+            foreach(var edge in treeEdges)
+            {
+                graph.AddEdge(edge.From, edge);
             }
         }
 

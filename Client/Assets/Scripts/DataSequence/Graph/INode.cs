@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace GameEngine.DataSequence.Graph
 {
     public interface INode
@@ -18,5 +20,11 @@ namespace GameEngine.DataSequence.Graph
         public float Y { get; set; }
 
         public int ID { get; set; }
+
+        public GeomertyNode(Vector3 v)
+        {
+            X = v.x;
+            Y = v.y;
+        }
     }
 }

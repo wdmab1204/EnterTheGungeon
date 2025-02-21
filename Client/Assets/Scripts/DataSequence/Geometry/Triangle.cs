@@ -3,93 +3,49 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameEngine.DataSequence.Shape
+namespace GameEngine.DataSequence.Geometry
 {
-    public struct Triangle : IEquatable<Triangle>
+    public interface ITriangle<T>
     {
-        static int id = 1;
+        T v1 { get; set; }
+        T v2 { get; set; }
+        T v3 { get; set; }
+    }
 
-        //    c
+    public class Triangle : ITriangle<Vertex>
+    {
+        //    v3
         //   /  \
         //  /    \
         // /      \
-        //a- - - - b
-        public Vector3 a, b, c;
-        public int ID;
+        //v1- - - - v2
+        public Vertex v1 { get; set; }
+        public Vertex v2 { get; set; }
+        public Vertex v3 { get; set; }
 
-        public Triangle(Vector3 a, Vector3 b, Vector3 c)
+        public HalfEdge halfEdge { get; set; }
+
+        public Triangle(Vector3 v1, Vector3 v2, Vector3 v3)
         {
-            this.a = a; this.b = b; this.c = c;
-            this.ID = id++;
-
-            float denominator = 2 * (this.a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
-
-            if (Math.Abs(denominator) < 1e-6)
-            {
-                throw new ArgumentException($"세 점이 일직선 상에 있어 외접원을 구할 수 없습니다. {a}, {b}, {c}");
-            }
+            this.v1 = new Vertex(v1);
+            this.v2 = new Vertex(v2);
+            this.v3 = new Vertex(v3);
         }
 
-        public List<Edge> GetEdges() =>
-            new() { new() { from = a, to = b }, new() { from = b, to = c }, new() { from = c, to = a } };
-
-        public Circle GetCircumCircle()
+        public Triangle(Vertex v1, Vertex v2, Vertex v3)
         {
-            float denominator = 2 * (this.a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
-
-            if (Math.Abs(denominator) < 1e-6)
-            {
-                throw new ArgumentException($"세 점이 일직선 상에 있어 외접원을 구할 수 없습니다. {a}, {b}, {c}");
-            }
-
-            float centerX = ((this.a.sqrMagnitude * (b.y - c.y)) + (b.sqrMagnitude * (c.y - a.y)) + (c.sqrMagnitude * (a.y - b.y))) / denominator;
-            float centerY = ((this.a.sqrMagnitude * (c.x - b.x)) + (b.sqrMagnitude * (a.x - c.x)) + (c.sqrMagnitude * (b.x - a.x))) / denominator;
-
-            Vector2 center = new Vector2(centerX, centerY);
-            float radius = Vector2.Distance(center, a);
-
-            return new() { center = center, radius = radius };
+            this.v1 = v1;
+            this.v2 = v2;
+            this.v3 = v3;
         }
 
-        public Vector3 GetCenter() => (a + b + c) / 3f;
+        public bool Contain(Vertex v) => MathUtility.IsPointInTriangle(v1.position, v2.position, v3.position, v.position);
 
-        public bool HasPoint(Vector3 point) => a == point || b == point || c == point;
-
-        public static bool operator ==(Triangle t1, Triangle t2)
+        public void ChangeOrientation()
         {
-            return t1.a == t2.a && t1.b == t2.b && t1.c == t2.c;
-        }
-
-        public static bool operator !=(Triangle t1, Triangle t2)
-        {
-            return !(t1 == t2);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is Triangle other)
-                return Equals(other);
-            else
-                return false;
-        }
-
-        public bool Equals(Triangle other) => this == other;
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 23 + a.GetHashCode();
-                hash = hash * 23 + b.GetHashCode();
-                hash = hash * 23 + c.GetHashCode();
-                return hash;
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"{a}, {b}, {c}";
+            Vertex t = v1;
+            v1 = v2;
+            v2 = t;
         }
     }
 }

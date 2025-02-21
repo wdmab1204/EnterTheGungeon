@@ -1,20 +1,35 @@
+using System;
+
 namespace GameEngine.DataSequence.Graph
 {
-    public interface IEdge<in TNode> where TNode : INode
+    public interface IEdge<TNode> where TNode : INode
     {
-        TNode From { set; }
-        TNode To { set; } 
+        TNode From { get;  set; }
+        TNode To { get;  set; } 
+        float Weight { get; set; }
     }
 
-    public interface IGeomeryEdge<in TNode> : IEdge<TNode> where TNode : IGeomertyNode
+    public class RoomEdge : IEdge<RoomNode>, IComparable<RoomEdge>
     {
-        int Weight { get; set; }
-    }
+        public RoomNode From { get; set; }
+        public RoomNode To { get; set; }
+        public float Weight { get; set; }
 
-    public class WeightEdge : IGeomeryEdge<GeomertyNode>
-    {
-        public GeomertyNode From { get; set; }
-        public GeomertyNode To { get; set; }
-        public int Weight { get; set; }
+        public RoomEdge(RoomNode from, RoomNode to, float weight)
+        {
+            From = from;
+            To = to;
+            Weight = weight;
+        }
+
+        public RoomEdge()
+        {
+            
+        }
+
+        public int CompareTo(RoomEdge other)
+        {
+            return Weight.CompareTo(other.Weight);
+        }
     }
 }

@@ -1,5 +1,6 @@
 using GameEngine.Pipeline;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GameEngine
@@ -16,9 +17,16 @@ namespace GameEngine
         {
             var payLoad = new DungeonGeneratorPayLoad()
             {
-                Random = new DataSequence.Random.NormalDistribution(new System.Random(), 0, 8),
+                Random = new DataSequence.Random.NormalDistribution(new System.Random(), 0, 32),
                 RoomTemplates = RoomTemplates.roomList,
+                RootGameObject = this.gameObject,
             };
+
+            var rootTransform = payLoad.RootGameObject.transform;
+            while(rootTransform.childCount != 0)
+            {
+                GameUtil.Destroy(rootTransform.GetChild(0).gameObject);
+            }
 
             var pipelineItems = GetPipelineItems();
 
@@ -36,9 +44,7 @@ namespace GameEngine
             {
                 new DungeonGeneratorTask(RoomCount),
                 new TilemapRenderingTask(),
-#if UNITY_EDITOR
-                new GraphRenderingTask()
-#endif
+                new GraphRenderingTask(),
             };
             return pipelineItems;
         }

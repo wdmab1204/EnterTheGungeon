@@ -1,9 +1,7 @@
-
-
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameEngine.DataSequence.Shape
+namespace GameEngine.DataSequence.Geometry
 {
     public struct Circle
     {

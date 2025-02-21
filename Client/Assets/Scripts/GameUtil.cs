@@ -34,5 +34,18 @@ namespace GameEngine
             else
                 GameObject.DestroyImmediate(obj);
         }
+
+        public static LineRenderer CreateLineRenderer(Vector3 start, Vector3 end, Color color, float width)
+        {
+            LineRenderer lineRenderer = new GameObject("Line Renderer").AddComponent<LineRenderer>();
+            lineRenderer.SetPosition(0, start);
+            lineRenderer.SetPosition(1, end);
+            lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+            lineRenderer.sharedMaterial.color = color;
+            lineRenderer.startWidth = width;
+            lineRenderer.endWidth = width;
+
+            return lineRenderer;
+        }
     }
 }

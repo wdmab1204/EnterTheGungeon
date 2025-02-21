@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameEngine.DataSequence.Graph
 {
@@ -6,16 +8,17 @@ namespace GameEngine.DataSequence.Graph
         where TNode : INode
         where TEdge : IEdge<TNode>, new()
     {
-        protected HashSet<TNode> nodeSet = new();
-        protected Dictionary<TNode, List<TEdge>> adjacencyMap = new();
+        public HashSet<TNode> Vertices { get; private set; } = new();
+        public IEnumerable<TEdge> Edges => adjacencyMap.Values.SelectMany(x => x);
+        protected Dictionary<TNode, HashSet<TEdge>> adjacencyMap = new();
 
         public virtual TNode AddNode(TNode node)
         {
-            nodeSet.Add(node);
+            Vertices.Add(node);
             return node;
         }
 
-        public virtual void AddEdge(TNode from, TNode to, bool isTwoWay = false)
+        public virtual void AddEdge(TNode from, TNode to, int weight, bool isTwoWay = false)
         {
             TEdge edge = new();
             edge.From = from;
@@ -24,14 +27,14 @@ namespace GameEngine.DataSequence.Graph
             AddEdge(from, edge);
 
             if (isTwoWay)
-                AddEdge(to, from, false);
+                AddEdge(to, from, weight, false);
         }
 
         public void AddEdge(TNode node, TEdge edge)
         {
             if (adjacencyMap.TryGetValue(node, out var list) == false)
             {
-                adjacencyMap.Add(node, list = new List<TEdge>() { edge });
+                adjacencyMap.Add(node, list = new HashSet<TEdge>() { edge });
             }
             else
             {
@@ -47,8 +50,5 @@ namespace GameEngine.DataSequence.Graph
 
             return edgeList;
         }
-
-        public void BFS(TNode node) => throw new System.NotImplementedException();
-        public void DFS(TNode node) => throw new System.NotImplementedException();
     }
 }

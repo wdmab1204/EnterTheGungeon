@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace GameEngine.DataSequence.Shape
+namespace GameEngine.DataSequence.Geometry
 {
     public struct Rectangle
     {
