@@ -26,5 +26,10 @@ namespace GameEngine.DataSequence.Graph
             X = v.x;
             Y = v.y;
         }
+
+        public override string ToString()
+        {
+            return $"{X}, {Y}";
+        }
     }
 }

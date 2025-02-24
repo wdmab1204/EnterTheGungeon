@@ -6,13 +6,15 @@ namespace GameEngine.DataSequence.Graph
 {
     public class RoomNode : GeomertyNode, IEquatable<RoomNode>
     {
-        public RoomNode(Vector3 v) : base(v)
-        {
-        }
+        public float Width { get; set; }
+        public float Height { get; set; }
+        public GameObject Prefab { get; set; }
 
-        public RoomNode() : base(Vector3.zero)
+        public RoomNode(Vector3 position, float width, float height, GameObject prefab) : base(position)
         {
-
+            Width = width;
+            Height = height;
+            Prefab = prefab;
         }
 
         public bool Equals(RoomNode other)

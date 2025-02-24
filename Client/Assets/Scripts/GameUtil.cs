@@ -27,6 +27,9 @@ namespace GameEngine
         public static UnityEngine.Vector3 ToVector3(this IGeomertyNode node)
             => new(node.X, node.Y);
 
+        public static UnityEngine.Vector3Int ToVector3Int(this IGeomertyNode node)
+            => new((int)node.X, (int)node.Y);
+
         public static void Destroy(UnityEngine.Object obj)
         {
             if(Application.isPlaying)
