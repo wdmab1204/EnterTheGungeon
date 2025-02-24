@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace GameEngine.Pipeline
     public class TilemapRenderingTask : IPipelineTask<DungeonGeneratorPayLoad>
     {
         public DungeonGeneratorPayLoad PayLoad { get; set; }
+        private Grid grid;
 
         public IEnumerator Process()
         {
@@ -20,16 +22,12 @@ namespace GameEngine.Pipeline
             yield return null;
 
             var destinationTilemaps = tilemapRoot.GetComponentsInChildren<Tilemap>();
+            var graph = PayLoad.DungeonGraph;
 
-            foreach (var vertex in PayLoad.DungeonGraph.Vertices)
+            foreach (var vertex in graph.Vertices)
             {
                 var sourceTilemaps = vertex.Prefab.GetComponentsInChildren<Tilemap>();
-                CopyTiles(sourceTilemaps, destinationTilemaps, vertex.ToVector3Int());
-
-                //var clone = Object.Instantiate(vertex.Prefab);
-                //clone.transform.parent = PayLoad.RootGameObject.transform;
-                //clone.SetActive(true);
-                //clone.transform.position = vertex.ToVector3();
+                CopyTiles(sourceTilemaps, destinationTilemaps, vertex.ToVector3(), grid.WorldToCell);
 
                 yield return null;
             }
@@ -37,7 +35,7 @@ namespace GameEngine.Pipeline
 
         private void InitializeTilemap(GameObject tilemapRoot)
         {
-            tilemapRoot.AddComponent<Grid>();
+            grid = tilemapRoot.AddComponent<Grid>();
             var rootTransform = tilemapRoot.transform;
 
             CreateTilemap("Floor", rootTransform, 0);
@@ -63,9 +61,9 @@ namespace GameEngine.Pipeline
             obj.GetOrAddComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         }
 
-        private void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3Int roomPosition)
+        private void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3 roomPosition, Func<Vector3, Vector3Int> getCellPosition)
         {
-            Vector3Int tilemapCenter = GetCenterFromTilemaps(sourceTilemaps);
+            Vector3 tilemapCenter = GetCenterFromTilemaps(sourceTilemaps);
 
             foreach (var sourceTilemap in sourceTilemaps)
             {
@@ -75,20 +73,19 @@ namespace GameEngine.Pipeline
 
                 var sourceTilemapCellBounds = sourceTilemap.cellBounds;
 
-                
-
                 foreach (var tilePosition in sourceTilemapCellBounds.allPositionsWithin)
                 {
                     var tile = sourceTilemap.GetTile(tilePosition);
                     if (tile == null)
                         continue;
 
-                    destinationTilemap.SetTile(tilePosition + roomPosition - tilemapCenter, tile);
+                    var cellPosition = getCellPosition(tilePosition + roomPosition - tilemapCenter);
+                    destinationTilemap.SetTile(cellPosition, tile);
                 }
             }
         }
 
-        private Vector3Int GetCenterFromTilemaps(IEnumerable<Tilemap> tilemaps)
+        private Vector3 GetCenterFromTilemaps(IEnumerable<Tilemap> tilemaps)
         {
             var minX = int.MaxValue;
             var minY = int.MaxValue;
@@ -105,7 +102,7 @@ namespace GameEngine.Pipeline
                 if (maxY < cellbounds.yMax) maxY = cellbounds.yMax;
             }
 
-            Vector3Int size = new((maxX + minX) / 2, (maxY + minY) / 2);
+            Vector3 size = new((maxX + minX) / 2f - 0.5f, (maxY + minY) / 2f - 0.5f);
             return size;
         }
     }
