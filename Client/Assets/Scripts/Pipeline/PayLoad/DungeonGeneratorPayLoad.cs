@@ -14,5 +14,6 @@ namespace GameEngine.Pipeline
         public List<(Rectangle rect, Room room)> RoomShapes { get; set; }
         public DungeonGraph DungeonGraph { get; set; } = new();
         public GameObject RootGameObject { get; set; }
+        public RoomTemplates roomTemplates { get; set; }
     }
 }

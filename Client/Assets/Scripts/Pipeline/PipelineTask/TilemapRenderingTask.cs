@@ -1,3 +1,5 @@
+using GameEngine.DataSequence.Graph;
+using GameEngine.DataSequence.PathFinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +13,8 @@ namespace GameEngine.Pipeline
     public class TilemapRenderingTask : IPipelineTask<DungeonGeneratorPayLoad>
     {
         public DungeonGeneratorPayLoad PayLoad { get; set; }
-        private Grid grid;
+        private Grid unityGrid;
+        private GameGrid gameGrid;
 
         public IEnumerator Process()
         {
@@ -24,18 +27,37 @@ namespace GameEngine.Pipeline
             var destinationTilemaps = tilemapRoot.GetComponentsInChildren<Tilemap>();
             var graph = PayLoad.DungeonGraph;
 
+            
+
             foreach (var vertex in graph.Vertices)
             {
                 var sourceTilemaps = vertex.Prefab.GetComponentsInChildren<Tilemap>();
-                CopyTiles(sourceTilemaps, destinationTilemaps, vertex.ToVector3(), grid.WorldToCell);
+                CopyTiles(sourceTilemaps, destinationTilemaps, vertex.ToVector3(), unityGrid.WorldToCell);
 
                 yield return null;
             }
+
+            gameGrid.CreateGrid(unityGrid);
+            DungeonRoadBuilder roader = new(Comparer<RoadTileNode>.Default, gameGrid);
+            var pathResult = roader.GetMinPath(gameGrid.gridBoundsInt.min, new(gameGrid.gridBoundsInt.xMax - 1, gameGrid.gridBoundsInt.yMax - 1));
+            if (pathResult != null)
+                GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(path => path.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+            //foreach (var edge in graph.Edges)
+            //{
+            //    var node1 = edge.From;
+            //    var node2 = edge.To;
+            //    var pathResult = roader.GetMinPath(node1.ToVector3(), node2.ToVector3());
+            //    if (pathResult == null)
+            //        continue;
+
+            //    GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(path => path.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+            //}
         }
 
         private void InitializeTilemap(GameObject tilemapRoot)
         {
-            grid = tilemapRoot.AddComponent<Grid>();
+            unityGrid = tilemapRoot.AddComponent<Grid>();
+            gameGrid = tilemapRoot.AddComponent<GameGrid>();
             var rootTransform = tilemapRoot.transform;
 
             CreateTilemap("Floor", rootTransform, 0);
@@ -61,16 +83,16 @@ namespace GameEngine.Pipeline
             obj.GetOrAddComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         }
 
-        private void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3 roomPosition, Func<Vector3, Vector3Int> getCellPosition)
+        public static void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3 roomPosition, Func<Vector3, Vector3Int> getCellPosition)
         {
-            Vector3 tilemapCenter = GetCenterFromTilemaps(sourceTilemaps);
+            Vector3 tilemapCenter = GameUtil.GetCenterFromTilemaps(sourceTilemaps);
 
             foreach (var sourceTilemap in sourceTilemaps)
             {
                 var destinationTilemap = destinationTilemaps.FirstOrDefault(dest => dest.name == sourceTilemap.name);
                 if (destinationTilemap == null)
                     continue;
-
+                sourceTilemap.CompressBounds();
                 var sourceTilemapCellBounds = sourceTilemap.cellBounds;
 
                 foreach (var tilePosition in sourceTilemapCellBounds.allPositionsWithin)
@@ -83,27 +105,6 @@ namespace GameEngine.Pipeline
                     destinationTilemap.SetTile(cellPosition, tile);
                 }
             }
-        }
-
-        private Vector3 GetCenterFromTilemaps(IEnumerable<Tilemap> tilemaps)
-        {
-            var minX = int.MaxValue;
-            var minY = int.MaxValue;
-            var maxX = int.MinValue;
-            var maxY = int.MinValue;
-
-            foreach (var tilemap in tilemaps)
-            {
-                var cellbounds = tilemap.cellBounds;
-
-                if (minX > cellbounds.xMin) minX = cellbounds.xMin;
-                if (minY > cellbounds.yMin) minY = cellbounds.yMin;
-                if (maxX < cellbounds.xMax) maxX = cellbounds.xMax;
-                if (maxY < cellbounds.yMax) maxY = cellbounds.yMax;
-            }
-
-            Vector3 size = new((maxX + minX) / 2f - 0.5f, (maxY + minY) / 2f - 0.5f);
-            return size;
         }
     }
 }

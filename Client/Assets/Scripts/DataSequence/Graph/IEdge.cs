@@ -32,4 +32,11 @@ namespace GameEngine.DataSequence.Graph
             return Weight.CompareTo(other.Weight);
         }
     }
+
+    public class RoadEdge : IEdge<RoadTileNode>
+    {
+        public RoadTileNode From { get; set; }
+        public RoadTileNode To { get; set; }
+        public float Weight { get; set; }
+    }
 }

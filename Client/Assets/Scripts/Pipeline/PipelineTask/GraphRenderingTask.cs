@@ -14,7 +14,7 @@ namespace GameEngine.Pipeline
 
             foreach (var edge in graph.Edges)
             {
-                var line = GameUtil.CreateLineRenderer(edge.From.ToVector3(), edge.To.ToVector3(), Color.white, .2f).transform;
+                var line = GameUtil.CreateLineRenderer(Color.white, .2f, edge.From.ToVector3(), edge.To.ToVector3()).transform;
                 line.parent = PayLoad.RootGameObject.transform;
                 yield return null;
             }

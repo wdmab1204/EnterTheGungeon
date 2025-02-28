@@ -42,6 +42,12 @@ namespace GameEngine.DataSequence.Graph
             }
         }
 
+        public IEnumerable<TNode> GetNeighbors(TNode item)
+        {
+            var neighborEdges = adjacencyMap[item];
+            return neighborEdges.Select(edge => edge.To);
+        }
+
         public List<TEdge> AllGetEdges()
         {
             List<TEdge> edgeList = new();

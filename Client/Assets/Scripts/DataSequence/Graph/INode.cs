@@ -13,6 +13,11 @@ namespace GameEngine.DataSequence.Graph
         float Y { get; set; }
     }
 
+    public interface IPathNode : INode
+    {
+        float gCost { get; set; }
+    }
+
     public class GeomertyNode : IGeomertyNode
     {
         public float X { get; set; }

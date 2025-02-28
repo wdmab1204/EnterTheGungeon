@@ -42,7 +42,7 @@ namespace GameEngine.Pipeline
                 Vector2 pos = new((int)rand.NextDouble(), (int)rand.NextDouble());
                 var room = roomList[Random.Range(0, roomList.Count)].GetComponent<Room>();
                 var tilemaps = room.GetComponentsInChildren<Tilemap>();
-                var size = GetSizeFromTilemaps(tilemaps);
+                var size = GameUtil.GetSizeFromTilemaps(tilemaps);
 
                 Rectangle rect = new(pos, size.x, size.y);
                 if (CanBuild(DungeonGraph.Vertices, rect))
@@ -54,28 +54,6 @@ namespace GameEngine.Pipeline
                 else
                     rand.stdev += .1f;
             }
-        }
-
-        private Vector2Int GetSizeFromTilemaps(IEnumerable<Tilemap> tilemaps)
-        {
-            var minX = int.MaxValue;
-            var minY = int.MaxValue;
-            var maxX = int.MinValue;
-            var maxY = int.MinValue;
-
-            foreach (var tilemap in tilemaps)
-            {
-                tilemap.CompressBounds();
-                var cellbounds = tilemap.cellBounds;
-
-                if (minX > cellbounds.xMin) minX = cellbounds.xMin;
-                if (minY > cellbounds.yMin) minY = cellbounds.yMin;
-                if (maxX < cellbounds.xMax) maxX = cellbounds.xMax;
-                if (maxY < cellbounds.yMax) maxY = cellbounds.yMax;
-            }
-
-            Vector2Int size = new(maxX - minX, maxY - minY);
-            return size;
         }
 
         private void AutoBuildEdges()

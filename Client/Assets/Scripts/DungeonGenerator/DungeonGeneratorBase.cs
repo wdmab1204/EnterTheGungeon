@@ -18,6 +18,7 @@ namespace GameEngine
             {
                 Random = new DataSequence.Random.NormalDistribution(new System.Random(), 0, 32),
                 RoomTemplates = RoomTemplates.roomList,
+                roomTemplates = RoomTemplates,
                 RootGameObject = this.gameObject,
             };
 
