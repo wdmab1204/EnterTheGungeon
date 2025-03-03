@@ -8,17 +8,19 @@ namespace GameEngine
 {
     public class GameGrid : MonoBehaviour
     {
+        public bool isGizmos;
+
         private RoadTileNode[,] nodes;
         public BoundsInt gridBoundsInt;
         private Grid grid;
         private int[] xDir = { 1, -1, 0, 0 };
         private int[] yDir = { 0, 0, 1, -1 };
 
-        public void CreateGrid(Grid grid)
+        public void CreateGrid(Grid grid, IEnumerable<RoomNode> roomEnumerable)
         {
             this.grid = grid;
             Tilemap[] childTilemaps = gameObject.GetComponentsInChildren<Tilemap>();
-            gridBoundsInt = GetBoundsIntFromTilemaps(childTilemaps);
+            gridBoundsInt = GameUtil.GetBoundsIntFromTilemaps(childTilemaps);
             nodes = new RoadTileNode[gridBoundsInt.size.y, gridBoundsInt.size.x];
             foreach (var tilePos in gridBoundsInt.allPositionsWithin)
             {
@@ -29,19 +31,27 @@ namespace GameEngine
                 nodes[j, i].IsWalkable = true;
             }
 
-            //foreach (var collidableTilemap in childTilemaps.Where(tilemap => tilemap.GetComponent<TilemapCollider2D>() != null))
-            //{
-            //    var cellBounds = collidableTilemap.cellBounds;
-            //    foreach (var tilePos in cellBounds.allPositionsWithin)
-            //    {
-            //        if (collidableTilemap.HasTile(tilePos) == false)
-            //            continue;
-
-            //        int j = tilePos.y - gridBoundsInt.yMin;
-            //        int i = tilePos.x - gridBoundsInt.xMin;
-            //        nodes[j, i].IsWalkable = false;
-            //    }
-            //}
+            foreach(var room in roomEnumerable)
+            {
+                var roolTileCenter = grid.WorldToCell(room.ToVector3());
+                for(int y = (int)(roolTileCenter.y - room.Height / 2f); y < (int)(roolTileCenter.y + room.Height / 2f); y++)
+                {
+                    for (int x = (int)(roolTileCenter.x - room.Width / 2f); x < (int)(roolTileCenter.x + room.Width / 2f); x++)
+                    {
+                        int j = y - gridBoundsInt.yMin;
+                        int i = x - gridBoundsInt.xMin;
+                        try
+                        {
+                            nodes[j, i].IsWalkable = false;
+                            nodes[j, i].Weight = 10;
+                        }
+                        catch
+                        {
+                            Debug.LogError($"grid Size : {gridBoundsInt.size}, index : {i},{j}");
+                        }
+                    }
+                }
+            }
         }
 
         public void Clear()
@@ -53,22 +63,6 @@ namespace GameEngine
                     nodes[j, i].gCost = float.MaxValue;
                 }
             }
-        }
-
-        private BoundsInt GetBoundsIntFromTilemaps(IEnumerable<Tilemap> tilemaps)
-        {
-            BoundsInt totalBounds = default;
-            foreach (var tilemap in tilemaps)
-            {
-                totalBounds.xMin = Mathf.Min(totalBounds.xMin, tilemap.cellBounds.xMin);
-                totalBounds.yMin = Mathf.Min(totalBounds.yMin, tilemap.cellBounds.yMin);
-                totalBounds.xMax = Mathf.Max(totalBounds.xMax, tilemap.cellBounds.xMax);
-                totalBounds.yMax = Mathf.Max(totalBounds.yMax, tilemap.cellBounds.yMax);
-            }
-            totalBounds.zMin = 0;
-            totalBounds.zMax = 1;
-
-            return totalBounds;
         }
 
         public IEnumerable<RoadTileNode> GetNeighbors(RoadTileNode item)
@@ -113,23 +107,25 @@ namespace GameEngine
 
         private void OnDrawGizmos()
         {
+            if (isGizmos == false)
+                return;
 
             Gizmos.DrawWireCube(transform.position + gridBoundsInt.center, gridBoundsInt.size);
             if (nodes == null)
                 return;
 
-            //foreach (var roadTileNode in nodes)
-            //{
-            //    if (roadTileNode == null)
-            //        continue;
+            foreach (var roadTileNode in nodes)
+            {
+                if (roadTileNode == null)
+                    continue;
 
-            //    if (roadTileNode.IsWalkable)
-            //        Gizmos.color = Color.white;
-            //    else
-            //        Gizmos.color = Color.black;
+                if (roadTileNode.Weight > 1f)
+                    Gizmos.color = Color.white;
+                else
+                    Gizmos.color = Color.black;
 
-            //    Gizmos.DrawCube(roadTileNode.ToVector3(), Vector3.one);
-            //}
+                Gizmos.DrawCube(roadTileNode.ToVector3(), Vector3.one);
+            }
         }
     }
 }

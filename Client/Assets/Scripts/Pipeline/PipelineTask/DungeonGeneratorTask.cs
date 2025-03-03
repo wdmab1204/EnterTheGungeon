@@ -39,10 +39,10 @@ namespace GameEngine.Pipeline
 
             while (sample > 0)
             {
-                Vector2 pos = new((int)rand.NextDouble(), (int)rand.NextDouble());
+                Vector2 pos = new((int)rand.NextDouble() - .5f, (int)rand.NextDouble() - .5f);
                 var room = roomList[Random.Range(0, roomList.Count)].GetComponent<Room>();
                 var tilemaps = room.GetComponentsInChildren<Tilemap>();
-                var size = GameUtil.GetSizeFromTilemaps(tilemaps);
+                var size = GameUtil.GetBoundsIntFromTilemaps(tilemaps).size;
 
                 Rectangle rect = new(pos, size.x, size.y);
                 if (CanBuild(DungeonGraph.Vertices, rect))
@@ -58,9 +58,21 @@ namespace GameEngine.Pipeline
 
         private void AutoBuildEdges()
         {
+            var vertices = DungeonGraph.Vertices;
+
+            if (vertices.Count == 2)
+            {
+                var firstNode = vertices.First();
+                var lastNode = vertices.Last();
+                RoomEdge edge = new(firstNode, lastNode, Vector3.Distance(firstNode.ToVector3(), lastNode.ToVector3()));
+                DungeonGraph.AddEdge(firstNode, edge);
+                return;
+            }
+
             //var triangles = Triangulation.TriangulatePoints(DungeonGraph.Vertices.Select(v => new Vertex(v.ToVector3())).ToList());
             var triangles = Triangulation.TriangulateByFlippingEdges(DungeonGraph.Vertices.Select(v => v.ToVector3()).ToList());
             HashSet<RoomEdge> edges = new();
+
             foreach(var tri in triangles)
             {
                 var v1Pos = tri.v1.position;

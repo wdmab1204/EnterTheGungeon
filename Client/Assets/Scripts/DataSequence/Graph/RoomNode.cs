@@ -46,11 +46,13 @@ namespace GameEngine.DataSequence.Graph
     {
         public float gCost { get; set; } = float.MaxValue;
         public float hCost { get; set; }
+        public float fCost => gCost + hCost;
         public int ID { get; set; }
         public float X { get; set; }
         public float Y { get; set; }
         public bool IsWalkable { get; set; }
         public Vector3Int CellPosition { get; set; }
+        public float Weight { get; set; }
 
         public RoadTileNode(Vector2 pos, Vector3Int cellPosition)
         {
@@ -73,17 +75,11 @@ namespace GameEngine.DataSequence.Graph
 
         public int CompareTo(RoadTileNode other)
         {
-            int fCostComp = gCost.CompareTo(other.gCost);
-            if (fCostComp == 0)
-            {
-                int xComp = X.CompareTo(other.X);
-                if(xComp == 0)
-                    return Y.CompareTo(other.Y);
-                else
-                    return xComp;
-            }
-            else
-                return fCostComp;
+            int compare = fCost.CompareTo(other.fCost);
+            if (compare == 0)
+                compare = hCost.CompareTo(other.hCost);
+
+            return compare;
         }
     }
 }

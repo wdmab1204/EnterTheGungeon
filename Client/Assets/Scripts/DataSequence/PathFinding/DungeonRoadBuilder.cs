@@ -63,20 +63,22 @@ namespace GameEngine.DataSequence.PathFinding
 
                 foreach (var next in grid.GetNeighbors(curNode))
                 {
-                    if (visited.Contains(next))
+                    if (pq.Contain(next))
                         continue;
 
-                    float nextGCost = 0f;
+                    float nextHCost = Vector3.Distance(dst.ToVector3(), next.ToVector3());
                     if (IsTurning(parentMap.GetValueOrDefault(curNode, curNode).ToVector3(), curNode.ToVector3(), next.ToVector3()))
                     {
-                        nextGCost += 500;
+                        nextHCost += 50f;
                     }
-                    float nextHCost = Vector3.Distance(dst.ToVector3(), next.ToVector3());
+                    float nextGCost = curNode.gCost + nextHCost + next.Weight;
                     if (nextGCost < next.gCost)
                     {
                         next.gCost = nextGCost;
+                        next.hCost = nextHCost;
                         parentMap[next] = curNode;
-                        pq.Enqueue(next);
+                        if (!pq.Contain(next))
+                            pq.Enqueue(next);
                     }
                 }
 

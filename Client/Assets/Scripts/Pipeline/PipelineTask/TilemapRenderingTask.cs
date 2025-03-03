@@ -15,6 +15,12 @@ namespace GameEngine.Pipeline
         public DungeonGeneratorPayLoad PayLoad { get; set; }
         private Grid unityGrid;
         private GameGrid gameGrid;
+        private bool showGizmos;
+
+        public TilemapRenderingTask(bool showGizmos)
+        {
+            this.showGizmos = showGizmos;
+        }
 
         public IEnumerator Process()
         {
@@ -27,8 +33,6 @@ namespace GameEngine.Pipeline
             var destinationTilemaps = tilemapRoot.GetComponentsInChildren<Tilemap>();
             var graph = PayLoad.DungeonGraph;
 
-            
-
             foreach (var vertex in graph.Vertices)
             {
                 var sourceTilemaps = vertex.Prefab.GetComponentsInChildren<Tilemap>();
@@ -37,21 +41,20 @@ namespace GameEngine.Pipeline
                 yield return null;
             }
 
-            gameGrid.CreateGrid(unityGrid);
-            DungeonRoadBuilder roader = new(Comparer<RoadTileNode>.Default, gameGrid);
-            var pathResult = roader.GetMinPath(gameGrid.gridBoundsInt.min, new(gameGrid.gridBoundsInt.xMax - 1, gameGrid.gridBoundsInt.yMax - 1));
-            if (pathResult != null)
-                GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(path => path.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
-            //foreach (var edge in graph.Edges)
-            //{
-            //    var node1 = edge.From;
-            //    var node2 = edge.To;
-            //    var pathResult = roader.GetMinPath(node1.ToVector3(), node2.ToVector3());
-            //    if (pathResult == null)
-            //        continue;
+            gameGrid.CreateGrid(unityGrid, graph.Vertices);
+            gameGrid.isGizmos = showGizmos;
+            DungeonRoadBuilder roadBuilder = new(Comparer<RoadTileNode>.Default, gameGrid);
 
-            //    GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(path => path.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
-            //}
+            foreach (var edge in graph.Edges)
+            {
+                var node1 = edge.From;
+                var node2 = edge.To;
+                var pathResult = roadBuilder.GetMinPath(node1.ToVector3(), node2.ToVector3());
+                if (pathResult == null)
+                    continue;
+
+                GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(path => path.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+            }
         }
 
         private void InitializeTilemap(GameObject tilemapRoot)
@@ -85,7 +88,7 @@ namespace GameEngine.Pipeline
 
         public static void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3 roomPosition, Func<Vector3, Vector3Int> getCellPosition)
         {
-            Vector3 tilemapCenter = GameUtil.GetCenterFromTilemaps(sourceTilemaps);
+            Vector3 tilemapCenter = GameUtil.GetBoundsIntFromTilemaps(sourceTilemaps).center;
 
             foreach (var sourceTilemap in sourceTilemaps)
             {

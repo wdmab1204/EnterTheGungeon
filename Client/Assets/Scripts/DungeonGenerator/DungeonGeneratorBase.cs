@@ -8,6 +8,8 @@ namespace GameEngine
     {
         public RoomTemplates RoomTemplates;
 
+        public bool ShowGizmos;
+
         public int RoomCount;
 
         private PipelineRunner<DungeonGeneratorPayLoad> pipelineRunner = new();
@@ -43,7 +45,7 @@ namespace GameEngine
             var pipelineItems = new List<IPipelineTask<DungeonGeneratorPayLoad>>()
             {
                 new DungeonGeneratorTask(RoomCount),
-                new TilemapRenderingTask(),
+                new TilemapRenderingTask(ShowGizmos),
                 new GraphRenderingTask(),
             };
             return pipelineItems;

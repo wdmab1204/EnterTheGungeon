@@ -15,6 +15,7 @@ namespace GameEngine.Editor
             EditorGUILayout.LabelField("Dungeon config", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(DungeonGeneratorBase.RoomTemplates)));
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(DungeonGeneratorBase.RoomCount)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(DungeonGeneratorBase.ShowGizmos)));
 
             serializedObject.ApplyModifiedProperties();
 

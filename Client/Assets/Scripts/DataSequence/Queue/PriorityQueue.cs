@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using UnityEngine;
 
 namespace Assets.Scripts.DataSequence.Queue
 {
@@ -20,8 +20,6 @@ namespace Assets.Scripts.DataSequence.Queue
 
         public void Enqueue(T item)
         {
-            if (sortedSet.Contains(item))
-                UnityEngine.Debug.LogError($"Dup Item!!");
             sortedSet.Add(item);
         }
 

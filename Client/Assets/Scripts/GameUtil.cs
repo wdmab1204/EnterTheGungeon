@@ -68,47 +68,28 @@ namespace GameEngine
             return defaultValue;
         }
 
-        public static Vector2Int GetSizeFromTilemaps(IEnumerable<Tilemap> tilemaps)
+        public static BoundsInt GetBoundsIntFromTilemaps(IEnumerable<Tilemap> tilemaps)
         {
-            var minX = int.MaxValue;
-            var minY = int.MaxValue;
-            var maxX = int.MinValue;
-            var maxY = int.MinValue;
-
-            foreach (var tilemap in tilemaps)
+            var enumerator = tilemaps.GetEnumerator();
+            if (!enumerator.MoveNext())
             {
-                tilemap.CompressBounds();
-                var cellbounds = tilemap.cellBounds;
-
-                if (minX > cellbounds.xMin) minX = cellbounds.xMin;
-                if (minY > cellbounds.yMin) minY = cellbounds.yMin;
-                if (maxX < cellbounds.xMax) maxX = cellbounds.xMax;
-                if (maxY < cellbounds.yMax) maxY = cellbounds.yMax;
+                throw new ArgumentException("Tilemaps collection is empty");
             }
 
-            Vector2Int size = new(maxX - minX, maxY - minY);
-            return size;
-        }
-
-        public static Vector3 GetCenterFromTilemaps(IEnumerable<Tilemap> tilemaps)
-        {
-            var minX = int.MaxValue;
-            var minY = int.MaxValue;
-            var maxX = int.MinValue;
-            var maxY = int.MinValue;
-
-            foreach (var tilemap in tilemaps)
+            BoundsInt totalBounds = enumerator.Current.cellBounds;
+            while (enumerator.MoveNext())
             {
-                var cellbounds = tilemap.cellBounds;
-
-                if (minX > cellbounds.xMin) minX = cellbounds.xMin;
-                if (minY > cellbounds.yMin) minY = cellbounds.yMin;
-                if (maxX < cellbounds.xMax) maxX = cellbounds.xMax;
-                if (maxY < cellbounds.yMax) maxY = cellbounds.yMax;
+                var tilemap = enumerator.Current;
+                totalBounds.xMin = Mathf.Min(totalBounds.xMin, tilemap.cellBounds.xMin);
+                totalBounds.yMin = Mathf.Min(totalBounds.yMin, tilemap.cellBounds.yMin);
+                totalBounds.xMax = Mathf.Max(totalBounds.xMax, tilemap.cellBounds.xMax);
+                totalBounds.yMax = Mathf.Max(totalBounds.yMax, tilemap.cellBounds.yMax);
+                totalBounds.zMin = Mathf.Max(totalBounds.zMin, tilemap.cellBounds.zMin);
+                totalBounds.zMax = Mathf.Max(totalBounds.zMax, tilemap.cellBounds.zMax);
             }
 
-            Vector3 size = new((maxX + minX) / 2f, (maxY + minY) / 2f);
-            return size;
+            return totalBounds;
         }
+
     }
 }
