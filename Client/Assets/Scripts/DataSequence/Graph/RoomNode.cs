@@ -7,15 +7,28 @@ namespace GameEngine.DataSequence.Graph
 {
     public class RoomNode : GeomertyNode, IEquatable<RoomNode>
     {
-        public float Width { get; set; }
-        public float Height { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         public GameObject Prefab { get; set; }
 
-        public RoomNode(Vector3 position, float width, float height, GameObject prefab) : base(position)
+        public RoomNode(Vector3 position, int width, int height, GameObject prefab) : base(position)
         {
             Width = width;
             Height = height;
             Prefab = prefab;
+        }
+
+        public Vector3 GetCenter()
+        {
+            return new Vector3(X + Width / 2f, Y + Height / 2f);
+        }
+
+        public Vector3 GetCenterInt()
+        {
+            var center = GetCenter();
+            center.x = (int)center.x;
+            center.y = (int)center.y;
+            return center;
         }
 
         public bool Equals(RoomNode other)

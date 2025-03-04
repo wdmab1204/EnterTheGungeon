@@ -39,9 +39,11 @@ namespace GameEngine.Pipeline
 
             while (sample > 0)
             {
-                Vector2 pos = new((int)rand.NextDouble() - .5f, (int)rand.NextDouble() - .5f);
+                Vector2 pos = new((int)rand.NextDouble(), (int)rand.NextDouble());
                 var room = roomList[Random.Range(0, roomList.Count)].GetComponent<Room>();
                 var tilemaps = room.GetComponentsInChildren<Tilemap>();
+                foreach (var tilemap in tilemaps)
+                    tilemap.CompressBounds();
                 var size = GameUtil.GetBoundsIntFromTilemaps(tilemaps).size;
 
                 Rectangle rect = new(pos, size.x, size.y);
@@ -104,7 +106,7 @@ namespace GameEngine.Pipeline
 
             foreach (var other in vertices)
             {
-                if (rect.IsColliding(new Rectangle(other.ToVector3(), other.Width, other.Height)))
+                if (rect.IsColliding(new Rectangle(other.GetCenter(), other.Width, other.Height)))
                 {
                     canCollide = true;
                     break;

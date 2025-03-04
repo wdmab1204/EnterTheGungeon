@@ -36,7 +36,7 @@ namespace GameEngine.Pipeline
             foreach (var vertex in graph.Vertices)
             {
                 var sourceTilemaps = vertex.Prefab.GetComponentsInChildren<Tilemap>();
-                CopyTiles(sourceTilemaps, destinationTilemaps, vertex.ToVector3(), unityGrid.WorldToCell);
+                CopyTiles(sourceTilemaps, destinationTilemaps, vertex.ToVector3Int(), unityGrid.WorldToCell);
 
                 yield return null;
             }
@@ -49,10 +49,12 @@ namespace GameEngine.Pipeline
             {
                 var node1 = edge.From;
                 var node2 = edge.To;
-                var pathResult = roadBuilder.GetMinPath(node1.ToVector3(), node2.ToVector3());
+                var pathResult = roadBuilder.GetMinPath(node1.GetCenter(), node2.GetCenter());
                 if (pathResult == null)
                     continue;
 
+                foreach(var path in pathResult)
+                    path.IsWalkable = false;
                 GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(path => path.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
             }
         }
@@ -86,7 +88,7 @@ namespace GameEngine.Pipeline
             obj.GetOrAddComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         }
 
-        public static void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3 roomPosition, Func<Vector3, Vector3Int> getCellPosition)
+        public static void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3Int bottomLeft, Func<Vector3, Vector3Int> getCellPosition)
         {
             Vector3 tilemapCenter = GameUtil.GetBoundsIntFromTilemaps(sourceTilemaps).center;
 
@@ -95,7 +97,7 @@ namespace GameEngine.Pipeline
                 var destinationTilemap = destinationTilemaps.FirstOrDefault(dest => dest.name == sourceTilemap.name);
                 if (destinationTilemap == null)
                     continue;
-                sourceTilemap.CompressBounds();
+
                 var sourceTilemapCellBounds = sourceTilemap.cellBounds;
 
                 foreach (var tilePosition in sourceTilemapCellBounds.allPositionsWithin)
@@ -104,7 +106,7 @@ namespace GameEngine.Pipeline
                     if (tile == null)
                         continue;
 
-                    var cellPosition = getCellPosition(tilePosition + roomPosition - tilemapCenter);
+                    var cellPosition = getCellPosition(tilePosition + bottomLeft);
                     destinationTilemap.SetTile(cellPosition, tile);
                 }
             }

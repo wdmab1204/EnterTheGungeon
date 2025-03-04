@@ -33,10 +33,16 @@ namespace GameEngine.DataSequence.PathFinding
             return GetMinPath(source, destination);
         }
 
+        //Get Shortest Path at minimum turns and ignore src and dst.
         public IEnumerable<RoadTileNode> GetMinPath(RoadTileNode src, RoadTileNode dst)
         {
+            if (src.IsWalkable == false || dst.IsWalkable == false)
+            {
+                Debug.LogError($"Source or Destination is Blocked : src : {src.ToVector3()}, dst : {dst.ToVector3()}");
+                return null;
+            }
+
             List<RoadTileNode> pathList = new();
-            HashSet<RoadTileNode> visited = new();
             Dictionary<RoadTileNode, RoadTileNode> parentMap = new();
             pq.Clear();
 
@@ -46,17 +52,16 @@ namespace GameEngine.DataSequence.PathFinding
             while (!pq.IsEmpty() && safety > 0)
             {
                 var curNode = pq.Dequeue();
-                visited.Add(curNode);
 
                 if (curNode.Equals(dst))
                 {
+                    curNode = parentMap[curNode];
                     while (!curNode.Equals(src))
                     {
                         pathList.Add(curNode);
                         curNode = parentMap[curNode];
                     }
 
-                    pathList.Add(src);
                     pathList.Reverse();
                     return pathList;
                 }
@@ -64,6 +69,9 @@ namespace GameEngine.DataSequence.PathFinding
                 foreach (var next in grid.GetNeighbors(curNode))
                 {
                     if (pq.Contain(next))
+                        continue;
+
+                    if (next.IsWalkable == false)
                         continue;
 
                     float nextHCost = Vector3.Distance(dst.ToVector3(), next.ToVector3());

@@ -33,11 +33,15 @@ namespace GameEngine
 
             foreach(var room in roomEnumerable)
             {
-                var roolTileCenter = grid.WorldToCell(room.ToVector3());
-                for(int y = (int)(roolTileCenter.y - room.Height / 2f); y < (int)(roolTileCenter.y + room.Height / 2f); y++)
+                var center = grid.WorldToCell(room.GetCenter());
+
+                for(int y = (int)room.Y; y < (int)(room.Y + room.Height); y++)
                 {
-                    for (int x = (int)(roolTileCenter.x - room.Width / 2f); x < (int)(roolTileCenter.x + room.Width / 2f); x++)
+                    for (int x = (int)room.X; x < (int)(room.X + room.Width); x++)
                     {
+                        if (x == center.x || y == center.y)
+                            continue;
+
                         int j = y - gridBoundsInt.yMin;
                         int i = x - gridBoundsInt.xMin;
                         try
@@ -119,7 +123,7 @@ namespace GameEngine
                 if (roadTileNode == null)
                     continue;
 
-                if (roadTileNode.Weight > 1f)
+                if (roadTileNode.IsWalkable == false)
                     Gizmos.color = Color.white;
                 else
                     Gizmos.color = Color.black;
