@@ -2,6 +2,7 @@ using GameEngine.DataSequence.Geometry;
 using GameEngine.DataSequence.Graph;
 using GameEngine.DataSequence.Tree;
 using GameEngine.MapGenerator.Room;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace GameEngine.Pipeline
     {
         public DungeonGeneratorPayLoad PayLoad { get; set; }
         private int roomCount;
+        private const int roomPadding = 1;
 
         private DungeonGraph DungeonGraph => PayLoad.DungeonGraph;
 
@@ -36,20 +38,29 @@ namespace GameEngine.Pipeline
             var rand = PayLoad.Random;
             int sample = roomCount;
             var roomList = PayLoad.RoomTemplates;
+            int gridCellSize = PayLoad.GridCellSize;
 
             while (sample > 0)
             {
-                Vector2 pos = new((int)rand.NextDouble(), (int)rand.NextDouble());
-                var room = roomList[Random.Range(0, roomList.Count)].GetComponent<Room>();
+                var randPosX = rand.NextDouble();
+                var randPosY = rand.NextDouble();
+
+                int randCellPosX = (int)(Math.Round(randPosX / gridCellSize) * gridCellSize);
+                int randCellPosY = (int)(Math.Round(randPosY / gridCellSize) * gridCellSize);
+
+                Vector2 cellPosition = new(randCellPosX, randCellPosY);
+                var room = roomList[UnityEngine.Random.Range(0, roomList.Count)].GetComponent<Room>();
                 var tilemaps = room.GetComponentsInChildren<Tilemap>();
                 foreach (var tilemap in tilemaps)
                     tilemap.CompressBounds();
-                var size = GameUtil.GetBoundsIntFromTilemaps(tilemaps).size;
+                Vector3Int size = GameUtil.GetBoundsIntFromTilemaps(tilemaps).size;
 
-                Rectangle rect = new(pos, size.x, size.y);
-                if (CanBuild(DungeonGraph.Vertices, rect))
+                Vector3Int roomBottomLeft = new((int)(cellPosition.x - roomPadding), (int)(cellPosition.y - roomPadding));
+                Vector3Int roomTopRight = new((int)(cellPosition.x + size.x + roomPadding), (int)(cellPosition.y + size.y + roomPadding));
+
+                if (CanBuild(DungeonGraph.Vertices, roomBottomLeft, roomTopRight))
                 {
-                    RoomNode roomNode = new(pos, size.x, size.y, room.gameObject);
+                    RoomNode roomNode = new(cellPosition, size.x, size.y, room.gameObject);
                     DungeonGraph.AddNode(roomNode);
                     sample--;
                 }
@@ -100,17 +111,20 @@ namespace GameEngine.Pipeline
             }
         }
 
-        private bool CanBuild(IEnumerable<RoomNode> vertices, Rectangle rect)
+        private bool CanBuild(IEnumerable<RoomNode> vertices, Vector3Int roomBottomLeft, Vector3Int roomTopRight)
         {
             bool canCollide = false;
 
-            foreach (var other in vertices)
+            Vector3Int min = roomBottomLeft;
+            Vector3Int max = roomTopRight;
+            foreach (var otherNode in vertices)
             {
-                if (rect.IsColliding(new Rectangle(other.GetCenter(), other.Width, other.Height)))
-                {
+                Vector3Int otherMin = otherNode.ToVector3Int();
+                otherMin.x -= roomPadding;
+                otherMin.y -= roomPadding;
+                Vector3Int otherMax = new Vector3Int(otherMin.x + otherNode.Width + roomPadding, otherMin.y + otherNode.Height + roomPadding);
+                if (MathUtility.AABB(min, max, otherMin, otherMax))
                     canCollide = true;
-                    break;
-                }
             }
 
             return canCollide == false;

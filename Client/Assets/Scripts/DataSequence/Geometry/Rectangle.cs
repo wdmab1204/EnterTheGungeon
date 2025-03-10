@@ -20,9 +20,9 @@ namespace GameEngine.DataSequence.Geometry
         public Rectangle(Vector2 center, float width, float height)
         {
             a = new(center.x - width / 2f, center.y + height / 2f);
-            b = new(center.x - width / 2f, center.y - height / 2f);
+            b = center - new Vector2(width / 2, height / 2);
             c = new(center.x + width / 2f, center.y - height / 2f);
-            d = new(center.x + width / 2f, center.y + height / 2f);
+            d = center + new Vector2(width / 2, height / 2);
         }
 
         public bool IsColliding(Rectangle other)

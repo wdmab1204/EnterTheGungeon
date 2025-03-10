@@ -32,6 +32,12 @@ namespace GameEngine.Pipeline
 
             var destinationTilemaps = tilemapRoot.GetComponentsInChildren<Tilemap>();
             var graph = PayLoad.DungeonGraph;
+            var gridCellSize = PayLoad.GridCellSize;
+            var gridBoundsInt = graph.GetBoundsInt(gridCellSize);
+
+            Vector3Int gridWorldPosition = graph.GetBottomLeftPos();
+
+            gameGrid.transform.position = gridWorldPosition;
 
             foreach (var vertex in graph.Vertices)
             {
@@ -41,9 +47,10 @@ namespace GameEngine.Pipeline
                 yield return null;
             }
 
-            gameGrid.CreateGrid(unityGrid, graph.Vertices);
+
+            gameGrid.CreateGrid(graph.Vertices, gridCellSize, gridBoundsInt);
             gameGrid.isGizmos = showGizmos;
-            DungeonRoadBuilder roadBuilder = new(Comparer<RoadTileNode>.Default, gameGrid);
+            DungeonRoadBuilder roadBuilder = new(Comparer<GridCell>.Default, gameGrid);
 
             foreach (var edge in graph.Edges)
             {
@@ -53,9 +60,9 @@ namespace GameEngine.Pipeline
                 if (pathResult == null)
                     continue;
 
-                foreach(var path in pathResult)
-                    path.IsWalkable = false;
-                GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(path => path.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+                foreach (GridCell cell in pathResult)
+                    cell.IsWalkable = false;
+                //GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(cell => cell.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
             }
         }
 

@@ -9,41 +9,38 @@ namespace GameEngine.DataSequence.PathFinding
     internal class DungeonRoadBuilder
     {
         private GameGrid grid;
-        private RoadTileNode destination;
-        private Dictionary<RoadTileNode, Vector3> directions = new();
+        private GridCell destination;
 
-        private PriorityQueue<RoadTileNode> pq;
+        private PriorityQueue<GridCell> pq;
         protected int safety;
 
-        public DungeonRoadBuilder(IComparer<RoadTileNode> comparer, GameGrid grid)
+        public DungeonRoadBuilder(IComparer<GridCell> comparer, GameGrid grid)
         {
             this.grid = grid;
             this.safety = grid.gridBoundsInt.size.x * grid.gridBoundsInt.size.y * 10;
-            pq = new PriorityQueue<RoadTileNode>(comparer);
+            pq = new PriorityQueue<GridCell>(comparer);
         }
 
-        public IEnumerable<RoadTileNode> GetMinPath(Vector3 from, Vector3 to)
+        public IEnumerable<GridCell> GetMinPath(Vector3 from, Vector3 to)
         {
-            directions.Clear();
             grid.Clear();
 
-            RoadTileNode source = grid.GetTile(from);
-            destination = grid.GetTile(to);
-            directions[source] = Vector3.zero;
+            GridCell source = grid.GetCell(from);
+            destination = grid.GetCell(to);
             return GetMinPath(source, destination);
         }
 
         //Get Shortest Path at minimum turns and ignore src and dst.
-        public IEnumerable<RoadTileNode> GetMinPath(RoadTileNode src, RoadTileNode dst)
+        public IEnumerable<GridCell> GetMinPath(GridCell src, GridCell dst)
         {
-            if (src.IsWalkable == false || dst.IsWalkable == false)
-            {
-                Debug.LogError($"Source or Destination is Blocked : src : {src.ToVector3()}, dst : {dst.ToVector3()}");
-                return null;
-            }
+            //if (src.IsWalkable == false || dst.IsWalkable == false)
+            //{
+            //    Debug.LogError($"Source or Destination is Blocked : src : {src.ToVector3()}, dst : {dst.ToVector3()}");
+            //    return null;
+            //}
 
-            List<RoadTileNode> pathList = new();
-            Dictionary<RoadTileNode, RoadTileNode> parentMap = new();
+            List<GridCell> pathList = new();
+            Dictionary<GridCell, GridCell> parentMap = new();
             pq.Clear();
 
             src.gCost = 0;
@@ -62,6 +59,7 @@ namespace GameEngine.DataSequence.PathFinding
                         curNode = parentMap[curNode];
                     }
 
+                    //pathList.Add(src);
                     pathList.Reverse();
                     return pathList;
                 }

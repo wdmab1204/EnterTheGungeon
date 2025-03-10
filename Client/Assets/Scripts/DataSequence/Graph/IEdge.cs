@@ -33,10 +33,10 @@ namespace GameEngine.DataSequence.Graph
         }
     }
 
-    public class RoadEdge : IEdge<RoadTileNode>
+    public class RoadEdge : IEdge<GridCell>
     {
-        public RoadTileNode From { get; set; }
-        public RoadTileNode To { get; set; }
+        public GridCell From { get; set; }
+        public GridCell To { get; set; }
         public float Weight { get; set; }
     }
 }

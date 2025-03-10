@@ -56,5 +56,10 @@ namespace GameEngine
 
             return isWithinTriangle;
         }
+
+        public static bool AABB(Vector3 r1Min, Vector3 r1Max, Vector3 r2Min, Vector3 r2Max)
+        {
+            return r1Max.x > r2Min.x && r1Min.x < r2Max.x && r1Max.y > r2Min.y && r1Min.y < r2Max.y;
+        }
     }
 }

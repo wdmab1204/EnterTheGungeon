@@ -15,5 +15,6 @@ namespace GameEngine.Pipeline
         public DungeonGraph DungeonGraph { get; set; } = new();
         public GameObject RootGameObject { get; set; }
         public RoomTemplates roomTemplates { get; set; }
+        public int GridCellSize;
     }
 }

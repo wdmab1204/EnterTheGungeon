@@ -55,7 +55,7 @@ namespace GameEngine.DataSequence.Graph
         }
     }
 
-    public class RoadTileNode : IGeomertyNode, IPathNode, IEquatable<RoadTileNode>, IComparable<RoadTileNode>
+    public class GridCell : IGeomertyNode, IPathNode, IEquatable<GridCell>, IComparable<GridCell>
     {
         public float gCost { get; set; } = float.MaxValue;
         public float hCost { get; set; }
@@ -67,26 +67,26 @@ namespace GameEngine.DataSequence.Graph
         public Vector3Int CellPosition { get; set; }
         public float Weight { get; set; }
 
-        public RoadTileNode(Vector2 pos, Vector3Int cellPosition)
+        public GridCell(Vector2 pos, Vector3Int cellPosition)
         {
             X = pos.x;
             Y = pos.y;
             CellPosition = cellPosition;
         }
 
-        public RoadTileNode()
+        public GridCell()
         {
             X = 0f;
             Y = 0f;
             CellPosition = default;
         }
 
-        public bool Equals(RoadTileNode other)
+        public bool Equals(GridCell other)
         {
             return this.ToVector3() == other.ToVector3();
         }
 
-        public int CompareTo(RoadTileNode other)
+        public int CompareTo(GridCell other)
         {
             int compare = fCost.CompareTo(other.fCost);
             if (compare == 0)

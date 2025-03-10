@@ -18,10 +18,11 @@ namespace GameEngine
         {
             var payLoad = new DungeonGeneratorPayLoad()
             {
-                Random = new DataSequence.Random.NormalDistribution(new System.Random(), 0, 32),
+                Random = new DataSequence.Random.NormalDistribution(new System.Random(), 0, 8),
                 RoomTemplates = RoomTemplates.roomList,
                 roomTemplates = RoomTemplates,
                 RootGameObject = this.gameObject,
+                GridCellSize = 5,
             };
 
             var rootTransform = payLoad.RootGameObject.transform;
