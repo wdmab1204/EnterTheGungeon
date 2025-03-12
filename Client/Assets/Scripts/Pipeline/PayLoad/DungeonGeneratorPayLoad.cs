@@ -1,7 +1,5 @@
-using GameEngine.DataSequence.Geometry;
 using GameEngine.DataSequence.Graph;
 using GameEngine.DataSequence.Random;
-using GameEngine.MapGenerator.Room;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,10 +9,14 @@ namespace GameEngine.Pipeline
     {
         public NormalDistribution Random { get; set; }
         public List<GameObject> RoomTemplates { get; set; }
-        public List<(Rectangle rect, Room room)> RoomShapes { get; set; }
+        public GameObject HorizonRoad { get; set; }
+        public GameObject VerticalRoad { get; set; }
+        public GameObject LeftTopRoad { get; set; }
+        public GameObject LeftBottomRoad { get; set; }
+        public GameObject RightTopRoad { get; set; }
+        public GameObject RightBottomRoad { get; set; }
         public DungeonGraph DungeonGraph { get; set; } = new();
         public GameObject RootGameObject { get; set; }
-        public RoomTemplates roomTemplates { get; set; }
         public int GridCellSize;
     }
 }

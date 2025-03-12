@@ -55,7 +55,13 @@ namespace GameEngine.DataSequence.PathFinding
                     curNode = parentMap[curNode];
                     while (!curNode.Equals(src))
                     {
-                        pathList.Add(curNode);
+                        if (curNode.CellType == CellType.None)
+                        {
+                            curNode.CellType = CellType.Road;
+                            curNode.IsWalkable = false;
+                            pathList.Add(curNode);
+                        }
+                            
                         curNode = parentMap[curNode];
                     }
 
@@ -100,23 +106,8 @@ namespace GameEngine.DataSequence.PathFinding
 
         private bool IsTurning(Vector3 v1, Vector3 v2, Vector3 v3)
         {
-            float x1 = v1.x;
-            float x2 = v2.x;
-            float x3 = v3.x;
-
-            float y1 = v1.y;
-            float y2 = v2.y;
-            float y3 = v3.y;
-
-            Vector2 AB = new Vector2(x2 - x1, y2 - y1);
-
-            Vector2 BC = new Vector2(x3 - x2, y3 - y2);
-
-            float dot = Vector2.Dot(AB, BC);
-            float det = AB.x * BC.y - AB.y * BC.x;
-            float angle = Mathf.Abs(Mathf.Atan2(det, dot));
-
-            return angle < 2.96f && angle > 0.17f;
+            float rad = MathUtility.GetRadianFrom3Points(v1, v2, v3);
+            return rad < 2.96f && rad > 0.17f;
         }
     }
 }

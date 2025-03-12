@@ -7,11 +7,11 @@ namespace GameEngine
     public class RoomTemplates : ScriptableObject
     {
         public List<GameObject> roomList = new();
-        public List<GameObject> verticalRoadList = new();
-        public List<GameObject> horizontalRoadList = new();
-        public GameObject leftdownCorner;
-        public GameObject leftupCorner;
-        public GameObject rightdownCorner;
-        public GameObject rightupCorner;
+        public GameObject horizonRoad;
+        public GameObject verticalRoad;
+        public GameObject leftTopRoad;
+        public GameObject leftBottomRoad;
+        public GameObject rightTopRoad;
+        public GameObject rightBottomRoad;
     }
 }

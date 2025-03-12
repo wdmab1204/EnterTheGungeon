@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomList:
   - {fileID: 8531459648525885223, guid: 5933e81fc3620a141860c21ec2e713f7, type: 3}
-  verticalRoadList: []
-  horizontalRoadList: []
-  leftdownCorner: {fileID: 0}
-  leftupCorner: {fileID: 0}
-  rightdownCorner: {fileID: 0}
-  rightupCorner: {fileID: 0}
+  - {fileID: 8531459648525885223, guid: 49c5ae5245b6b0b41baa58ef1b864915, type: 3}
+  horizonRoad: {fileID: 8531459648525885223, guid: 2de2ca803ecbcb249b5fed097e12b18c, type: 3}
+  verticalRoad: {fileID: 8531459648525885223, guid: bf5d950bfb688244982a155bc3b88483, type: 3}
+  leftTopRoad: {fileID: 0}
+  leftBottomRoad: {fileID: 0}
+  rightTopRoad: {fileID: 0}
+  rightBottomRoad: {fileID: 0}

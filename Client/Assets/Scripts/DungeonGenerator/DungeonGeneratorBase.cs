@@ -20,7 +20,12 @@ namespace GameEngine
             {
                 Random = new DataSequence.Random.NormalDistribution(new System.Random(), 0, 8),
                 RoomTemplates = RoomTemplates.roomList,
-                roomTemplates = RoomTemplates,
+                VerticalRoad = RoomTemplates.verticalRoad,
+                HorizonRoad = RoomTemplates.horizonRoad,
+                LeftBottomRoad = RoomTemplates.leftBottomRoad,
+                LeftTopRoad = RoomTemplates.leftTopRoad,
+                RightTopRoad = RoomTemplates.rightTopRoad,
+                RightBottomRoad = RoomTemplates.rightBottomRoad,
                 RootGameObject = this.gameObject,
                 GridCellSize = 5,
             };

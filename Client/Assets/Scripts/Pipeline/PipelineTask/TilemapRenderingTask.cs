@@ -12,6 +12,7 @@ namespace GameEngine.Pipeline
 {
     public class TilemapRenderingTask : IPipelineTask<DungeonGeneratorPayLoad>
     {
+
         public DungeonGeneratorPayLoad PayLoad { get; set; }
         private Grid unityGrid;
         private GameGrid gameGrid;
@@ -60,10 +61,73 @@ namespace GameEngine.Pipeline
                 if (pathResult == null)
                     continue;
 
-                foreach (GridCell cell in pathResult)
-                    cell.IsWalkable = false;
-                //GameUtil.CreateLineRenderer(Color.red, .2f, pathResult.Select(cell => cell.ToVector3()).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+                GridCell srcCell = gameGrid.GetCell(node1.GetCenter());
+                GridCell dstCell = gameGrid.GetCell(node2.GetCenter());
+
+                var pathResultArray = pathResult.ToArray();
+                for (int i = 0; i < pathResultArray.Length; i++)
+                {
+                    GridCell prevCell = i - 1 < 0 ? srcCell : pathResultArray[i - 1];
+                    GridCell curCell = pathResultArray[i];
+                    GridCell nextCell = i + 1 >= pathResultArray.Length ? dstCell : pathResultArray[i + 1];
+
+                    Vector3 prevPos = prevCell.ToVector3();
+                    Vector3 curPos = curCell.ToVector3();
+                    Vector3 nextPos = nextCell.ToVector3();
+;
+                    GameObject roadPrefab = GetRoadPrefab(prevPos, curPos, nextPos);
+                    if (roadPrefab == null)
+                    {
+                        Debug.LogError($"Src : {node1.ToVector3()}, Dst : {node2.ToVector3()}");
+                        continue;
+                    }
+                    Tilemap[] sourceTilemap = roadPrefab.GetComponentsInChildren<Tilemap>();
+                    CopyTiles(sourceTilemap, destinationTilemaps, curCell.ToVector3Int(), unityGrid.WorldToCell);
+                }
             }
+
+            
+        }
+
+        public GameObject GetRoadPrefab(Vector2 p1, Vector2 p2, Vector2 p3)
+        {
+            if(MathUtility.IsTriangleOrientedClockwise(p1, p2, p3) == false)
+            {
+                Vector2 t = p1;
+                p1 = p3;
+                p3 = t;
+            }
+
+            if (p1.x == p2.x && p2.x == p3.x)
+            {
+                return PayLoad.VerticalRoad; // 수직
+            }
+            else if (p1.y == p2.y && p2.y == p3.y)
+            {
+                return PayLoad.HorizonRoad; // 수평
+            }
+
+            else if (p1.y == p2.y && p2.x == p3.x && p3.y > p2.y)
+            {
+                return PayLoad.RightTopRoad; // ㄴ자 모양 (오른쪽 위)
+            }
+
+            else if (p1.y == p2.y && p2.x == p3.x && p2.y > p3.y)
+            {
+                return PayLoad.LeftBottomRoad; // ㄱ자 모양 (왼쪽 아래)
+            }
+
+            else if (p1.x == p2.x && p2.y == p3.y && p3.x > p2.x)
+            {
+                return PayLoad.RightBottomRoad; // ┌자 모양 (오른쪽 아래)
+            }
+
+            else if (p1.x == p2.x && p2.y == p3.y && p2.x > p3.x)
+            {
+                return PayLoad.LeftTopRoad; // ┘자 모양 (왼쪽 위)
+            }
+            Debug.LogError(p1 + ", " + p2 + ", " + p3);
+            return null;
         }
 
         private void InitializeTilemap(GameObject tilemapRoot)
@@ -95,7 +159,7 @@ namespace GameEngine.Pipeline
             obj.GetOrAddComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         }
 
-        public static void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3Int bottomLeft, Func<Vector3, Vector3Int> getCellPosition)
+        public void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3Int bottomLeft, Func<Vector3, Vector3Int> getCellPosition)
         {
             Vector3 tilemapCenter = GameUtil.GetBoundsIntFromTilemaps(sourceTilemaps).center;
 
@@ -115,6 +179,17 @@ namespace GameEngine.Pipeline
 
                     var cellPosition = getCellPosition(tilePosition + bottomLeft);
                     destinationTilemap.SetTile(cellPosition, tile);
+                }
+            }
+        }
+
+        private void RemoveTiles(IEnumerable<Tilemap> worldTilemaps, IEnumerable<Vector3Int> cellTilePositions)
+        {
+            foreach(var tilemap in worldTilemaps)
+            {
+                foreach(var cellTilePosition in cellTilePositions)
+                {
+                    tilemap.SetTile(cellTilePosition, null);
                 }
             }
         }

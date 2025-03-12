@@ -61,5 +61,26 @@ namespace GameEngine
         {
             return r1Max.x > r2Min.x && r1Min.x < r2Max.x && r1Max.y > r2Min.y && r1Min.y < r2Max.y;
         }
+
+        public static float GetRadianFrom3Points(Vector3 v1, Vector3 v2, Vector3 v3)
+        {
+            float x1 = v1.x;
+            float x2 = v2.x;
+            float x3 = v3.x;
+
+            float y1 = v1.y;
+            float y2 = v2.y;
+            float y3 = v3.y;
+
+            Vector2 AB = new Vector2(x2 - x1, y2 - y1);
+
+            Vector2 BC = new Vector2(x3 - x2, y3 - y2);
+
+            float dot = Vector2.Dot(AB, BC);
+            float det = AB.x * BC.y - AB.y * BC.x;
+            float rad = Mathf.Abs(Mathf.Atan2(det, dot));
+
+            return rad;
+        }
     }
 }

@@ -55,6 +55,13 @@ namespace GameEngine.DataSequence.Graph
         }
     }
 
+    public enum CellType
+    {
+        None,
+        Room,
+        Road
+    }
+
     public class GridCell : IGeomertyNode, IPathNode, IEquatable<GridCell>, IComparable<GridCell>
     {
         public float gCost { get; set; } = float.MaxValue;
@@ -66,6 +73,7 @@ namespace GameEngine.DataSequence.Graph
         public bool IsWalkable { get; set; }
         public Vector3Int CellPosition { get; set; }
         public float Weight { get; set; }
+        public CellType CellType { get; set; }
 
         public GridCell(Vector2 pos, Vector3Int cellPosition)
         {

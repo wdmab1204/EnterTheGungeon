@@ -50,6 +50,7 @@ namespace GameEngine
                     {
                         //cellArray[y, x].IsWalkable = false;
                         cellArray[y, x].Weight = 10;
+                        cellArray[y, x].CellType = CellType.Room;
                     }
                 }
             }
@@ -145,13 +146,13 @@ namespace GameEngine
                 if (cell == null)
                     continue;
 
-                if (cell.IsWalkable == true)
+                if (cell.CellType == CellType.None)
                     continue;
 
                 Vector3Int cellPosition = cell.CellPosition;
                 Vector3 cellWorldPosition = GetCellWorldPosition(cellPosition);
                 Vector3 cellWorldCenter = GetCellWorldCenter(cellWorldPosition);
-                Gizmos.color = Color.black;
+                Gizmos.color = cell.CellType == CellType.Room ? Color.black : Color.red;
                 Gizmos.DrawCube(cellWorldCenter, cellSize);
             }
         }
