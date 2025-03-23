@@ -82,5 +82,20 @@ namespace GameEngine
 
             return rad;
         }
+
+        public static bool IsPointInRectangle(Vector3 point, Vector3 rectPos, Vector3 rectSize)
+        {
+            bool isContains = true;
+            if(rectPos.x > point.x)
+                isContains = false;
+            if(rectPos.y > point.y)
+                isContains = false;
+            if(rectPos.x + rectSize.x <= point.x)
+                isContains = false;
+            if(rectPos.y + rectSize.y <= point.y)
+                isContains = false;
+
+            return isContains;
+        }
     }
 }

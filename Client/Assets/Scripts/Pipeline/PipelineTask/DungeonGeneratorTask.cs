@@ -42,25 +42,26 @@ namespace GameEngine.Pipeline
 
             while (sample > 0)
             {
+                //TODO : 3개 이상의 좌표가 일직선 위에 있지 않도록 배치
                 var randPosX = rand.NextDouble();
                 var randPosY = rand.NextDouble();
 
                 int randCellPosX = (int)(Math.Round(randPosX / gridCellSize) * gridCellSize);
                 int randCellPosY = (int)(Math.Round(randPosY / gridCellSize) * gridCellSize);
 
-                Vector2 cellPosition = new(randCellPosX, randCellPosY);
+                Vector2 cellWorldPosition = new(randCellPosX, randCellPosY);
                 var room = roomList[UnityEngine.Random.Range(0, roomList.Count)].GetComponent<Room>();
                 var tilemaps = room.GetComponentsInChildren<Tilemap>();
                 foreach (var tilemap in tilemaps)
                     tilemap.CompressBounds();
                 Vector3Int size = GameUtil.GetBoundsIntFromTilemaps(tilemaps).size;
 
-                Vector3Int roomBottomLeft = new((int)(cellPosition.x - roomPadding), (int)(cellPosition.y - roomPadding));
-                Vector3Int roomTopRight = new((int)(cellPosition.x + size.x + roomPadding), (int)(cellPosition.y + size.y + roomPadding));
+                Vector3Int roomBottomLeft = new((int)(cellWorldPosition.x - roomPadding), (int)(cellWorldPosition.y - roomPadding));
+                Vector3Int roomTopRight = new((int)(cellWorldPosition.x + size.x + roomPadding), (int)(cellWorldPosition.y + size.y + roomPadding));
 
                 if (CanBuild(DungeonGraph.Vertices, roomBottomLeft, roomTopRight))
                 {
-                    RoomNode roomNode = new(cellPosition, size.x, size.y, room.gameObject);
+                    RoomNode roomNode = new(cellWorldPosition, size.x, size.y, room.gameObject);
                     DungeonGraph.AddNode(roomNode);
                     sample--;
                 }

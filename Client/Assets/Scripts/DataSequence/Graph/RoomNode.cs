@@ -23,6 +23,11 @@ namespace GameEngine.DataSequence.Graph
             return new Vector3(X + Width / 2f, Y + Height / 2f);
         }
 
+        public Vector3 GetSize()
+        {
+            return new Vector3(Width, Height);
+        }
+
         public Vector3 GetCenterInt()
         {
             var center = GetCenter();

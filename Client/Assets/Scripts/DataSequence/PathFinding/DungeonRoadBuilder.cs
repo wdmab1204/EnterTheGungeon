@@ -75,7 +75,7 @@ namespace GameEngine.DataSequence.PathFinding
                     if (pq.Contain(next))
                         continue;
 
-                    if (next.IsWalkable == false)
+                    if (next.IsWalkable == false && next.CellType != CellType.None)
                         continue;
 
                     float nextHCost = Vector3.Distance(dst.ToVector3(), next.ToVector3());

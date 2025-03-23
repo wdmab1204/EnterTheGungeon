@@ -10,9 +10,9 @@ using UnityEngine.Tilemaps;
 
 namespace GameEngine.Pipeline
 {
+
     public class TilemapRenderingTask : IPipelineTask<DungeonGeneratorPayLoad>
     {
-
         public DungeonGeneratorPayLoad PayLoad { get; set; }
         private Grid unityGrid;
         private GameGrid gameGrid;
@@ -51,30 +51,115 @@ namespace GameEngine.Pipeline
 
             gameGrid.CreateGrid(graph.Vertices, gridCellSize, gridBoundsInt);
             gameGrid.isGizmos = showGizmos;
+
+            yield return null;
+
+            BuildRoad(graph.Edges, destinationTilemaps);
+
+            yield return null;
+        }
+
+        private void InitializeTilemap(GameObject tilemapRoot)
+        {
+            unityGrid = tilemapRoot.AddComponent<Grid>();
+            gameGrid = tilemapRoot.AddComponent<GameGrid>();
+            var rootTransform = tilemapRoot.transform;
+
+            CreateTilemap("Floor", rootTransform, 0);
+            var collideableTilemap = CreateTilemap("Collideable", rootTransform, 1);
+            AddCollider(collideableTilemap);
+        }
+
+        private GameObject CreateTilemap(string name, Transform parent, int sortingOrder)
+        {
+            GameObject obj = new GameObject(name);
+            obj.transform.parent = parent;
+            obj.AddComponent<Tilemap>();
+            obj.AddComponent<TilemapRenderer>().sortingOrder = sortingOrder;
+            return obj;
+        }
+
+        private void AddCollider(GameObject obj)
+        {
+            var collider = obj.AddComponent<TilemapCollider2D>();
+            collider.usedByComposite = true;
+
+            obj.AddComponent<CompositeCollider2D>();
+            obj.GetOrAddComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+        }
+
+        private void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3Int bottomLeft, Func<Vector3, Vector3Int> getCellPosition)
+        {
+            Vector3 tilemapCenter = GameUtil.GetBoundsIntFromTilemaps(sourceTilemaps).center;
+
+            foreach (var sourceTilemap in sourceTilemaps)
+            {
+                var destinationTilemap = destinationTilemaps.FirstOrDefault(dest => dest.name == sourceTilemap.name);
+                if (destinationTilemap == null)
+                    continue;
+
+                var sourceTilemapCellBounds = sourceTilemap.cellBounds;
+
+                foreach (var tilePosition in sourceTilemapCellBounds.allPositionsWithin)
+                {
+                    var tile = sourceTilemap.GetTile(tilePosition);
+                    if (tile == null)
+                        continue;
+
+                    var cellPosition = getCellPosition(tilePosition + bottomLeft);
+                    destinationTilemap.SetTile(cellPosition, tile);
+                }
+            }
+        }
+
+        private void BuildRoad(IEnumerable<RoomEdge> edges, Tilemap[] gridTilemaps)
+        {
             DungeonRoadBuilder roadBuilder = new(Comparer<GridCell>.Default, gameGrid);
 
-            foreach (var edge in graph.Edges)
+            foreach (var edge in edges)
             {
                 var node1 = edge.From;
                 var node2 = edge.To;
-                var pathResult = roadBuilder.GetMinPath(node1.GetCenter(), node2.GetCenter());
-                if (pathResult == null)
-                    continue;
 
+                gameGrid.Clear();
                 GridCell srcCell = gameGrid.GetCell(node1.GetCenter());
                 GridCell dstCell = gameGrid.GetCell(node2.GetCenter());
+
+                var pathResult = roadBuilder.GetMinPath(srcCell, dstCell);
+                if (pathResult == null)
+                    continue;
 
                 var pathResultArray = pathResult.ToArray();
                 for (int i = 0; i < pathResultArray.Length; i++)
                 {
-                    GridCell prevCell = i - 1 < 0 ? srcCell : pathResultArray[i - 1];
                     GridCell curCell = pathResultArray[i];
-                    GridCell nextCell = i + 1 >= pathResultArray.Length ? dstCell : pathResultArray[i + 1];
+
+                    GridCell prevCell;
+                    if (i - 1 < 0)
+                    {
+                        Vector3 nearestCellWorldPosition = GetNearestCellFromRoom(curCell.ToVector3(), node1.ToVector3(), node1.GetSize());
+                        prevCell = gameGrid.GetCell(nearestCellWorldPosition);
+                    }
+                    else
+                    {
+                        prevCell = pathResultArray[i - 1];
+                    }
+
+                    GridCell nextCell;
+                    if (i + 1 >= pathResultArray.Length)
+                    {
+                        Vector3 nearestCellWorldPosition = GetNearestCellFromRoom(curCell.ToVector3(), node2.ToVector3(), node2.GetSize());
+                        nextCell = gameGrid.GetCell(nearestCellWorldPosition);
+                    }
+                    else
+                    {
+                        nextCell = pathResultArray[i + 1];
+                    }
 
                     Vector3 prevPos = prevCell.ToVector3();
                     Vector3 curPos = curCell.ToVector3();
                     Vector3 nextPos = nextCell.ToVector3();
-;
+                    ;
                     GameObject roadPrefab = GetRoadPrefab(prevPos, curPos, nextPos);
                     if (roadPrefab == null)
                     {
@@ -82,16 +167,33 @@ namespace GameEngine.Pipeline
                         continue;
                     }
                     Tilemap[] sourceTilemap = roadPrefab.GetComponentsInChildren<Tilemap>();
-                    CopyTiles(sourceTilemap, destinationTilemaps, curCell.ToVector3Int(), unityGrid.WorldToCell);
+                    CopyTiles(sourceTilemap, gridTilemaps, curCell.ToVector3Int(), unityGrid.WorldToCell);
                 }
-            }
 
-            
+                var list = pathResult.ToList();
+                list.Insert(0, gameGrid.GetCell(GetNearestCellFromRoom(list.First().ToVector3(), node1.ToVector3(), node1.GetSize())));
+                list.Add(gameGrid.GetCell(GetNearestCellFromRoom(list.Last().ToVector3(), node2.ToVector3(), node2.GetSize())));
+                pathResult = list;
+
+                Color randomColor = new Color(
+                    UnityEngine.Random.Range(0f, 1f),
+                    UnityEngine.Random.Range(0f, 1f),
+                    UnityEngine.Random.Range(0f, 1f),
+                    1f
+                );
+
+                GameUtil.CreateLineRenderer(randomColor, 0.2f, pathResult.Select(path =>
+                {
+                    var v = gameGrid.GetCellCenter(path.ToVector3Int());
+                    v.z = -1;
+                    return v;
+                }).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+            }
         }
 
-        public GameObject GetRoadPrefab(Vector2 p1, Vector2 p2, Vector2 p3)
+        private GameObject GetRoadPrefab(Vector2 p1, Vector2 p2, Vector2 p3)
         {
-            if(MathUtility.IsTriangleOrientedClockwise(p1, p2, p3) == false)
+            if (MathUtility.IsTriangleOrientedClockwise(p1, p2, p3) == false)
             {
                 Vector2 t = p1;
                 p1 = p3;
@@ -130,68 +232,30 @@ namespace GameEngine.Pipeline
             return null;
         }
 
-        private void InitializeTilemap(GameObject tilemapRoot)
+        private Vector3 GetNearestCellFromRoom(Vector3 point, Vector3 roomPos, Vector3 roomSize)
         {
-            unityGrid = tilemapRoot.AddComponent<Grid>();
-            gameGrid = tilemapRoot.AddComponent<GameGrid>();
-            var rootTransform = tilemapRoot.transform;
+            int cellSize = PayLoad.GridCellSize;
+            Vector3 leftRectPos = new(roomPos.x - roomSize.x, roomPos.y);
+            bool left = MathUtility.IsPointInRectangle(point, leftRectPos, roomSize);
+            if (left)
+                return new(roomPos.x, point.y);
 
-            CreateTilemap("Floor", rootTransform, 0);
-            var collideableTilemap = CreateTilemap("Collideable", rootTransform, 1);
-            AddCollider(collideableTilemap);
-        }
+            Vector3 upRectPos = new(roomPos.x, roomPos.y + roomSize.y);
+            bool up = MathUtility.IsPointInRectangle(point, upRectPos, roomSize);
+            if (up)
+                return new(point.x, roomPos.y + roomSize.y - cellSize);
 
-        private GameObject CreateTilemap(string name, Transform parent, int sortingOrder)
-        {
-            GameObject obj = new GameObject(name);
-            obj.transform.parent = parent;
-            obj.AddComponent<Tilemap>();
-            obj.AddComponent<TilemapRenderer>().sortingOrder = sortingOrder;
-            return obj;
-        }
+            Vector3 rightRectPos = new(roomPos.x + roomSize.x, roomPos.y);
+            bool right = MathUtility.IsPointInRectangle(point, rightRectPos, roomSize);
+            if (right)
+                return new(roomPos.x + roomSize.x - cellSize, point.y);
 
-        private void AddCollider(GameObject obj)
-        {
-            var collider = obj.AddComponent<TilemapCollider2D>();
-            collider.usedByComposite = true;
+            Vector3 downRectPos = new(roomPos.x, roomPos.y - roomSize.y);
+            bool down = MathUtility.IsPointInRectangle(point, downRectPos, roomSize);
+            if (down)
+                return new(point.x, roomPos.y);
 
-            obj.AddComponent<CompositeCollider2D>();
-            obj.GetOrAddComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        }
-
-        public void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3Int bottomLeft, Func<Vector3, Vector3Int> getCellPosition)
-        {
-            Vector3 tilemapCenter = GameUtil.GetBoundsIntFromTilemaps(sourceTilemaps).center;
-
-            foreach (var sourceTilemap in sourceTilemaps)
-            {
-                var destinationTilemap = destinationTilemaps.FirstOrDefault(dest => dest.name == sourceTilemap.name);
-                if (destinationTilemap == null)
-                    continue;
-
-                var sourceTilemapCellBounds = sourceTilemap.cellBounds;
-
-                foreach (var tilePosition in sourceTilemapCellBounds.allPositionsWithin)
-                {
-                    var tile = sourceTilemap.GetTile(tilePosition);
-                    if (tile == null)
-                        continue;
-
-                    var cellPosition = getCellPosition(tilePosition + bottomLeft);
-                    destinationTilemap.SetTile(cellPosition, tile);
-                }
-            }
-        }
-
-        private void RemoveTiles(IEnumerable<Tilemap> worldTilemaps, IEnumerable<Vector3Int> cellTilePositions)
-        {
-            foreach(var tilemap in worldTilemaps)
-            {
-                foreach(var cellTilePosition in cellTilePositions)
-                {
-                    tilemap.SetTile(cellTilePosition, null);
-                }
-            }
+            throw new System.ArgumentException("Rectangle Contains Point");
         }
     }
 }

@@ -15,9 +15,9 @@ MonoBehaviour:
   roomList:
   - {fileID: 8531459648525885223, guid: 5933e81fc3620a141860c21ec2e713f7, type: 3}
   - {fileID: 8531459648525885223, guid: 49c5ae5245b6b0b41baa58ef1b864915, type: 3}
-  horizonRoad: {fileID: 8531459648525885223, guid: 2de2ca803ecbcb249b5fed097e12b18c, type: 3}
-  verticalRoad: {fileID: 8531459648525885223, guid: bf5d950bfb688244982a155bc3b88483, type: 3}
-  leftTopRoad: {fileID: 0}
-  leftBottomRoad: {fileID: 0}
-  rightTopRoad: {fileID: 0}
-  rightBottomRoad: {fileID: 0}
+  horizonRoad: {fileID: 8531459648525885223, guid: 8e4091f1063891a4f88f32b96556788f, type: 3}
+  verticalRoad: {fileID: 8531459648525885223, guid: 2de2ca803ecbcb249b5fed097e12b18c, type: 3}
+  leftTopRoad: {fileID: 8531459648525885223, guid: cadfe2ddf2406f04bac2966194c75bf5, type: 3}
+  leftBottomRoad: {fileID: 8531459648525885223, guid: a3d47830d157f92479309cc70fd7e41e, type: 3}
+  rightTopRoad: {fileID: 8531459648525885223, guid: 3228f9d4708b9e14fa5273a3ff410fce, type: 3}
+  rightBottomRoad: {fileID: 8531459648525885223, guid: fb102cf04c553734ca975b9197b0b842, type: 3}
