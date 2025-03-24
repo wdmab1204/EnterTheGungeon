@@ -26,6 +26,8 @@ namespace GameEngine
                 LeftTopRoad = RoomTemplates.leftTopRoad,
                 RightTopRoad = RoomTemplates.rightTopRoad,
                 RightBottomRoad = RoomTemplates.rightBottomRoad,
+                VerticalDoor = RoomTemplates.verticalDoor,
+                HorizonDoor = RoomTemplates.horizonDoor,
                 RootGameObject = this.gameObject,
                 GridCellSize = 5,
             };

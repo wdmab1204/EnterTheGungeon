@@ -42,12 +42,11 @@ namespace GameEngine.Pipeline
 
             foreach (var vertex in graph.Vertices)
             {
-                var sourceTilemaps = vertex.Prefab.GetComponentsInChildren<Tilemap>();
+                var sourceTilemaps = GetTilemaps(vertex.Prefab);
                 CopyTiles(sourceTilemaps, destinationTilemaps, vertex.ToVector3Int(), unityGrid.WorldToCell);
 
                 yield return null;
             }
-
 
             gameGrid.CreateGrid(graph.Vertices, gridCellSize, gridBoundsInt);
             gameGrid.isGizmos = showGizmos;
@@ -90,6 +89,26 @@ namespace GameEngine.Pipeline
 
         private void CopyTiles(IEnumerable<Tilemap> sourceTilemaps, IEnumerable<Tilemap> destinationTilemaps, Vector3Int bottomLeft, Func<Vector3, Vector3Int> getCellPosition)
         {
+            HashSet<Vector3Int> removeTiles = new();
+            foreach(Tilemap tilemap in sourceTilemaps)
+            {
+                foreach(var tilePos in tilemap.cellBounds.allPositionsWithin)
+                {
+                    var tile = tilemap.GetTile(tilePos);
+                    if (tile != null)
+                        removeTiles.Add(tilePos);
+                }
+            }
+
+            foreach(var tilePos in removeTiles)
+            {
+                foreach(var tilemap in destinationTilemaps)
+                {
+                    var cellPosition = getCellPosition(tilePos + bottomLeft);
+                    tilemap.SetTile(cellPosition, null);
+                }
+            }
+
             Vector3 tilemapCenter = GameUtil.GetBoundsIntFromTilemaps(sourceTilemaps).center;
 
             foreach (var sourceTilemap in sourceTilemaps)
@@ -159,20 +178,36 @@ namespace GameEngine.Pipeline
                     Vector3 prevPos = prevCell.ToVector3();
                     Vector3 curPos = curCell.ToVector3();
                     Vector3 nextPos = nextCell.ToVector3();
-                    ;
+
                     GameObject roadPrefab = GetRoadPrefab(prevPos, curPos, nextPos);
                     if (roadPrefab == null)
                     {
                         Debug.LogError($"Src : {node1.ToVector3()}, Dst : {node2.ToVector3()}");
                         continue;
                     }
-                    Tilemap[] sourceTilemap = roadPrefab.GetComponentsInChildren<Tilemap>();
+                    Tilemap[] sourceTilemap = GetTilemaps(roadPrefab);
                     CopyTiles(sourceTilemap, gridTilemaps, curCell.ToVector3Int(), unityGrid.WorldToCell);
                 }
 
                 var list = pathResult.ToList();
-                list.Insert(0, gameGrid.GetCell(GetNearestCellFromRoom(list.First().ToVector3(), node1.ToVector3(), node1.GetSize())));
-                list.Add(gameGrid.GetCell(GetNearestCellFromRoom(list.Last().ToVector3(), node2.ToVector3(), node2.GetSize())));
+                GridCell firstPathCell = list.First();
+                GridCell lastPathCell = list.Last();
+
+                Vector3 firstPathCellPosition = firstPathCell.ToVector3();
+                Vector3 lastPathCellPosition = lastPathCell.ToVector3();
+
+                Vector3 startCellWorldPosition = GetNearestCellFromRoom(firstPathCellPosition, node1.ToVector3(), node1.GetSize());
+                Vector3 endCellWorldPosition = GetNearestCellFromRoom(lastPathCellPosition, node2.ToVector3(), node2.GetSize());
+                GridCell startCell = gameGrid.GetCell(startCellWorldPosition);
+                GridCell endCell = gameGrid.GetCell(endCellWorldPosition);
+
+                (Tilemap[] sourceDoorTilemaps, Vector3Int sourceDoorPosition) = GetDoor(startCellWorldPosition, firstPathCellPosition);
+                CopyTiles(sourceDoorTilemaps, gridTilemaps, sourceDoorPosition, unityGrid.WorldToCell);
+                (Tilemap[] destinationDoorTilemaps, Vector3Int destinationDoorPosition) = GetDoor(endCellWorldPosition, lastPathCellPosition);
+                CopyTiles(destinationDoorTilemaps, gridTilemaps, destinationDoorPosition, unityGrid.WorldToCell);
+
+                list.Insert(0, startCell);
+                list.Add(endCell);
                 pathResult = list;
 
                 Color randomColor = new Color(
@@ -182,12 +217,15 @@ namespace GameEngine.Pipeline
                     1f
                 );
 
-                GameUtil.CreateLineRenderer(randomColor, 0.2f, pathResult.Select(path =>
+                if (showGizmos) 
                 {
-                    var v = gameGrid.GetCellCenter(path.ToVector3Int());
-                    v.z = -1;
-                    return v;
-                }).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+                    GameUtil.CreateLineRenderer(randomColor, 0.2f, pathResult.Select(path =>
+                    {
+                        var v = gameGrid.GetCellCenter(path.ToVector3Int());
+                        v.z = -1;
+                        return v;
+                    }).ToArray()).transform.parent = PayLoad.RootGameObject.transform;
+                }
             }
         }
 
@@ -256,6 +294,45 @@ namespace GameEngine.Pipeline
                 return new(point.x, roomPos.y);
 
             throw new System.ArgumentException("Rectangle Contains Point");
+        }
+
+        private (Tilemap[] doorTilemaps, Vector3Int doorPosition) GetDoor(Vector3 firstCellPosition, Vector3 secondCellPosition)
+        {
+            Vector3 doorPosition = default;
+            Tilemap[] doorTilemaps = null;
+            int size;
+            Vector3 direction = secondCellPosition - firstCellPosition;
+            if (direction.y == 0)
+            {
+                doorTilemaps = GetTilemaps(PayLoad.HorizonDoor);
+                size = GameUtil.GetBoundsIntFromTilemaps(doorTilemaps).size.x;
+                if (direction.x > 0)
+                    doorPosition = new(secondCellPosition.x - size, secondCellPosition.y);
+                else
+                    doorPosition = firstCellPosition;
+            }
+            else if (direction.x == 0)
+            {
+                doorTilemaps = GetTilemaps(PayLoad.VerticalDoor);
+                size = GameUtil.GetBoundsIntFromTilemaps(doorTilemaps).size.y;
+                if (direction.y > 0)
+                    doorPosition = new(secondCellPosition.x, secondCellPosition.y - size);
+                else
+                    doorPosition = firstCellPosition;
+            }
+            else
+                throw new System.InvalidOperationException("Direction is not horizontal or vertical");
+
+            return (doorTilemaps, new Vector3Int((int)doorPosition.x, (int)doorPosition.y, (int)doorPosition.z));
+        }
+            
+
+        private Tilemap[] GetTilemaps(GameObject obj)
+        {
+            var result = obj.GetComponentsInChildren<Tilemap>(); ;
+            foreach(var tilemap in result)
+                tilemap.CompressBounds();
+            return result;
         }
     }
 }

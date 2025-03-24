@@ -21,3 +21,5 @@ MonoBehaviour:
   leftBottomRoad: {fileID: 8531459648525885223, guid: a3d47830d157f92479309cc70fd7e41e, type: 3}
   rightTopRoad: {fileID: 8531459648525885223, guid: 3228f9d4708b9e14fa5273a3ff410fce, type: 3}
   rightBottomRoad: {fileID: 8531459648525885223, guid: fb102cf04c553734ca975b9197b0b842, type: 3}
+  horizonDoor: {fileID: 8531459648525885223, guid: 452d6613677b8914e997a45c4be9c10d, type: 3}
+  verticalDoor: {fileID: 8531459648525885223, guid: 20b5f18f4f7af40498e735a837279194, type: 3}

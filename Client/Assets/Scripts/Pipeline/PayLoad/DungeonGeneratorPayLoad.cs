@@ -15,6 +15,8 @@ namespace GameEngine.Pipeline
         public GameObject LeftBottomRoad { get; set; }
         public GameObject RightTopRoad { get; set; }
         public GameObject RightBottomRoad { get; set; }
+        public GameObject HorizonDoor { get; set; }
+        public GameObject VerticalDoor { get; set; }
         public DungeonGraph DungeonGraph { get; set; } = new();
         public GameObject RootGameObject { get; set; }
         public int GridCellSize;
