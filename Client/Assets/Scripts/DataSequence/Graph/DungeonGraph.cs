@@ -24,12 +24,16 @@ namespace GameEngine.DataSequence.Graph
         public BoundsInt GetBoundsInt(int gridCellSize)
         {
             BoundsInt boundsInt = new BoundsInt();
-            boundsInt.size = new Vector3Int(Mathf.RoundToInt((maxRoomPosX - minRoomPosX) / gridCellSize), Mathf.RoundToInt((maxRoomPosY - minRoomPosY) / gridCellSize), 1);
+            boundsInt.size = 
+                new Vector3Int(
+                    Mathf.RoundToInt((maxRoomPosX - minRoomPosX) / gridCellSize),
+                    Mathf.RoundToInt((maxRoomPosY - minRoomPosY) / gridCellSize),
+                    1);
             boundsInt.min = Vector3Int.zero;
             return boundsInt;
         }
 
-        public Vector3Int GetBottomLeftPos() => new((int)minRoomPosX, (int)minRoomPosY);
+        public Vector3Int GetGridWorldPosition() => new((int)minRoomPosX, (int)minRoomPosY);
 
         public RoomNode GetNodeFromPos(Vector3 pos)
         {

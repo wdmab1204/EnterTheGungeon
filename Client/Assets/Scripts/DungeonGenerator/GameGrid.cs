@@ -18,9 +18,6 @@ namespace GameEngine
 
         public void CreateGrid(IEnumerable<RoomNode> roomEnumerable, int gridCellSize, BoundsInt boundsInt)
         {
-            //if (boundsInt.size.x % gridCellSize != 0 || boundsInt.size.y % gridCellSize != 0)
-            //    throw new System.InvalidOperationException("Invalid Grid Cell Size or BoundsInt");
-
             this.gridBoundsInt = boundsInt;
             this.gridCellSize = gridCellSize;
             gridWorldPosition = this.transform.position;
@@ -37,7 +34,6 @@ namespace GameEngine
             {
                 var roomWorldPosition = room.ToVector3();
                 var roomCellPosition = GetCellPosition(roomWorldPosition);
-
                 int cellHeight = room.Height / gridCellSize;
                 int cellWidth = room.Width / gridCellSize;
 

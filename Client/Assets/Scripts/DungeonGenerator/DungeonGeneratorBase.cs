@@ -30,6 +30,7 @@ namespace GameEngine
                 HorizonDoor = RoomTemplates.horizonDoor,
                 RootGameObject = this.gameObject,
                 GridCellSize = 5,
+                ShowGizmos = ShowGizmos
             };
 
             var rootTransform = payLoad.RootGameObject.transform;
@@ -53,7 +54,7 @@ namespace GameEngine
             var pipelineItems = new List<IPipelineTask<DungeonGeneratorPayLoad>>()
             {
                 new DungeonGeneratorTask(RoomCount),
-                new TilemapRenderingTask(ShowGizmos),
+                new TilemapRenderingTask(),
                 new GraphRenderingTask(),
             };
             return pipelineItems;
