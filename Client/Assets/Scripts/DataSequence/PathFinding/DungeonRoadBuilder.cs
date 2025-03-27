@@ -49,7 +49,7 @@ namespace GameEngine.DataSequence.PathFinding
             while (!pq.IsEmpty() && safety > 0)
             {
                 var curNode = pq.Dequeue();
-
+                Debug.Log(curNode.ToVector3());
                 if (curNode.Equals(dst))
                 {
                     curNode = parentMap[curNode];
@@ -75,7 +75,10 @@ namespace GameEngine.DataSequence.PathFinding
                     if (pq.Contain(next))
                         continue;
 
-                    if (next.IsWalkable == false && next.CellType != CellType.None)
+                    if (next.IsWalkable == false)
+                        continue;
+
+                    if (next.CellType == CellType.Room && next.ID != dst.ID)
                         continue;
 
                     float nextHCost = Vector3.Distance(dst.ToVector3(), next.ToVector3());
@@ -95,6 +98,24 @@ namespace GameEngine.DataSequence.PathFinding
                 }
 
                 safety--;
+
+                //if(pq.IsEmpty())
+                //{
+                //    curNode = parentMap[curNode];
+                //    while (!curNode.Equals(src))
+                //    {
+                //        if (curNode.CellType == CellType.None)
+                //        {
+                //            curNode.CellType = CellType.Road;
+                //            curNode.IsWalkable = false;
+                //            pathList.Add(curNode);
+                //        }
+
+                //        curNode = parentMap[curNode];
+                //    }
+
+                //    return pathList;
+                //}
             }
 
             if (safety <= 0)

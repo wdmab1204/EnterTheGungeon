@@ -54,6 +54,8 @@ namespace GameEngine.Pipeline
 
             List<(Tilemap[] tilemaps, Vector3 worldPosition)> tilemapRenderTasks = new();
 
+            int id = 1;
+
             while (sample > 0)
             {
                 //TODO : 3개 이상의 좌표가 일직선 위에 있지 않도록 배치
@@ -76,7 +78,11 @@ namespace GameEngine.Pipeline
                 if (CanBuild(dungeonGraph.Vertices, roomWorldPositionContainPadding, roomTopRight))
                 {
                     var roomPrefab = room.gameObject;
+
                     RoomNode roomNode = new(roomWorldPosition, size.x, size.y, roomPrefab);
+                    roomNode.ID = id;
+                    id++;
+
                     dungeonGraph.AddNode(roomNode);
                     tilemapRenderTasks.Add((GetTilemaps(roomPrefab), roomWorldPosition));
                     sample--;
@@ -104,7 +110,7 @@ namespace GameEngine.Pipeline
             var triangles = Triangulation.TriangulateByFlippingEdges(dungeonGraph.Vertices.Select(v => v.ToVector3()).ToList());
             HashSet<RoomEdge> edges = new();
 
-            foreach(var tri in triangles)
+            foreach (var tri in triangles)
             {
                 var v1Pos = tri.v1.position;
                 var v2Pos = tri.v2.position;
@@ -122,8 +128,8 @@ namespace GameEngine.Pipeline
                 edges.Add(new RoomEdge(node1, node3, Vector3.Distance(v1Pos, v3Pos)));
             }
 
-            var treeEdges =  SpanningTree.TransformMininum(dungeonGraph.Vertices, edges);
-            foreach(var edge in treeEdges)
+            var treeEdges = SpanningTree.TransformMininum(dungeonGraph.Vertices, edges);
+            foreach (var edge in treeEdges)
             {
                 dungeonGraph.AddEdge(edge.From, edge);
             }
@@ -305,7 +311,7 @@ namespace GameEngine.Pipeline
             throw new System.ArgumentException("Rectangle Contains Point");
         }
 
-        private(Tilemap[] doorTilemaps, Vector3 doorPosition) GetDoor(Vector3 firstCellPosition, Vector3 secondCellPosition)
+        private (Tilemap[] doorTilemaps, Vector3 doorPosition) GetDoor(Vector3 firstCellPosition, Vector3 secondCellPosition)
         {
             Vector3 doorPosition;
             Tilemap[] doorTilemaps;

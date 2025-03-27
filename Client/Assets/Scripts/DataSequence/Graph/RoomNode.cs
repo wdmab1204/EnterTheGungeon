@@ -96,7 +96,11 @@ namespace GameEngine.DataSequence.Graph
 
         public bool Equals(GridCell other)
         {
-            return this.ToVector3() == other.ToVector3();
+            bool compare = this.ID == other.ID;
+            if(compare == false)
+                compare = this.ToVector3() == other.ToVector3();
+
+            return compare;
         }
 
         public int CompareTo(GridCell other)

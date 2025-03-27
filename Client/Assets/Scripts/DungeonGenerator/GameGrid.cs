@@ -44,9 +44,9 @@ namespace GameEngine
                 {
                     for (int x = roomCellPosition.x; x < cellTopRightX; x++)
                     {
-                        //cellArray[y, x].IsWalkable = false;
                         cellArray[y, x].Weight = 10;
                         cellArray[y, x].CellType = CellType.Room;
+                        cellArray[y, x].ID = room.ID;
                     }
                 }
             }
@@ -142,13 +142,13 @@ namespace GameEngine
                 if (cell == null)
                     continue;
 
-                if (cell.CellType == CellType.None)
+                if (cell.CellType != CellType.Road)
                     continue;
 
                 Vector3Int cellPosition = cell.CellPosition;
                 Vector3 cellWorldPosition = GetCellWorldPosition(cellPosition);
                 Vector3 cellWorldCenter = GetCellWorldCenter(cellWorldPosition);
-                Gizmos.color = cell.CellType == CellType.Room ? Color.black : Color.red;
+                Gizmos.color = Color.Lerp(Color.white, Color.black, Mathf.Lerp(0, float.MaxValue, cell.fCost));
                 Gizmos.DrawCube(cellWorldCenter, cellSize);
             }
         }
