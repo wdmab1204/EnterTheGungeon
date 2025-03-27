@@ -35,6 +35,7 @@ namespace GameEngine.Pipeline
             {
                 VertexRenderer renderer = new GameObject("Vertex Renderer").AddComponent<VertexRenderer>();
                 renderer.transform.parent = PayLoad.RootGameObject.transform;
+                renderer.transform.position = vertex.ToVector3Int();
                 renderer.Render(vertex);
             }
             

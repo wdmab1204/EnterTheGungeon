@@ -142,13 +142,13 @@ namespace GameEngine
                 if (cell == null)
                     continue;
 
-                if (cell.CellType != CellType.Road)
+                if (cell.CellType == CellType.None)
                     continue;
 
                 Vector3Int cellPosition = cell.CellPosition;
                 Vector3 cellWorldPosition = GetCellWorldPosition(cellPosition);
                 Vector3 cellWorldCenter = GetCellWorldCenter(cellWorldPosition);
-                Gizmos.color = Color.Lerp(Color.white, Color.black, Mathf.Lerp(0, float.MaxValue, cell.fCost));
+                Gizmos.color = cell.CellType == CellType.Room ? Color.black : Color.red;
                 Gizmos.DrawCube(cellWorldCenter, cellSize);
             }
         }
