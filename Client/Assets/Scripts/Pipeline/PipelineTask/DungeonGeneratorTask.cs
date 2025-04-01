@@ -1,6 +1,8 @@
 using GameEngine.DataSequence.Geometry;
 using GameEngine.DataSequence.Graph;
 using GameEngine.DataSequence.PathFinding;
+using GameEngine.DataSequence.Queue;
+using GameEngine.DataSequence.Random;
 using GameEngine.DataSequence.Tree;
 using GameEngine.MapGenerator.Room;
 using System;
@@ -17,6 +19,8 @@ namespace GameEngine.Pipeline
         public DungeonGeneratorPayLoad PayLoad { get; set; }
         private int roomCount;
         private const int roomPadding = 1;
+
+        private Queue<GameObject> roomPrefabQueue = new();
 
         public DungeonGeneratorTask(int roomCount)
         {
@@ -49,49 +53,84 @@ namespace GameEngine.Pipeline
         {
             var rand = PayLoad.Random;
             int sample = roomCount;
-            var roomList = PayLoad.RoomTemplates;
             int gridCellSize = PayLoad.GridCellSize;
+
+            roomPrefabQueue = InitializeRoomPrefabQueue(PayLoad.RoomTemplates, roomCount);
 
             List<(Tilemap[] tilemaps, Vector3 worldPosition)> tilemapRenderTasks = new();
 
             int id = 1;
+            bool isBuilt = true;
+            GameObject roomPrefab = null;
 
             while (sample > 0)
             {
-                //TODO : 3개 이상의 좌표가 일직선 위에 있지 않도록 배치
-                var randPosX = rand.NextDouble();
-                var randPosY = rand.NextDouble();
-
-                int randomRoomPositionX = (int)(Math.Round(randPosX / gridCellSize) * gridCellSize);
-                int randomRoomPositionY = (int)(Math.Round(randPosY / gridCellSize) * gridCellSize);
-
-                Vector2 roomWorldPosition = new(randomRoomPositionX, randomRoomPositionY);
-                var room = roomList[UnityEngine.Random.Range(0, roomList.Count)].GetComponent<Room>();
-                var tilemaps = room.GetComponentsInChildren<Tilemap>();
-                foreach (var tilemap in tilemaps)
-                    tilemap.CompressBounds();
+                var roomWorldPosition = GetRoomWorldPosition(rand, gridCellSize);
+                if (isBuilt)
+                    roomPrefab = roomPrefabQueue.Dequeue();
+                var tilemaps = GetTilemaps(roomPrefab);
                 Vector3Int size = GameUtil.GetBoundsIntFromTilemaps(tilemaps).size;
 
                 Vector3Int roomWorldPositionContainPadding = new((int)(roomWorldPosition.x - roomPadding), (int)(roomWorldPosition.y - roomPadding));
                 Vector3Int roomTopRight = new((int)(roomWorldPosition.x + size.x + roomPadding), (int)(roomWorldPosition.y + size.y + roomPadding));
 
-                if (CanBuild(dungeonGraph.Vertices, roomWorldPositionContainPadding, roomTopRight))
+                if (isBuilt = CanBuild(dungeonGraph.Vertices, roomWorldPositionContainPadding, roomTopRight))
                 {
-                    var roomPrefab = room.gameObject;
-
-                    RoomNode roomNode = new(roomWorldPosition, size.x, size.y, roomPrefab);
+                    RoomNode roomNode = new(roomWorldPosition, size.x, size.y);
                     roomNode.ID = id;
                     id++;
 
                     dungeonGraph.AddNode(roomNode);
-                    tilemapRenderTasks.Add((GetTilemaps(roomPrefab), roomWorldPosition));
+                    tilemapRenderTasks.Add((tilemaps, roomWorldPosition));
                     sample--;
                 }
                 else
+                {
                     rand.stdev += .1f;
+                }
             }
 
             PayLoad.TilemapRenderTaskList.AddRange(tilemapRenderTasks);
+        }
+
+        private Queue<GameObject> InitializeRoomPrefabQueue(IEnumerable<RoomData> roomDatas, int roomCount)
+        {
+            int totalGuaranteedCount = roomDatas.Sum(x => x.guaranteedCount);
+            System.Random random = new System.Random();
+
+            if (totalGuaranteedCount > roomCount)
+                throw new System.InvalidOperationException("The minimum number of rooms is greater than the maximum number of rooms");
+
+            var positives = roomDatas.Where(n => n.guaranteedCount >= 1);
+            var zeros = roomDatas.Where(n => n.guaranteedCount <= 0).ToList();
+
+            positives = positives.SelectMany(roomData => Enumerable.Repeat(roomData, roomData.guaranteedCount)).ToList();
+            int additionalCount = roomCount - totalGuaranteedCount - zeros.Count;
+            while(additionalCount-- > 0)
+            {
+                zeros.Add(zeros[random.Next(zeros.Count)]);
+            }
+
+           
+            positives = positives.OrderBy(n => random.Next()).ToList();
+            zeros = zeros.OrderBy(n => random.Next()).ToList();
+
+            Queue<GameObject> queue = new(positives.Concat(zeros).Select(x => x.prefab));
+            return queue;
+        }
+
+        private Vector2 GetRoomWorldPosition(NormalDistribution rand, int gridCellSize)
+        {
+            //TODO : 3개 이상의 좌표가 일직선 위에 있지 않도록 배치
+            var randPosX = rand.NextDouble();
+            var randPosY = rand.NextDouble();
+
+            int randomRoomPositionX = (int)(Math.Round(randPosX / gridCellSize) * gridCellSize);
+            int randomRoomPositionY = (int)(Math.Round(randPosY / gridCellSize) * gridCellSize);
+
+            Vector2 roomWorldPosition = new(randomRoomPositionX, randomRoomPositionY);
+
+            return roomWorldPosition;
         }
 
         private void BuildEdges(DungeonGraph dungeonGraph)
@@ -341,9 +380,9 @@ namespace GameEngine.Pipeline
             return (doorTilemaps, doorPosition);
         }
 
-        private Tilemap[] GetTilemaps(GameObject obj)
+        private Tilemap[] GetTilemaps(GameObject prefab)
         {
-            var result = obj.GetComponentsInChildren<Tilemap>();
+            var result = prefab.GetComponentsInChildren<Tilemap>();
             foreach (var tilemap in result)
                 tilemap.CompressBounds();
             return result;

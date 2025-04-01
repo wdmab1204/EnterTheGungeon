@@ -1,5 +1,5 @@
-﻿using Assets.Scripts.DataSequence.Queue;
-using GameEngine.DataSequence.Graph;
+﻿using GameEngine.DataSequence.Graph;
+using GameEngine.DataSequence.Queue;
 using System.Collections.Generic;
 using UnityEngine;
 

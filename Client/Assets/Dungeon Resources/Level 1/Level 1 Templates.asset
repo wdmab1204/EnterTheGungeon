@@ -12,12 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7497948e1db0e9c4b928130420d3ae93, type: 3}
   m_Name: Level 1 Templates
   m_EditorClassIdentifier: 
-  roomList:
-  - {fileID: 8531459648525885223, guid: 5933e81fc3620a141860c21ec2e713f7, type: 3}
-  - {fileID: 8531459648525885223, guid: 49c5ae5245b6b0b41baa58ef1b864915, type: 3}
-  - {fileID: 8531459648525885223, guid: 035bea204e34f9d4e9cebacb9c4f2b64, type: 3}
-  - {fileID: 8531459648525885223, guid: 776b7a3038c55a74f86174de9284977d, type: 3}
-  - {fileID: 8531459648525885223, guid: 7766801722b45124a97859f8610f172c, type: 3}
+  roomList: []
+  roomList2:
+  - prefab: {fileID: 8531459648525885223, guid: 5933e81fc3620a141860c21ec2e713f7, type: 3}
+    guaranteedCount: 0
+  - prefab: {fileID: 8531459648525885223, guid: 49c5ae5245b6b0b41baa58ef1b864915, type: 3}
+    guaranteedCount: 0
+  - prefab: {fileID: 8531459648525885223, guid: 035bea204e34f9d4e9cebacb9c4f2b64, type: 3}
+    guaranteedCount: 0
+  - prefab: {fileID: 8531459648525885223, guid: 7766801722b45124a97859f8610f172c, type: 3}
+    guaranteedCount: 1
+  - prefab: {fileID: 8531459648525885223, guid: 776b7a3038c55a74f86174de9284977d, type: 3}
+    guaranteedCount: 1
   horizonRoad: {fileID: 8531459648525885223, guid: 8e4091f1063891a4f88f32b96556788f, type: 3}
   verticalRoad: {fileID: 8531459648525885223, guid: 2de2ca803ecbcb249b5fed097e12b18c, type: 3}
   leftTopRoad: {fileID: 8531459648525885223, guid: cadfe2ddf2406f04bac2966194c75bf5, type: 3}

@@ -9,13 +9,11 @@ namespace GameEngine.DataSequence.Graph
     {
         public int Width { get; set; }
         public int Height { get; set; }
-        public GameObject Prefab { get; set; }
 
-        public RoomNode(Vector3 position, int width, int height, GameObject prefab) : base(position)
+        public RoomNode(Vector3 position, int width, int height) : base(position)
         {
             Width = width;
             Height = height;
-            Prefab = prefab;
         }
 
         public Vector3 GetCenter()

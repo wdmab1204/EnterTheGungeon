@@ -9,7 +9,7 @@ namespace GameEngine.Pipeline
     public class DungeonGeneratorPayLoad
     {
         public NormalDistribution Random { get; set; }
-        public List<GameObject> RoomTemplates { get; set; }
+        public List<RoomData> RoomTemplates { get; set; }
         public GameObject HorizonRoad { get; set; }
         public GameObject VerticalRoad { get; set; }
         public GameObject LeftTopRoad { get; set; }

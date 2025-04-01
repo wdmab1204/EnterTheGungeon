@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
-namespace Assets.Scripts.DataSequence.Queue
+namespace GameEngine.DataSequence.Queue
 {
     internal class PriorityQueue<T>
     {
