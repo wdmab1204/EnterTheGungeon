@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7497948e1db0e9c4b928130420d3ae93, type: 3}
   m_Name: Level 1 Templates
   m_EditorClassIdentifier: 
-  roomList: []
-  roomList2:
+  roomList:
   - prefab: {fileID: 8531459648525885223, guid: 5933e81fc3620a141860c21ec2e713f7, type: 3}
     guaranteedCount: 0
   - prefab: {fileID: 8531459648525885223, guid: 49c5ae5245b6b0b41baa58ef1b864915, type: 3}
@@ -24,6 +23,8 @@ MonoBehaviour:
     guaranteedCount: 1
   - prefab: {fileID: 8531459648525885223, guid: 776b7a3038c55a74f86174de9284977d, type: 3}
     guaranteedCount: 1
+  - prefab: {fileID: 8531459648525885223, guid: ce4a3fb4feb9c474989a788ae295637f, type: 3}
+    guaranteedCount: 3
   horizonRoad: {fileID: 8531459648525885223, guid: 8e4091f1063891a4f88f32b96556788f, type: 3}
   verticalRoad: {fileID: 8531459648525885223, guid: 2de2ca803ecbcb249b5fed097e12b18c, type: 3}
   leftTopRoad: {fileID: 8531459648525885223, guid: cadfe2ddf2406f04bac2966194c75bf5, type: 3}

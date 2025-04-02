@@ -14,7 +14,7 @@ namespace GameEngine
 
         private PipelineRunner<DungeonGeneratorPayLoad> pipelineRunner = new();
 
-        public void Generate()
+        public DungeonGeneratorLevel Generate()
         {
             var payLoad = new DungeonGeneratorPayLoad()
             {
@@ -34,10 +34,23 @@ namespace GameEngine
             };
 
             var rootTransform = payLoad.RootGameObject.transform;
-            while(rootTransform.childCount != 0)
+
+            if (Application.isPlaying)
             {
-                GameUtil.Destroy(rootTransform.GetChild(0).gameObject);
+                foreach (Transform child in rootTransform)
+                {
+                    GameUtil.Destroy(child.gameObject);
+                }
             }
+            else
+            {
+                while (rootTransform.childCount != 0)
+                {
+                    GameUtil.Destroy(rootTransform.GetChild(0).gameObject);
+                }
+            }
+
+
 
             var pipelineItems = GetPipelineItems();
 
@@ -47,6 +60,10 @@ namespace GameEngine
             sw.Stop();
 
             Debug.Log($"Total Seconds : {sw.ElapsedMilliseconds / 1000f}s");
+
+            DungeonGeneratorLevel dungeonGeneratorLevel = new(payLoad.DungeonGraph.Vertices);
+
+            return dungeonGeneratorLevel;
         }
 
         protected virtual List<IPipelineTask<DungeonGeneratorPayLoad>> GetPipelineItems()
@@ -55,7 +72,7 @@ namespace GameEngine
             {
                 new DungeonGeneratorTask(RoomCount),
                 new TilemapRenderingTask(),
-                new GraphRenderingTask(),
+                //new GraphRenderingTask(),
             };
             return pipelineItems;
         }

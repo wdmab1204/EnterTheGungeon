@@ -35,9 +35,14 @@ namespace GameEngine.DataSequence.Graph
 
         public Vector3Int GetGridWorldPosition() => new((int)minRoomPosX, (int)minRoomPosY);
 
-        public RoomNode GetNodeFromPos(Vector3 pos)
+        public RoomNode GetNodeAtPos(Vector3 pos)
         {
             return posToNodeMap[pos];
         }
+
+        //public RoomNode GetNodeFromPos(Vector3 pos)
+        //{
+            
+        //}
     }
 }

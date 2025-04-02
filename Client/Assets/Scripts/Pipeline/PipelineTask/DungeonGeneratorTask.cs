@@ -19,6 +19,7 @@ namespace GameEngine.Pipeline
         public DungeonGeneratorPayLoad PayLoad { get; set; }
         private int roomCount;
         private const int roomPadding = 1;
+        private GameObject roomInstanceRootObject;
 
         private Queue<GameObject> roomPrefabQueue = new();
 
@@ -30,6 +31,8 @@ namespace GameEngine.Pipeline
         public IEnumerator Process()
         {
             DungeonGraph dungeonGraph = new();
+            roomInstanceRootObject = new GameObject("Room Instance Root Object");
+            roomInstanceRootObject.transform.parent = PayLoad.RootGameObject.transform;
             CreateRandomRoom(dungeonGraph);
             yield return null;
 
@@ -83,6 +86,8 @@ namespace GameEngine.Pipeline
                     dungeonGraph.AddNode(roomNode);
                     tilemapRenderTasks.Add((tilemaps, roomWorldPosition));
                     sample--;
+
+                    CreateRoomInstance(roomPrefab, roomWorldPosition, roomInstanceRootObject.transform);
                 }
                 else
                 {
@@ -155,9 +160,9 @@ namespace GameEngine.Pipeline
                 var v2Pos = tri.v2.position;
                 var v3Pos = tri.v3.position;
 
-                var node1 = dungeonGraph.GetNodeFromPos(v1Pos);
-                var node2 = dungeonGraph.GetNodeFromPos(v2Pos);
-                var node3 = dungeonGraph.GetNodeFromPos(v3Pos);
+                var node1 = dungeonGraph.GetNodeAtPos(v1Pos);
+                var node2 = dungeonGraph.GetNodeAtPos(v2Pos);
+                var node3 = dungeonGraph.GetNodeAtPos(v3Pos);
 
                 edges.Add(new RoomEdge(node1, node2, Vector3.Distance(v1Pos, v2Pos)));
                 edges.Add(new RoomEdge(node2, node1, Vector3.Distance(v1Pos, v2Pos)));
@@ -386,6 +391,14 @@ namespace GameEngine.Pipeline
             foreach (var tilemap in result)
                 tilemap.CompressBounds();
             return result;
+        }
+
+        private void CreateRoomInstance(GameObject roomPrefab, Vector3 roomWorldPosition, Transform rootObject)
+        {
+            var roomInstance = UnityEngine.Object.Instantiate(roomPrefab, rootObject);
+            foreach (var tilemap in GetTilemaps(roomInstance))
+                GameUtil.Destroy(tilemap.gameObject);
+            roomInstance.transform.position = roomWorldPosition;
         }
     }
 }
