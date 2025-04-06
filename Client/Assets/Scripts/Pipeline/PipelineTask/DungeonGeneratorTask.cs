@@ -1,10 +1,8 @@
 using GameEngine.DataSequence.Geometry;
 using GameEngine.DataSequence.Graph;
 using GameEngine.DataSequence.PathFinding;
-using GameEngine.DataSequence.Queue;
 using GameEngine.DataSequence.Random;
 using GameEngine.DataSequence.Tree;
-using GameEngine.MapGenerator.Room;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,6 +12,17 @@ using UnityEngine.Tilemaps;
 
 namespace GameEngine.Pipeline
 {
+    public class RoomInstance
+    {
+        public List<GameObject> Doors { get; private set; } = new();
+
+        public void AddDoor(GameObject door)
+        {
+            door.SetActive(false);
+            Doors.Add(door);
+        }
+    }
+
     public class DungeonGeneratorTask : IPipelineTask<DungeonGeneratorPayLoad>
     {
         public DungeonGeneratorPayLoad PayLoad { get; set; }
@@ -22,6 +31,7 @@ namespace GameEngine.Pipeline
         private GameObject roomInstanceRootObject;
 
         private Queue<GameObject> roomPrefabQueue = new();
+        private Dictionary<RoomNode, RoomInstance> layoutData = new();
 
         public DungeonGeneratorTask(int roomCount)
         {
@@ -50,6 +60,8 @@ namespace GameEngine.Pipeline
 
             BuildRoad(dungeonGraph.Edges, gameGrid);
             yield return null;
+
+            PayLoad.LayoutData = layoutData;
         }
 
         private void CreateRandomRoom(DungeonGraph dungeonGraph)
@@ -79,15 +91,15 @@ namespace GameEngine.Pipeline
 
                 if (isBuilt = CanBuild(dungeonGraph.Vertices, roomWorldPositionContainPadding, roomTopRight))
                 {
-                    RoomNode roomNode = new(roomWorldPosition, size.x, size.y);
-                    roomNode.ID = id;
+                    RoomInstance roomInstance = new RoomInstance();
+                    RoomNode roomNode = new(roomWorldPosition, size.x, size.y, roomInstance);
+                    roomNode.ID = roomPrefab.name == "Start Room" ? 1000 : id;
                     id++;
 
+                    layoutData.Add(roomNode, roomInstance);
                     dungeonGraph.AddNode(roomNode);
                     tilemapRenderTasks.Add((tilemaps, roomWorldPosition));
                     sample--;
-
-                    CreateRoomInstance(roomPrefab, roomWorldPosition, roomInstanceRootObject.transform);
                 }
                 else
                 {
@@ -279,10 +291,16 @@ namespace GameEngine.Pipeline
                 Vector3 startCellWorldPosition = GetNearestCellFromRoom(firstPathCellPosition, node1.ToVector3(), node1.GetSize());
                 Vector3 endCellWorldPosition = GetNearestCellFromRoom(lastPathCellPosition, node2.ToVector3(), node2.GetSize());
 
-                (Tilemap[] sourceDoorTilemaps, Vector3 sourceDoorPosition) = GetDoor(startCellWorldPosition, firstPathCellPosition);
+                (GameObject sourceDoorPrefab, Tilemap[] sourceDoorTilemaps, Vector3 sourceDoorPosition) = GetDoor(startCellWorldPosition, firstPathCellPosition);
                 pathwayList.Add((sourceDoorTilemaps, sourceDoorPosition));
-                (Tilemap[] destinationDoorTilemaps, Vector3 destinationDoorPosition) = GetDoor(endCellWorldPosition, lastPathCellPosition);
+                (GameObject destinationDoorPrefab, Tilemap[] destinationDoorTilemaps, Vector3 destinationDoorPosition) = GetDoor(endCellWorldPosition, lastPathCellPosition);
                 pathwayList.Add((destinationDoorTilemaps, destinationDoorPosition));
+
+                var sourceDoorInstance = CreateInstance(sourceDoorPrefab, sourceDoorPosition, roomInstanceRootObject.transform);
+                var destinationDoorInstance = CreateInstance(destinationDoorPrefab, destinationDoorPosition, roomInstanceRootObject.transform);
+
+                layoutData[node1].AddDoor(sourceDoorInstance);
+                layoutData[node2].AddDoor(destinationDoorInstance);
             }
 
             PayLoad.TilemapRenderTaskList.AddRange(pathwayList);
@@ -355,15 +373,17 @@ namespace GameEngine.Pipeline
             throw new System.ArgumentException("Rectangle Contains Point");
         }
 
-        private (Tilemap[] doorTilemaps, Vector3 doorPosition) GetDoor(Vector3 firstCellPosition, Vector3 secondCellPosition)
+        private (GameObject prefab, Tilemap[] doorTilemaps, Vector3 doorPosition) GetDoor(Vector3 firstCellPosition, Vector3 secondCellPosition)
         {
+            GameObject prefab;
             Vector3 doorPosition;
             Tilemap[] doorTilemaps;
             int size;
             Vector3 direction = secondCellPosition - firstCellPosition;
             if (direction.y == 0)
             {
-                doorTilemaps = GetTilemaps(PayLoad.HorizonDoor);
+                prefab = PayLoad.HorizonDoor;
+                doorTilemaps = GetTilemaps(prefab);
                 size = GameUtil.GetBoundsIntFromTilemaps(doorTilemaps).size.x;
                 if (direction.x > 0)
                     doorPosition = new(secondCellPosition.x - size, secondCellPosition.y);
@@ -372,7 +392,8 @@ namespace GameEngine.Pipeline
             }
             else if (direction.x == 0)
             {
-                doorTilemaps = GetTilemaps(PayLoad.VerticalDoor);
+                prefab = PayLoad.VerticalDoor;
+                doorTilemaps = GetTilemaps(prefab);
                 size = GameUtil.GetBoundsIntFromTilemaps(doorTilemaps).size.y;
                 if (direction.y > 0)
                     doorPosition = new(secondCellPosition.x, secondCellPosition.y - size);
@@ -382,7 +403,7 @@ namespace GameEngine.Pipeline
             else
                 throw new System.InvalidOperationException("Direction is not horizontal or vertical");
 
-            return (doorTilemaps, doorPosition);
+            return (prefab, doorTilemaps, doorPosition);
         }
 
         private Tilemap[] GetTilemaps(GameObject prefab)
@@ -393,12 +414,14 @@ namespace GameEngine.Pipeline
             return result;
         }
 
-        private void CreateRoomInstance(GameObject roomPrefab, Vector3 roomWorldPosition, Transform rootObject)
+        private GameObject CreateInstance(GameObject prefab, Vector3 worldPosition, Transform rootObject)
         {
-            var roomInstance = UnityEngine.Object.Instantiate(roomPrefab, rootObject);
-            foreach (var tilemap in GetTilemaps(roomInstance))
+            var gameObjectInstance = UnityEngine.Object.Instantiate(prefab, rootObject);
+            foreach (var tilemap in GetTilemaps(gameObjectInstance))
                 GameUtil.Destroy(tilemap.gameObject);
-            roomInstance.transform.position = roomWorldPosition;
+            gameObjectInstance.transform.position = worldPosition;
+
+            return gameObjectInstance;
         }
     }
 }

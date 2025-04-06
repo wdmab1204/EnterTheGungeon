@@ -61,7 +61,11 @@ namespace GameEngine
 
             Debug.Log($"Total Seconds : {sw.ElapsedMilliseconds / 1000f}s");
 
-            DungeonGeneratorLevel dungeonGeneratorLevel = new(payLoad.DungeonGraph.Vertices);
+            DungeonGeneratorLevel dungeonGeneratorLevel = new()
+            {
+                Rooms = payLoad.DungeonGraph.Vertices,
+                LayoutData = payLoad.LayoutData,
+            };
 
             return dungeonGeneratorLevel;
         }

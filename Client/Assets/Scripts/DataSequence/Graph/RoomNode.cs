@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using GameEngine.Pipeline;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,10 +10,13 @@ namespace GameEngine.DataSequence.Graph
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public RoomNode(Vector3 position, int width, int height) : base(position)
+        private RoomInstance roomInstance;
+
+        public RoomNode(Vector3 position, int width, int height, RoomInstance roomInstance) : base(position)
         {
             Width = width;
             Height = height;
+            this.roomInstance = roomInstance;
         }
 
         public Vector3 GetCenter()
@@ -36,9 +39,11 @@ namespace GameEngine.DataSequence.Graph
 
         public bool Equals(RoomNode other)
         {
-            Vector3 myVec = this.ToVector3();
-            Vector3 otherVec = other.ToVector3();
-            return myVec == otherVec;
+            bool compare = this.ID == other.ID;
+            if(compare == false)
+                compare = this.ToVector3() == other.ToVector3();
+
+            return compare;
         }
 
         public override bool Equals(object obj)

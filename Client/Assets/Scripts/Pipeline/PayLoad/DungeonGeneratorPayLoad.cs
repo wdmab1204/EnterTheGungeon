@@ -25,5 +25,7 @@ namespace GameEngine.Pipeline
         public int GridCellSize { get; set; }
         public bool ShowGizmos { get; set; }
 
+        public Dictionary<RoomNode, RoomInstance> LayoutData { get; set; }
+
     }
 }
