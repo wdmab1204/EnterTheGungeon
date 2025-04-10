@@ -15,11 +15,18 @@ namespace GameEngine.Pipeline
     public class RoomInstance
     {
         public List<GameObject> Doors { get; private set; } = new();
+        public List<GameObject> Mobs { get; private set; } = new();
 
         public void AddDoor(GameObject door)
         {
             door.SetActive(false);
             Doors.Add(door);
+        }
+
+        public void AddMob(GameObject mob)
+        {
+            mob.SetActive(false);
+            Mobs.Add(mob);
         }
     }
 
@@ -95,6 +102,10 @@ namespace GameEngine.Pipeline
                     RoomNode roomNode = new(roomWorldPosition, size.x, size.y, roomInstance);
                     roomNode.ID = roomPrefab.name == "Start Room" ? 1000 : id;
                     id++;
+
+                    var mobs = CreateInstance(roomPrefab, roomWorldPosition, roomInstanceRootObject.transform).
+                        GetComponentsInChildren<Monster>();
+                    foreach (var mob in mobs) roomInstance.AddMob(mob.gameObject);
 
                     layoutData.Add(roomNode, roomInstance);
                     dungeonGraph.AddNode(roomNode);

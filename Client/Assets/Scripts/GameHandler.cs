@@ -1,5 +1,4 @@
 using GameEngine.DataSequence.Graph;
-using GameEngine.MapGenerator.Room;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -43,6 +42,9 @@ namespace GameEngine
                     foreach(var door in layoutData[room].Doors)
                         door.SetActive(true);
                     
+                    foreach(var mob in layoutData[room].Mobs)
+                        mob.SetActive(true);
+
                     return;
                 }
             }
@@ -69,8 +71,6 @@ namespace GameEngine
                 roomArea.y -= width * 2;
 
                 bool result = MathUtility.IsPointInRectangle(position, roomWorldPosition, roomArea);
-                if (result)
-                    Debug.Log(roomWorldPosition + ", " + roomArea);
                 return result;
             }
         }
