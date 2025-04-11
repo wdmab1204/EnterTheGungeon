@@ -13,7 +13,10 @@ public class Bullet : MonoBehaviour
             GameUtil.Destroy(gameObject);
 
         if (!string.IsNullOrEmpty(TargetTag) && collidableObject.CompareTag(TargetTag))
+        {
             GameUtil.Destroy(collidableObject);
+            GameUtil.Destroy(gameObject);
+        }   
     }
 
     private void OnBecameInvisible()

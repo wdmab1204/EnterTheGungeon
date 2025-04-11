@@ -13,6 +13,7 @@ namespace GameEngine
 
         private HashSet<RoomNode> visitedRoomSet = new();
         private RoomNode currentVisitRoom;
+        private new FollowPlayer camera;
 
         private void Awake()
         {
@@ -23,6 +24,10 @@ namespace GameEngine
             SetPlayerPosition(playerMovementController.transform);
             playerMovementController.onMove += OnUserMove;
             OnUserMove(playerMovementController.transform.position);
+
+            camera = GameObject.Find("Main Camera").GetComponent<FollowPlayer>();
+            camera.transform.position = playerMovementController.transform.position;
+            camera.AddTransform(playerMovementController.transform);
         }
 
         private void OnUserMove(Vector3 position)
@@ -43,7 +48,10 @@ namespace GameEngine
                         door.SetActive(true);
                     
                     foreach(var mob in layoutData[room].Mobs)
+                    {
+                        camera.AddTransform(mob.transform);
                         mob.SetActive(true);
+                    }
 
                     return;
                 }
