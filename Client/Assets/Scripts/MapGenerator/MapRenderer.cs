@@ -10,6 +10,7 @@ namespace GameEngine.MapGenerator
     {
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private Tilemap tilemap;
+        [FormerlySerializedAs("collderMap")] [SerializeField] private Tilemap colliderMap;
         [SerializeField] private TileBase tile;
         private Vector2Int mapSize;
         private List<Rect> list = new();
@@ -30,15 +31,21 @@ namespace GameEngine.MapGenerator
         {
             for(int i=x; i<x+width; i++)
             for (int j = y; j < y + height; j++)
-                tilemap.SetTile(new Vector3Int(i, j, 0), tile);
+                SetTile(new Vector3Int(i, j, 0), tile);
         }
 
         public void DrawRoad(Vector2Int node1, Vector2Int node2)
         {
-            for (int x = Mathf.Min(node1.x, node1.x); x <= Mathf.Max(node1.x, node2.x); x++)
-                tilemap.SetTile(new Vector3Int(x, node1.y , 0), tile); 
+            for (int x = Mathf.Min(node1.x, node2.x); x <= Mathf.Max(node1.x, node2.x); x++)
+                SetTile(new Vector3Int(x, node1.y , 0), tile); 
             for (int y = Mathf.Min(node1.y, node2.y); y <= Mathf.Max(node1.y, node2.y); y++)
-                tilemap.SetTile(new Vector3Int(node2.x, y, 0), tile);
+                SetTile(new Vector3Int(node2.x, y, 0), tile);
+        }
+
+        private void SetTile(Vector3Int tilePos, TileBase tile)
+        {
+            tilemap.SetTile(tilePos, tile);
+            colliderMap.SetTile(tilePos, null);
         }
 
         private void OnDrawGizmosSelected()

@@ -8,14 +8,7 @@ public class FanShapeShooting : MonoBehaviour
     public float spreadAngle = 60f;  // 부채꼴 각도
     public float bulletSpeed = 5f;   // 탄환 속도
 
-    private CharacterController player;
-    
-    private void Start()
-    {
-        player = GameObject.FindObjectOfType<CharacterController>();
-    }
-
-    void Shoot(Vector2 targetPosition)
+    public void Shoot(Vector2 targetPosition)
     {
         float halfDegree = spreadAngle / 2;
         float startAngle = -halfDegree;
@@ -35,21 +28,6 @@ public class FanShapeShooting : MonoBehaviour
             bullet.transform.position = transform.position;
             Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
             rb.velocity = shootDirection * bulletSpeed;
-        }
-    }
-
-    private float timeInterval = 3f;
-    private float curTime = 0f;
-    
-    void Update()
-    {
-        if (curTime < timeInterval)
-            curTime += Time.deltaTime;
-        else
-        {
-            curTime = 0;
-            Vector2 mousePosition = player.transform.position;
-            Shoot(mousePosition);
         }
     }
 }
