@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace GameEngine.DataSequence.Graph
 {
@@ -13,6 +14,7 @@ namespace GameEngine.DataSequence.Graph
     {
         public RoomNode From { get; set; }
         public RoomNode To { get; set; }
+        public IEnumerable<GridCell> PathResult { get; set; }
         public float Weight { get; set; }
 
         public RoomEdge(RoomNode from, RoomNode to, float weight)
@@ -31,12 +33,5 @@ namespace GameEngine.DataSequence.Graph
         {
             return Weight.CompareTo(other.Weight);
         }
-    }
-
-    public class RoadEdge : IEdge<GridCell>
-    {
-        public GridCell From { get; set; }
-        public GridCell To { get; set; }
-        public float Weight { get; set; }
     }
 }

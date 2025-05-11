@@ -47,14 +47,5 @@ namespace GameEngine.DataSequence.Graph
             var neighborEdges = adjacencyMap[item];
             return neighborEdges.Select(edge => edge.To);
         }
-
-        public List<TEdge> AllGetEdges()
-        {
-            List<TEdge> edgeList = new();
-            foreach (var edges in adjacencyMap.Values)
-                edgeList.AddRange(edges);
-
-            return edgeList;
-        }
     }
 }

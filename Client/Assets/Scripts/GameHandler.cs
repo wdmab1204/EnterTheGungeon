@@ -1,6 +1,8 @@
 using GameEngine.DataSequence.Graph;
+using GameEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace GameEngine
@@ -8,8 +10,10 @@ namespace GameEngine
     public class GameHandler : MonoBehaviour
     {
         DungeonGeneratorBase dungeonGenerator;
-        CharacterController playerMovementController;
         DungeonGeneratorLevel dungeonGeneratorLevel;
+        CharacterController playerMovementController;
+
+        [SerializeField] private UI_Minimap minimapUI;
 
         private HashSet<RoomNode> visitedRoomSet = new();
         private RoomNode currentVisitRoom;
@@ -89,6 +93,30 @@ namespace GameEngine
             Vector3 worldPosition = startRoom.GetCenter();
             playerTrans.position = worldPosition;
             visitedRoomSet.Add(startRoom);
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                var ui = Instantiate(minimapUI, minimapUI.transform.parent);
+                ui.gameObject.SetActive(true);
+                ui.SetData(
+                    dungeonGeneratorLevel.Rooms,
+                    dungeonGeneratorLevel.RoadEdges,
+                    playerMovementController.transform.position,
+                    dungeonGeneratorLevel.GridCellSize);
+                playerMovementController.onMove += ui.OnMovePlayer;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                var ui = GameObject.Find("Minimap UI(Clone)")?.GetComponent<UI_Minimap>();
+                if (ui == null) return;
+                playerMovementController.onMove -= ui.OnMovePlayer;
+                GameUtil.Destroy(ui.gameObject);
+            }
+                
         }
     }
 }

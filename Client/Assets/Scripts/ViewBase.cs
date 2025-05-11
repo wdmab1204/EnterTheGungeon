@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameEngine
+namespace GameEngine.UI
 {
     public abstract class ViewBase : MonoBehaviour
     {
