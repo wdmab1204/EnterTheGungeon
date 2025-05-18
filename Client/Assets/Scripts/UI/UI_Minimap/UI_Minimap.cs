@@ -1,5 +1,6 @@
 using GameEngine.DataSequence.Graph;
 using GameEngine.UI.Minimap;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,17 +9,19 @@ namespace GameEngine.UI
 {
     public class UI_Minimap : MonoBehaviour
     {
-        [SerializeField] private Sprite roomSprite;
+        [SerializeField] private MinimapScreen minimapScreen;
+        [SerializeField] private MinimapOveray minimapOveray;
+
         [SerializeField] private RectTransform playerIcon;
         [SerializeField] private RoomRenderer roomRenderer;
         [SerializeField] private RoadRenderer roadRenderer;
-        [SerializeField] private Transform zoomGroup;
         [SerializeField] private Transform roomLayer;
         [SerializeField] private Transform roadLayer;
+        [SerializeField] private Transform minimapObject;
 
-        private float zoomValue = 4f;
-        private float minZoomValue, maxZoomValue;
         private Vector3 initPlayerPosition;
+        private Func<Vector3> getPlayerPosition;
+        private IMinimapDisplay currentMinimapDisplay;
 
         private static readonly Vector3Int[] clockWiseDirections = new Vector3Int[]
         {
@@ -28,22 +31,57 @@ namespace GameEngine.UI
             Vector3Int.left
         };
 
-        public void SetData(
-            IEnumerable<RoomNode>   rooms,
-            IEnumerable<RoomEdge>   roads,
-            Vector3                 playerPosition,
-            int                     gridCellSize)
+        public enum Mode
         {
-            initPlayerPosition = playerPosition;
-            Vector3 centerOffset = playerPosition;
+            Overay,
+            Screen
+        };
+
+        private void Start()
+        {
+            SetMode(Mode.Overay);
+        }
+
+        public void SetMode(Mode mode)
+        {
+            if(mode == Mode.Screen)
+            {
+                minimapOveray.gameObject.SetActive(false);
+                minimapScreen.gameObject.SetActive(true);
+                minimapScreen.SetGameObject(minimapObject.gameObject);
+                minimapScreen.OnMovePlayer(getPlayerPosition() - initPlayerPosition);
+                currentMinimapDisplay = minimapScreen;
+            }
+            else if(mode == Mode.Overay)
+            {
+                minimapOveray.gameObject.SetActive(true);
+                minimapScreen.gameObject.SetActive(false);
+                minimapOveray.SetGameObject(minimapObject.gameObject);
+                minimapOveray.OnMovePlayer(getPlayerPosition() - initPlayerPosition);
+                currentMinimapDisplay = minimapOveray;
+            }
+        }
+
+        public void Render(
+            IEnumerable<RoomNode> rooms,
+            IEnumerable<RoomEdge> roads,
+            Func<Vector3> getPlayerPosition,
+            int gridCellSize)
+        {
+            var playerPos = getPlayerPosition();
+            this.getPlayerPosition = getPlayerPosition;
+            initPlayerPosition = playerPos;
+            Vector3 centerOffset = playerPos;
 
             RenderRooms(rooms, centerOffset);
             RenderRoads(roads, gridCellSize, centerOffset);
 
             playerIcon.anchoredPosition = Vector2.zero;
+        }
 
-            minZoomValue = zoomValue / 3f;
-            maxZoomValue = zoomValue * 3;
+        public void OnMovePlayer(Vector3 playerPosition)
+        {
+            currentMinimapDisplay?.OnMovePlayer(playerPosition - initPlayerPosition);
         }
 
         private void RenderRooms(IEnumerable<RoomNode> rooms, Vector3 centerOffset)
@@ -66,31 +104,6 @@ namespace GameEngine.UI
             }
         }
 
-        private void RenderRoads(IEnumerable<RoomEdge> roads, int gridCellSize, Vector3 centerOffset)
-        {
-            foreach (var road in roads)
-            {
-                var roadRenderer = Instantiate(this.roadRenderer, roadLayer);
-                roadRenderer.gameObject.SetActive(true);
-
-                var worldPoints = road.PathResult.Select(p => p.ToVector3()).ToList();
-                var min = new Vector3(worldPoints.Min(p => p.x), worldPoints.Min(p => p.y));
-
-                var localPoints = worldPoints
-                    .Select(p => new Vector2(p.x - min.x + gridCellSize / 2f, p.y - min.y + gridCellSize / 2f))
-                    .ToList();
-
-                roadRenderer.rectTransform.anchoredPosition = min - centerOffset;
-                roadRenderer.points = localPoints.ToArray();
-            }
-        }
-
-        public void OnMovePlayer(Vector3 playerPosition)
-        {
-            Vector2 playerIconAnchorPosition = playerPosition - initPlayerPosition;
-            playerIcon.anchoredPosition = playerIconAnchorPosition;
-        }
-
         private HashSet<Vector3Int> AllGetTilePosition(RoomNode room)
         {
             HashSet<Vector3Int> allPoints = new();
@@ -106,10 +119,10 @@ namespace GameEngine.UI
 
             return allPoints;
         }
-        
+
         private List<Vector3Int> GetOutlinePoints(HashSet<Vector3Int> pointSet)
         {
-            HashSet<(Vector3Int, Vector3Int)>   lineSet = new();
+            HashSet<(Vector3Int, Vector3Int)> lineSet = new();
             List<Vector3Int> lineList = new();
 
             foreach (var cellPosition in pointSet)
@@ -149,14 +162,36 @@ namespace GameEngine.UI
             return lineList;
         }
 
+        private void RenderRoads(IEnumerable<RoomEdge> roads, int gridCellSize, Vector3 centerOffset)
+        {
+            foreach (var road in roads)
+            {
+                var roadRenderer = Instantiate(this.roadRenderer, roadLayer);
+                roadRenderer.gameObject.SetActive(true);
+
+                var worldPoints = road.PathResult.Select(p => p.ToVector3()).ToList();
+                var min = new Vector3(worldPoints.Min(p => p.x), worldPoints.Min(p => p.y));
+
+                var localPoints = worldPoints
+                    .Select(p => new Vector2(p.x - min.x + gridCellSize / 2f, p.y - min.y + gridCellSize / 2f))
+                    .ToList();
+
+                roadRenderer.rectTransform.anchoredPosition = min - centerOffset;
+                roadRenderer.points = localPoints.ToArray();
+            }
+        }
+
         private void Update()
         {
-            float scrollDelta = Input.GetAxis("Mouse ScrollWheel");
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                SetMode(Mode.Screen);
+            }
 
-            zoomValue += scrollDelta * 0.5f;
-            zoomValue = Mathf.Clamp(zoomValue + scrollDelta * 0.5f, minZoomValue, maxZoomValue);
-
-            zoomGroup.localScale = Vector3.one * zoomValue;
+            else if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                SetMode(Mode.Overay);
+            }
         }
     }
 }

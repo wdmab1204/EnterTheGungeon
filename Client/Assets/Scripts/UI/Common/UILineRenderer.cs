@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace GameEngine.UI
 {
-    public class UILineRenderer : Graphic
+    public class UILineRenderer : MaskableGraphic
     {
         public Vector2[] points;
 

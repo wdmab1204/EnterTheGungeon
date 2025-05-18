@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace GameEngine.UI.Minimap
 {
-    public class RoomRenderer : Graphic
+    public class RoomRenderer : MaskableGraphic
     {
         public Vector3Int[] cellPositions;
 

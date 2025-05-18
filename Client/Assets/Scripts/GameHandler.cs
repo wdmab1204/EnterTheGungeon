@@ -32,6 +32,13 @@ namespace GameEngine
             camera = GameObject.Find("Main Camera").GetComponent<FollowPlayer>();
             camera.transform.position = playerMovementController.transform.position;
             camera.AddTransform(playerMovementController.transform);
+
+            minimapUI.Render(
+                dungeonGeneratorLevel.Rooms,
+                dungeonGeneratorLevel.RoadEdges,
+                () => playerMovementController.transform.position,
+                dungeonGeneratorLevel.GridCellSize);
+            playerMovementController.onMove += minimapUI.OnMovePlayer;
         }
 
         private void OnUserMove(Vector3 position)
@@ -93,30 +100,6 @@ namespace GameEngine
             Vector3 worldPosition = startRoom.GetCenter();
             playerTrans.position = worldPosition;
             visitedRoomSet.Add(startRoom);
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                var ui = Instantiate(minimapUI, minimapUI.transform.parent);
-                ui.gameObject.SetActive(true);
-                ui.SetData(
-                    dungeonGeneratorLevel.Rooms,
-                    dungeonGeneratorLevel.RoadEdges,
-                    playerMovementController.transform.position,
-                    dungeonGeneratorLevel.GridCellSize);
-                playerMovementController.onMove += ui.OnMovePlayer;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                var ui = GameObject.Find("Minimap UI(Clone)")?.GetComponent<UI_Minimap>();
-                if (ui == null) return;
-                playerMovementController.onMove -= ui.OnMovePlayer;
-                GameUtil.Destroy(ui.gameObject);
-            }
-                
         }
     }
 }
