@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameEngine
+namespace GameEngine.UI
 {
     public abstract class ViewBase : MonoBehaviour
     {
@@ -24,9 +24,9 @@ namespace GameEngine
             for (int i = 0; i < names.Length; i++)
             {
                 if (typeof(T) == typeof(GameObject))
-                    objects[i] = Util.FindChild(gameObject, names[i], true);
+                    objects[i] = GameUtil.FindChild(gameObject, names[i], true);
                 else
-                    objects[i] = Util.FindChild<T>(gameObject, names[i], true);
+                    objects[i] = GameUtil.FindChild<T>(gameObject, names[i], true);
 
                 if (objects[i] == null)
                     Debug.LogError($"Failed to bind({names[i]})");

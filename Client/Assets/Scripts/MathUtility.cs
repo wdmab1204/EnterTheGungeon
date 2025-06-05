@@ -97,5 +97,12 @@ namespace GameEngine
 
             return isContains;
         }
+
+        public static int ClampListIndex(int index, int listSize)
+        {
+            index = ((index % listSize) + listSize) % listSize;
+
+            return index;
+        }
     }
 }

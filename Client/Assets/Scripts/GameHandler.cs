@@ -1,6 +1,8 @@
 using GameEngine.DataSequence.Graph;
+using GameEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace GameEngine
@@ -8,8 +10,10 @@ namespace GameEngine
     public class GameHandler : MonoBehaviour
     {
         DungeonGeneratorBase dungeonGenerator;
-        CharacterController playerMovementController;
         DungeonGeneratorLevel dungeonGeneratorLevel;
+        CharacterController playerMovementController;
+
+        [SerializeField] private UI_Minimap minimapUI;
 
         private HashSet<RoomNode> visitedRoomSet = new();
         private RoomNode currentVisitRoom;
@@ -28,6 +32,13 @@ namespace GameEngine
             camera = GameObject.Find("Main Camera").GetComponent<FollowPlayer>();
             camera.transform.position = playerMovementController.transform.position;
             camera.AddTransform(playerMovementController.transform);
+
+            minimapUI.Render(
+                dungeonGeneratorLevel.Rooms,
+                dungeonGeneratorLevel.RoadEdges,
+                () => playerMovementController.transform.position,
+                dungeonGeneratorLevel.GridCellSize);
+            playerMovementController.onMove += minimapUI.OnMovePlayer;
         }
 
         private void OnUserMove(Vector3 position)

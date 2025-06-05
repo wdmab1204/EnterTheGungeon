@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace GameEngine.DataSequence.Graph
 {
@@ -29,13 +30,7 @@ namespace GameEngine.DataSequence.Graph
             return new Vector3(Width, Height);
         }
 
-        public Vector3 GetCenterInt()
-        {
-            var center = GetCenter();
-            center.x = (int)center.x;
-            center.y = (int)center.y;
-            return center;
-        }
+        public Tilemap[] GetTilemaps() => roomInstance.Tilemaps;
 
         public bool Equals(RoomNode other)
         {

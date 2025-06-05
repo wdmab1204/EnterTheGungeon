@@ -16,6 +16,7 @@ namespace GameEngine.Pipeline
     {
         public List<GameObject> Doors { get; private set; } = new();
         public List<GameObject> Mobs { get; private set; } = new();
+        public Tilemap[] Tilemaps { get; private set; }
 
         public void AddDoor(GameObject door)
         {
@@ -27,6 +28,11 @@ namespace GameEngine.Pipeline
         {
             mob.SetActive(false);
             Mobs.Add(mob);
+        }
+
+        public void AddTilemaps(Tilemap[] tilemaps)
+        {
+            this.Tilemaps = tilemaps;
         }
     }
 
@@ -102,6 +108,8 @@ namespace GameEngine.Pipeline
                     RoomNode roomNode = new(roomWorldPosition, size.x, size.y, roomInstance);
                     roomNode.ID = roomPrefab.name == "Start Room" ? 1000 : id;
                     id++;
+
+                    roomInstance.AddTilemaps(tilemaps);
 
                     var mobs = CreateInstance(roomPrefab, roomWorldPosition, roomInstanceRootObject.transform).
                         GetComponentsInChildren<Monster>();
@@ -292,15 +300,23 @@ namespace GameEngine.Pipeline
                     pathwayList.Add((GetTilemaps(roadPrefab), curCell.ToVector3Int()));
                 }
 
-                var list = pathResult.ToList();
-                GridCell firstPathCell = list.First();
-                GridCell lastPathCell = list.Last();
+                var pathResultList = pathResult.ToList();
+                GridCell firstPathCell = pathResultList.First();
+                GridCell lastPathCell = pathResultList.Last();
 
                 Vector3 firstPathCellPosition = firstPathCell.ToVector3();
                 Vector3 lastPathCellPosition = lastPathCell.ToVector3();
 
                 Vector3 startCellWorldPosition = GetNearestCellFromRoom(firstPathCellPosition, node1.ToVector3(), node1.GetSize());
                 Vector3 endCellWorldPosition = GetNearestCellFromRoom(lastPathCellPosition, node2.ToVector3(), node2.GetSize());
+
+                GridCell startCell = gameGrid.GetCell(startCellWorldPosition);
+                GridCell endCell = gameGrid.GetCell(endCellWorldPosition);
+
+                pathResultList.Insert(0, startCell);
+                pathResultList.Add(endCell);
+
+                edge.PathResult = pathResultList;
 
                 (GameObject sourceDoorPrefab, Tilemap[] sourceDoorTilemaps, Vector3 sourceDoorPosition) = GetDoor(startCellWorldPosition, firstPathCellPosition);
                 pathwayList.Add((sourceDoorTilemaps, sourceDoorPosition));
