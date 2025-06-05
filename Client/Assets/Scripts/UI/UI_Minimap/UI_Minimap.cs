@@ -3,6 +3,7 @@ using GameEngine.UI.Minimap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GameEngine.UI
@@ -98,9 +99,18 @@ namespace GameEngine.UI
                 var cellPositions = AllGetTilePosition(room);
                 roomRenderer.cellPositions = cellPositions.ToArray();
 
-                var outline = GetOutlinePoints(cellPositions);
-                outline.Add(outline[1]);
-                roomRenderer.GetComponentInChildren<UILineRenderer>().points = outline.Select(p => new Vector2(p.x, p.y)).ToArray();
+                var outlines = GetAllOutlinePoints(cellPositions);
+                foreach(var outline in outlines)
+                {
+                    outline.Add(outline[1]);
+
+                    var lineRenderer = new GameObject("UI Line Renderer").AddComponent<UILineRenderer>();
+                    lineRenderer.transform.SetParent(roomRenderer.transform, false);
+                    lineRenderer.color = Color.black;
+                    lineRenderer.thickness = 2;
+                    lineRenderer.raycastTarget = false;
+                    lineRenderer.points = outline.Select(p => new Vector2(p.x, p.y)).ToArray();
+                }
             }
         }
 
@@ -120,11 +130,12 @@ namespace GameEngine.UI
             return allPoints;
         }
 
-        private List<Vector3Int> GetOutlinePoints(HashSet<Vector3Int> pointSet)
+        private List<List<Vector3Int>> GetAllOutlinePoints(HashSet<Vector3Int> pointSet)
         {
             HashSet<(Vector3Int, Vector3Int)> lineSet = new();
-            List<Vector3Int> lineList = new();
+            Dictionary<Vector3Int, Vector3Int> lineConnectMap = new();
 
+            // 1. 외곽선을 구성하는 선분 찾기
             foreach (var cellPosition in pointSet)
             {
                 Vector3Int to = cellPosition, from;
@@ -133,34 +144,50 @@ namespace GameEngine.UI
                     from = to;
                     to = from + clockWiseDirections[i];
 
-                    if (lineSet.Remove((from, to)))
-                        continue;
-                    if (lineSet.Remove((to, from)))
+                    if (lineSet.Remove((from, to)) || lineSet.Remove((to, from)))
                         continue;
 
                     lineSet.Add((from, to));
                 }
             }
 
-            var lineConnectMap = lineSet.ToDictionary(line => line.Item1, line => line.Item2);
-
-            Vector3Int current = lineConnectMap.First().Key;
-            HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
-
-            lineList.Add(current);
-
-            while (lineConnectMap.TryGetValue(current, out var next))
+            // 2. 연결 정보 구성
+            foreach (var line in lineSet)
             {
-                if (visited.Contains(current))
-                    break;
-
-                visited.Add(current);
-                lineList.Add(next);
-                current = next;
+                lineConnectMap[line.Item1] = line.Item2;
             }
 
-            return lineList;
+            // 3. 외곽선 여러 개 추적
+            List<List<Vector3Int>> outlines = new();
+            HashSet<Vector3Int> visited = new();
+
+            foreach (var start in lineConnectMap.Keys.ToList())
+            {
+                if (visited.Contains(start))
+                    continue;
+
+                List<Vector3Int> line = new();
+                Vector3Int current = start;
+
+                do
+                {
+                    visited.Add(current);
+                    line.Add(current);
+
+                    if (!lineConnectMap.TryGetValue(current, out var next))
+                        break;
+
+                    current = next;
+                }
+                while (!visited.Contains(current));
+
+                if (line.Count > 1)
+                    outlines.Add(line);
+            }
+
+            return outlines;
         }
+
 
         private void RenderRoads(IEnumerable<RoomEdge> roads, int gridCellSize, Vector3 centerOffset)
         {
