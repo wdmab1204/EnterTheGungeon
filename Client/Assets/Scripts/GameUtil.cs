@@ -42,20 +42,26 @@ namespace GameEngine
                 GameObject.DestroyImmediate(obj);
         }
 
-        public static LineRenderer CreateLineRenderer(Color color, float width, params Vector3[] positions)
+        public static LineRenderer CreateLineRenderer(Color color, float width)
         {
             LineRenderer lineRenderer = new GameObject("Line Renderer").AddComponent<LineRenderer>();
+            lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
+            lineRenderer.sharedMaterial.color = color;
+            lineRenderer.startWidth = width;
+            lineRenderer.endWidth = width;
+
+            return lineRenderer;
+        }
+
+        public static LineRenderer CreateLineRenderer(Color color, float width, params Vector3[] positions)
+        {
+            LineRenderer lineRenderer = CreateLineRenderer(color, width);
             lineRenderer.positionCount = positions.Length;
             for(int i=0; i<positions.Length - 1; i++)
             {
                 lineRenderer.SetPosition(i, positions[i]);
                 lineRenderer.SetPosition(i + 1, positions[i + 1]);
             }
-            
-            lineRenderer.material = new Material(Shader.Find("Unlit/Color"));
-            lineRenderer.sharedMaterial.color = color;
-            lineRenderer.startWidth = width;
-            lineRenderer.endWidth = width;
 
             return lineRenderer;
         }

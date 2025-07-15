@@ -1,0 +1,74 @@
+{
+  "guns": [
+    {
+      "ID": 1,
+      "Name": "녹슨 사이드암",
+      "GunForm": 1,
+      "AmmoSize": 6,
+      "AmmoCount": -1,
+      "ReloadTime": 1.2,
+      "Speed": 16,
+      "Knockback": 10,
+      "Damage": 6,
+      "Delay": 0.2,
+      "Range": 16,
+      "Spread": 7
+    },
+    {
+      "ID": 2,
+      "Name": "저가형 리볼버",
+      "GunForm": 1,
+      "AmmoSize": 5,
+      "AmmoCount": -1,
+      "ReloadTime": 0.9,
+      "Speed": 23,
+      "Knockback": 10,
+      "Damage": 6,
+      "Delay": 0.15,
+      "Range": 18,
+      "Spread": 10
+    },
+    {
+      "ID": 3,
+      "Name": "머신 피스톨",
+      "GunForm": 2,
+      "AmmoSize": 30,
+      "AmmoCount": 600,
+      "ReloadTime": 1.2,
+      "Speed": 23,
+      "Knockback": 6,
+      "Damage": 3.2,
+      "Delay": 0.07,
+      "Range": 16,
+      "Spread": 10
+    },
+    {
+      "ID": 4,
+      "Name": "톰슨 서브머신건",
+      "GunForm": 2,
+      "AmmoSize": 30,
+      "AmmoCount": 350,
+      "ReloadTime": 0.78,
+      "Speed": 9,
+      "Knockback": 23,
+      "Damage": 5,
+      "Delay": 0.1,
+      "Range": -1,
+      "Spread": 10
+    },
+    {
+      "ID": 5,
+      "Name": "패트리어트",
+      "GunForm": 2,
+      "AmmoSize": 100,
+      "AmmoCount": 500,
+      "ReloadTime": 1,
+      "Speed": 300,
+      "Knockback": 15,
+      "Damage": 7,
+      "Delay": 0.3,
+      "Range": -1,
+      "Spread": 1
+    }
+  ]
+}
