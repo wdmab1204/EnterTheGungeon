@@ -35,7 +35,7 @@ namespace GameEngine
             {
                 avrPosition /= validCount;
                 Vector3 smoothedPosition = Vector3.Lerp(transform.position, avrPosition, smoothSpeed * Time.deltaTime);
-                transform.position = smoothedPosition;
+                transform.position = smoothedPosition + offset;
             }
 
             foreach (var t in removeList)

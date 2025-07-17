@@ -20,6 +20,9 @@ namespace GameEngine.GunController
         public int Range;           //사거리
         public int Spread;          //산탄도
 
+        public float ShakeDuration; //카메라 진동 시간
+        public float ShakeIntensity;//카메라 진동 세기
+
         public GunTransformData TransformData;
     }
 

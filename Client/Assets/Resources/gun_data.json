@@ -14,6 +14,9 @@
       "Range": 16,
       "Spread": 7,
 
+      "ShakeDuration": 0.1,
+      "ShakeIntensity": 0.02,
+
       "TransformData": {
 
         "Position": {
@@ -22,7 +25,8 @@
         },
 
         "MuzzlePosition": {
-          "x": 0.96
+          "x": 1.145,
+          "y": 0.184
         }
       }
     },
@@ -40,6 +44,9 @@
       "Delay": 0.15,
       "Range": 18,
       "Spread": 10,
+
+      "ShakeDuration": 0.1,
+      "ShakeIntensity": 0.02,
 
       "TransformData": {
 
@@ -67,6 +74,9 @@
       "Delay": 0.07,
       "Range": 16,
       "Spread": 10,
+
+      "ShakeDuration": 0.07,
+      "ShakeIntensity": 0.008,
 
       "TransformData": {
 
@@ -96,6 +106,9 @@
       "Range": -1,
       "Spread": 10,
 
+      "ShakeDuration": 0.07,
+      "ShakeIntensity": 0.008,
+
       "TransformData": {
 
         "Position": {
@@ -105,7 +118,7 @@
 
         "MuzzlePosition": {
           "x": 1.34,
-          "y": 0.106
+          "y": 0.151
         }
       }
     },
@@ -123,6 +136,9 @@
       "Delay": 0.05,
       "Range": -1,
       "Spread": 12,
+
+      "ShakeDuration": 0.05,
+      "ShakeIntensity": 0.015,
 
       "TransformData": {
 

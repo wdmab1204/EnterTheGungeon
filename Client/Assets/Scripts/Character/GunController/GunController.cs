@@ -20,13 +20,16 @@ namespace GameEngine.GunController
 
         private GunBase myGun;
         private GunForm gunType;
+        private int myGunID;
         private Camera mainCamera;
+        private CameraShake camShake;
 
         private Dictionary<int, GunData> datas = new();
 
         private void Awake()
         {
             mainCamera = Camera.main;
+            camShake = mainCamera.GetComponent<CameraShake>();
             var jsonString = Resources.Load<TextAsset>("gun_data").text;
             var list = JsonUtility.FromJson<GunDataList>(jsonString).guns;
             foreach (var gunData in list)
@@ -52,6 +55,7 @@ namespace GameEngine.GunController
 
             myGun = gunBase;
             gunType = gunData.GunForm;
+            myGunID = id; 
         }
 
         private GunBase GetGunBase(GunForm gunForm)
@@ -95,6 +99,11 @@ namespace GameEngine.GunController
 
                 // Shoot »£√‚
                 myGun?.Shoot(shootDirection);
+
+                //Camera Shake
+                var shakeDuration = datas[myGunID].ShakeDuration;
+                var shakeIndensity = datas[myGunID].ShakeIntensity;
+                camShake.Shake(shakeDuration, shakeIndensity);
             }
 
             if (isMouseUp)
