@@ -6,5 +6,7 @@ namespace GameEngine.GunController
     {
         void Shoot(Vector3 direction);
         void Init(GunData data);
+        void MouseUp();
+        void MouseDown();
     }
 }

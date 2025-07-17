@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace GameEngine.GunController
 {
@@ -18,7 +19,16 @@ namespace GameEngine.GunController
         public float Delay;         //µÙ∑π¿Ã
         public int Range;           //ªÁ∞≈∏Æ
         public int Spread;          //ªÍ≈∫µµ
-        
+
+        public GunTransformData TransformData;
+    }
+
+    [System.Serializable]
+    public class GunTransformData
+    {
+        public Vector3 MuzzlePosition;
+        public Vector3 MuzzleFlashPosition;
+        public Vector3 Position;
     }
 
     [System.Serializable]

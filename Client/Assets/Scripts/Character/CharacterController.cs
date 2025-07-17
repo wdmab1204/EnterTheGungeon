@@ -20,7 +20,7 @@ public class CharacterController : MonoBehaviour
 
     private void Start()
     {
-        myGun.Set(4);
+        myGun.Set(3);
     }
 
     void Update()
@@ -28,8 +28,10 @@ public class CharacterController : MonoBehaviour
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        if (movement != Vector2.zero)
-            onMove?.Invoke(transform.position);
+        if (movement == Vector2.zero)
+            return;
+
+        onMove?.Invoke(transform.position);
     }
 
     void FixedUpdate()

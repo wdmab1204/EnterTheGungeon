@@ -13,6 +13,11 @@ namespace GameEngine.GunController
 
     public class GunController : MonoBehaviour
     {
+        [SerializeField] SpriteRenderer gunRenderer;
+        [SerializeField] Transform body;
+        [SerializeField] Transform muzzle;
+        [SerializeField] GameObject muzzleFlash;
+
         private GunBase myGun;
         private GunForm gunType;
         private Camera mainCamera;
@@ -40,6 +45,11 @@ namespace GameEngine.GunController
 
             gunBase.Init(gunData);
 
+            gunRenderer.sprite = Resources.Load<Sprite>($"GunSprite_{id}");
+            gunRenderer.transform.localPosition = gunData.TransformData.Position;
+            muzzle.localPosition = gunData.TransformData.MuzzlePosition;
+            muzzleFlash.transform.localPosition = gunData.TransformData.MuzzlePosition;
+
             myGun = gunBase;
             gunType = gunData.GunForm;
         }
@@ -50,13 +60,13 @@ namespace GameEngine.GunController
             switch (gunForm)
             {
                 case GunForm.Semiautomatic:
-                    gun = new SemiAutomaticGun(Resources.Load<GameObject>("Bullet_1"), transform);
+                    gun = new SemiAutomaticGun(Resources.Load<GameObject>("Bullet_1"), muzzle);
                     break;
                 case GunForm.Automatic:
-                    gun = new AutomaticGun(Resources.Load<GameObject>("Bullet_1"), transform);
+                    gun = new AutomaticGun(Resources.Load<GameObject>("Bullet_1"), muzzleFlash, muzzle);
                     break;
                 case GunForm.Beam:
-                    gun = new BeamGun(Resources.Load<GameObject>("Bullet_1"), transform);
+                    gun = new BeamGun(Resources.Load<GameObject>("Bullet_1"), muzzle);
                     break;
             }
 
@@ -67,21 +77,28 @@ namespace GameEngine.GunController
         {
             bool isMouseDown = Input.GetMouseButtonDown(0); // 버튼을 누른 시점
             bool isMouseHold = Input.GetMouseButton(0);     // 버튼을 누르고 있는 동안
+            bool isMouseUp = Input.GetMouseButtonUp(0);     // 버튼에서 손을 뗀 시점
 
             bool isMouseClick = (gunType == GunForm.Automatic || gunType == GunForm.Beam)
                                 ? isMouseHold
                                 : isMouseDown;
 
+            if (isMouseDown)
+                myGun?.MouseDown();
+
             if (isMouseClick)
             {
-                var mousePosition = Input.mousePosition;
-                var myPosition = transform.position;
-                var mouseWorldPosition = mainCamera.ScreenToWorldPoint(mousePosition);
-                Vector2 shootDirection = (mouseWorldPosition - myPosition).normalized;
+                var mouseWorldPosition = GameUtil.GetMouseWoirldPosition(mainCamera, Input.mousePosition);
+                if (mouseWorldPosition == null)
+                    return;
+                Vector2 shootDirection = (mouseWorldPosition.Value - body.position).normalized;
 
                 // Shoot 호출
                 myGun?.Shoot(shootDirection);
             }
+
+            if (isMouseUp)
+                myGun?.MouseUp();
         }
     }
 }

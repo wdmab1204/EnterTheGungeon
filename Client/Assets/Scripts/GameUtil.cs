@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 
 namespace GameEngine
 {
@@ -135,6 +133,18 @@ namespace GameEngine
             }
 
             return null;
+        }
+
+        public static Vector3? GetMouseWoirldPosition(Camera camera, Vector3 mousePosition)
+        {
+#if UNITY_EDITOR
+            if (float.IsNaN(mousePosition.x)        ||
+                float.IsNaN(mousePosition.y)        ||
+                float.IsInfinity(mousePosition.x)   ||
+                float.IsInfinity(mousePosition.y))
+                return null;
+#endif
+            return camera.ScreenToWorldPoint(mousePosition);
         }
     }
 }

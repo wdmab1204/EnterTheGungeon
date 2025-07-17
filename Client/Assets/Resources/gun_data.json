@@ -12,8 +12,21 @@
       "Damage": 6,
       "Delay": 0.2,
       "Range": 16,
-      "Spread": 7
+      "Spread": 7,
+
+      "TransformData": {
+
+        "Position": {
+          "x": 0.246,
+          "y": -0.122
+        },
+
+        "MuzzlePosition": {
+          "x": 0.96
+        }
+      }
     },
+
     {
       "ID": 2,
       "Name": "저가형 리볼버",
@@ -26,8 +39,21 @@
       "Damage": 6,
       "Delay": 0.15,
       "Range": 18,
-      "Spread": 10
+      "Spread": 10,
+
+      "TransformData": {
+
+        "Position": {
+          "x": 0.246,
+          "y": -0.122
+        },
+
+        "MuzzlePosition": {
+          "x": 0.676
+        }
+      }
     },
+
     {
       "ID": 3,
       "Name": "머신 피스톨",
@@ -40,8 +66,22 @@
       "Damage": 3.2,
       "Delay": 0.07,
       "Range": 16,
-      "Spread": 10
+      "Spread": 10,
+
+      "TransformData": {
+
+        "Position": {
+          "x": 0.246,
+          "y": -0.122
+        },
+
+        "MuzzlePosition": {
+          "x": 0.703,
+          "y": 0.183
+        }
+      }
     },
+
     {
       "ID": 4,
       "Name": "톰슨 서브머신건",
@@ -54,21 +94,47 @@
       "Damage": 5,
       "Delay": 0.1,
       "Range": -1,
-      "Spread": 10
+      "Spread": 10,
+
+      "TransformData": {
+
+        "Position": {
+          "x": -0.025,
+          "y": 0
+        },
+
+        "MuzzlePosition": {
+          "x": 1.34,
+          "y": 0.106
+        }
+      }
     },
+
     {
       "ID": 5,
-      "Name": "패트리어트",
+      "Name": "벌컨포",
       "GunForm": 2,
-      "AmmoSize": 100,
-      "AmmoCount": 500,
-      "ReloadTime": 1,
-      "Speed": 300,
+      "AmmoSize": 900,
+      "AmmoCount": 900,
+      "ReloadTime": 0.6,
+      "Speed": 35,
       "Knockback": 15,
-      "Damage": 7,
-      "Delay": 0.3,
+      "Damage": 5,
+      "Delay": 0.05,
       "Range": -1,
-      "Spread": 1
+      "Spread": 12,
+
+      "TransformData": {
+
+        "Position": {
+          "x": -0.025
+        },
+
+        "MuzzlePosition": {
+          "x": 1.59
+        }
+      }
     }
+
   ]
 }

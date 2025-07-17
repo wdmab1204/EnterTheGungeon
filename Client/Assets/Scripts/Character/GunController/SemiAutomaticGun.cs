@@ -18,6 +18,16 @@ namespace GameEngine.GunController
 
         }
 
+        public void MouseDown()
+        {
+            Debug.Log("Mouse Down");
+        }
+
+        public void MouseUp()
+        {
+            Debug.Log("Mouse Up");
+        }
+
         public void Shoot(Vector3 direction)
         {
             //shoot
