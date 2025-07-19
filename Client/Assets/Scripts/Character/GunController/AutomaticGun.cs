@@ -12,6 +12,8 @@ namespace GameEngine.GunController
         private Animator muzzleFlash;
         private Transform transform;
 
+        private GunData gunData;
+
         public AutomaticGun(GameObject bulletPrefab, GameObject muzzleFlash, Transform transform)
         {
             this.bulletPrefab = bulletPrefab;
@@ -21,6 +23,7 @@ namespace GameEngine.GunController
 
         public void Init(GunData gunData)
         {
+            this.gunData = gunData;
             delayTimeSpan = TimeSpan.FromSeconds(gunData.Delay);
         }
 
@@ -42,7 +45,14 @@ namespace GameEngine.GunController
                 Bullet bullet = UnityEngine.Object.Instantiate(bulletPrefab).GetComponent<Bullet>();
                 bullet.transform.position = transform.position;
                 Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-                rb.velocity = direction * 8;
+
+                float halfSpread = gunData.Spread / 2f;
+                float randomAngle = UnityEngine.Random.Range(-halfSpread, halfSpread);
+                float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                float spreadAngle = baseAngle + randomAngle;
+
+                direction = new Vector3(Mathf.Cos(spreadAngle * Mathf.Deg2Rad), Mathf.Sin(spreadAngle * Mathf.Deg2Rad));
+                rb.velocity = direction * gunData.Speed;
 
                 muzzleFlash.Play("Flash", 0, 0f);
                 bullet.TargetTag = "Mob";
