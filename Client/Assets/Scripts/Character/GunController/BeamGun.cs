@@ -32,7 +32,7 @@ namespace GameEngine.GunController
             Debug.Log("Mouse Up");
         }
 
-        public void Shoot(Vector3 direction)
+        public bool Shoot(Vector3 direction)
         {
             if (DateTime.UtcNow >= lastShootDate + interval)
             {
@@ -46,7 +46,11 @@ namespace GameEngine.GunController
                 
                 lastShootDate = DateTime.UtcNow;
                 beamRenderer.Add(bullet.transform);
+
+                return true;
             }
+
+            return false;
         }
     }
 }

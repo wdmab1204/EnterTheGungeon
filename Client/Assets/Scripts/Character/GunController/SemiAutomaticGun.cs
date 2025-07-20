@@ -28,7 +28,7 @@ namespace GameEngine.GunController
             Debug.Log("Mouse Up");
         }
 
-        public void Shoot(Vector3 direction)
+        public bool Shoot(Vector3 direction)
         {
             //shoot
             Bullet bullet = UnityEngine.Object.Instantiate(bulletPrefab).GetComponent<Bullet>();
@@ -37,6 +37,8 @@ namespace GameEngine.GunController
             rb.velocity = direction * 8;
 
             bullet.TargetTag = "Mob";
+
+            return true;
         }
     }
 }

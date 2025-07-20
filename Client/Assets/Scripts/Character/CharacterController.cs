@@ -20,7 +20,7 @@ public class CharacterController : MonoBehaviour
 
     private void Start()
     {
-        myGun.Set(3);
+        myGun.Equip(3);
     }
 
     void Update()

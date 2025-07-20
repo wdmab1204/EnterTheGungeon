@@ -37,7 +37,7 @@ namespace GameEngine.GunController
             muzzleFlash.gameObject.SetActive(false);
         }
 
-        public void Shoot(Vector3 direction)
+        public bool Shoot(Vector3 direction)
         {
             if (DateTime.UtcNow >= lastShootDate + delayTimeSpan)
             {
@@ -58,7 +58,11 @@ namespace GameEngine.GunController
                 bullet.TargetTag = "Mob";
 
                 lastShootDate = DateTime.UtcNow;
+
+                return true;
             }
+
+            return false;
         }
     }
 }

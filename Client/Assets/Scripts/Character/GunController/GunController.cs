@@ -1,5 +1,7 @@
+using GameEngine.UI;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace GameEngine.GunController
 {
@@ -17,28 +19,32 @@ namespace GameEngine.GunController
         [SerializeField] Transform body;
         [SerializeField] Transform muzzle;
         [SerializeField] GameObject muzzleFlash;
+        [SerializeField] UI_Reload ui_Reload;
 
-        private GunBase myGun;
-        private GunForm gunType;
+        private GunBase currentGun;
+        private GunForm currentForm;
         private int myGunID;
+
         private Camera mainCamera;
         private CameraShake camShake;
 
-        private Dictionary<int, GunData> datas = new();
+        private bool IsReloadEnd = true;
+        private float reloadTime = 0f;
+
+        private Dictionary<int, GunData> dataCache = new();
 
         private void Awake()
         {
             mainCamera = Camera.main;
             camShake = mainCamera.GetComponent<CameraShake>();
             var jsonString = Resources.Load<TextAsset>("gun_data").text;
-            var list = JsonUtility.FromJson<GunDataList>(jsonString).guns;
-            foreach (var gunData in list)
-                datas.Add(gunData.ID, gunData);
+            foreach (var gunData in JsonUtility.FromJson<GunDataList>(jsonString).guns)
+                dataCache.Add(gunData.ID, gunData);
         }
 
-        public void Set(int id)
+        public void Equip(int id)
         {
-            var gunData = datas[id];
+            var gunData = dataCache[id];
             var gunBase = GetGunBase(gunData.GunForm);
             if(gunBase == null)
             {
@@ -53,9 +59,14 @@ namespace GameEngine.GunController
             muzzle.localPosition = gunData.TransformData.MuzzlePosition;
             muzzleFlash.transform.localPosition = gunData.TransformData.MuzzlePosition;
 
-            myGun = gunBase;
-            gunType = gunData.GunForm;
-            myGunID = id; 
+            GameData.EquipGunData = gunData;
+            GameData.AmmoSize.Value = gunData.AmmoSize;
+            GameData.AmmoCount.Value = gunData.AmmoCount;
+            currentGun = gunBase;
+            currentForm = gunData.GunForm;
+            myGunID = id;
+
+            
         }
 
         private GunBase GetGunBase(GunForm gunForm)
@@ -79,16 +90,49 @@ namespace GameEngine.GunController
 
         private void Update()
         {
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            if (GameData.AmmoCount.Value == 0)
+                return;
+
+            if (Input.GetKeyDown(KeyCode.R))
+                IsReloadEnd = false;
+
+            if(IsReloadEnd == false)
+            {
+                reloadTime += Time.deltaTime;
+                ui_Reload.Play(dataCache[myGunID].ReloadTime);
+                if (reloadTime >= dataCache[myGunID].ReloadTime)
+                {
+                    IsReloadEnd = true;
+                    reloadTime = 0f;
+                    int prevAmmoSize = GameData.AmmoSize.Value;
+                    GameData.AmmoSize.Value = 
+                        dataCache[myGunID].AmmoCount == -1 ||
+                        GameData.AmmoCount.Value > dataCache[myGunID].AmmoSize ?
+                        dataCache[myGunID].AmmoSize : 0;
+                    GameData.AmmoCount.Value = 
+                        dataCache[myGunID].AmmoCount == -1 ? 
+                        -1 : GameData.AmmoCount.Value - (dataCache[myGunID].AmmoSize - prevAmmoSize);
+                }
+                    
+                return;
+            }
+
             bool isMouseDown = Input.GetMouseButtonDown(0); // 버튼을 누른 시점
             bool isMouseHold = Input.GetMouseButton(0);     // 버튼을 누르고 있는 동안
             bool isMouseUp = Input.GetMouseButtonUp(0);     // 버튼에서 손을 뗀 시점
 
-            bool isMouseClick = (gunType == GunForm.Automatic || gunType == GunForm.Beam)
+            bool isMouseClick = (currentForm == GunForm.Automatic || currentForm == GunForm.Beam)
                                 ? isMouseHold
                                 : isMouseDown;
 
+            if (currentGun == null)
+                return;
+
             if (isMouseDown)
-                myGun?.MouseDown();
+                currentGun.MouseDown();
 
             if (isMouseClick)
             {
@@ -97,17 +141,26 @@ namespace GameEngine.GunController
                     return;
                 Vector2 shootDirection = (mouseWorldPosition.Value - body.position).normalized;
 
+
+                if (GameData.AmmoSize.Value <= 0)
+                {
+                    IsReloadEnd = false;
+                    return;
+                }
+
                 // Shoot 호출
-                myGun?.Shoot(shootDirection);
+                var result = currentGun.Shoot(shootDirection);
+                if (result)
+                    GameData.AmmoSize.Value -= 1;
 
                 //Camera Shake
-                var shakeDuration = datas[myGunID].ShakeDuration;
-                var shakeIndensity = datas[myGunID].ShakeIntensity;
+                var shakeDuration = dataCache[myGunID].ShakeDuration;
+                var shakeIndensity = dataCache[myGunID].ShakeIntensity;
                 camShake.Shake(shakeDuration, shakeIndensity);
             }
 
             if (isMouseUp)
-                myGun?.MouseUp();
+                currentGun.MouseUp();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace GameEngine.Test
             {
                 var controller = GameObject.Find("Mine").GetComponent<GunController.GunController>();
                 var id = int.Parse(inputField.text);
-                controller.Set(id);
+                controller.Equip(id);
             });
         }
 

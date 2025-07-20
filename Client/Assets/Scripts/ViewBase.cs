@@ -9,6 +9,11 @@ namespace GameEngine.UI
     {
         protected Dictionary<Type, UnityEngine.Object[]> _objects = new Dictionary<Type, UnityEngine.Object[]>();
 
+        private void Start()
+        {
+            Init();
+        }
+
         public abstract void Init();
         
         protected void Bind<T>(Type type = null) where T : UnityEngine.Object
