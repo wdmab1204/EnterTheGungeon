@@ -2270,7 +2270,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -50, y: 50}
+  m_AnchoredPosition: {x: -50, y: 25}
   m_SizeDelta: {x: 127.0635, y: 100}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &484543483
@@ -84920,6 +84920,7 @@ MonoBehaviour:
   body: {fileID: 1805748250}
   muzzle: {fileID: 687908444}
   muzzleFlash: {fileID: 464273948}
+  ui_Reload: {fileID: 752551136}
 --- !u!1 &1510616804
 GameObject:
   m_ObjectHideFlags: 0
@@ -87604,11 +87605,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 484543482}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 21.5, y: -53.3}
-  m_SizeDelta: {x: 160, y: 30}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -27.3, y: 0}
+  m_SizeDelta: {x: 160, y: 20.4012}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &2008425482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87636,7 +87637,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 4
+    m_Alignment: 5
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
