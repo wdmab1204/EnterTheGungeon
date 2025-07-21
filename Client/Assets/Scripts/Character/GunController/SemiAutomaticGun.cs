@@ -6,6 +6,7 @@ namespace GameEngine.GunController
     {
         private GameObject bulletPrefab;
         private Transform transform;
+        private GunData gunData;
 
         public SemiAutomaticGun(GameObject bulletPrefab, Transform transform)
         {
@@ -15,17 +16,15 @@ namespace GameEngine.GunController
 
         public void Init(GunData gunData)
         {
-
+            this.gunData = gunData;
         }
 
         public void MouseDown()
         {
-            Debug.Log("Mouse Down");
         }
 
         public void MouseUp()
         {
-            Debug.Log("Mouse Up");
         }
 
         public bool Shoot(Vector3 direction)
@@ -33,8 +32,11 @@ namespace GameEngine.GunController
             //shoot
             Bullet bullet = UnityEngine.Object.Instantiate(bulletPrefab).GetComponent<Bullet>();
             bullet.transform.position = transform.position;
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            rb.velocity = direction * 8;
+            bullet.Velocity = direction * 8;
+
+            bullet.Range = gunData.Range;
+            bullet.Knockback = gunData.Knockback;
+            bullet.Damage = gunData.Damage;
 
             bullet.TargetTag = "Mob";
 

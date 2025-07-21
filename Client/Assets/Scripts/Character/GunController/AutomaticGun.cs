@@ -44,7 +44,10 @@ namespace GameEngine.GunController
                 //shoot
                 Bullet bullet = UnityEngine.Object.Instantiate(bulletPrefab).GetComponent<Bullet>();
                 bullet.transform.position = transform.position;
-                Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
+
+                bullet.Range = gunData.Range;
+                bullet.Knockback = gunData.Knockback;
+                bullet.Damage = gunData.Damage;
 
                 float halfSpread = gunData.Spread / 2f;
                 float randomAngle = UnityEngine.Random.Range(-halfSpread, halfSpread);
@@ -52,7 +55,7 @@ namespace GameEngine.GunController
                 float spreadAngle = baseAngle + randomAngle;
 
                 direction = new Vector3(Mathf.Cos(spreadAngle * Mathf.Deg2Rad), Mathf.Sin(spreadAngle * Mathf.Deg2Rad));
-                rb.velocity = direction * gunData.Speed;
+                bullet.Velocity = direction * gunData.Speed;
 
                 muzzleFlash.Play("Flash", 0, 0f);
                 bullet.TargetTag = "Mob";

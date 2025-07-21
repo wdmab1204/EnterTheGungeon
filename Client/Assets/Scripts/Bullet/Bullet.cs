@@ -4,6 +4,42 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public string TargetTag;
+    public int Damage;
+    public int Knockback;
+    public int Range;
+    public Vector3 Velocity;
+
+    private new Rigidbody2D rigidbody;
+    private float timeOfRange;
+    private float t = 0f;
+
+    private void Awake()
+    {
+        rigidbody = GetComponent<Rigidbody2D>();
+    }
+
+    private void Start()
+    {
+        rigidbody.velocity = Velocity;
+
+        if (Range == -1)
+            timeOfRange = float.MaxValue;
+        else
+            timeOfRange = Range / Velocity.magnitude;
+    }
+
+    private void Update()
+    {
+        if (t < timeOfRange)
+        {
+            t += Time.deltaTime;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -19,7 +55,7 @@ public class Bullet : MonoBehaviour
         }   
     }
 
-    private void OnBecameInvisible()
+    private void OnBecameInvisible() 
     {
         GameUtil.Destroy(gameObject);
     }

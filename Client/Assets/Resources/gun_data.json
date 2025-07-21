@@ -151,6 +151,37 @@
           "x": 1.59
         }
       }
+    },
+
+    {
+      "ID": 6,
+      "Name": "사랑 듬뿍 산탄총",
+      "GunForm": 1,
+      "AmmoSize": 8,
+      "AmmoCount": 120,
+      "ReloadTime": 1.2,
+      "Speed": 23,
+      "Knockback": 30,
+      "Damage": 5,
+      "Delay": 0.45,
+      "Range": 60,
+      "Spread": 14,
+
+      "BulletPerShot": 5,
+
+      "ShakeDuration": 0.05,
+      "ShakeIntensity": 0.015,
+
+      "TransformData": {
+
+        "Position": {
+          "x": -0.025
+        },
+
+        "MuzzlePosition": {
+          "x": 1.59
+        }
+      }
     }
 
   ]
