@@ -50,7 +50,9 @@ public class Bullet : MonoBehaviour
 
         if (!string.IsNullOrEmpty(TargetTag) && collidableObject.CompareTag(TargetTag))
         {
-            GameUtil.Destroy(collidableObject);
+            //GameUtil.Destroy(collidableObject);
+            Rigidbody2D mobRig = collidableObject.GetComponent<Rigidbody2D>();
+            mobRig.AddForce(Velocity.normalized * Knockback, ForceMode2D.Impulse);
             GameUtil.Destroy(gameObject);
         }   
     }

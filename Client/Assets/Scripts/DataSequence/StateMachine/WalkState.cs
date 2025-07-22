@@ -23,14 +23,24 @@ namespace GameEngine.DataSequence.StateMachine
 
         public override void FixedUpdate(float time)
         {
-            Vector2 distance = getDistance();
-            if (atkRange >= distance.magnitude)
+            Vector2 dir = getDistance();
+            Vector2 dirNormalized = dir.normalized;
+            if (atkRange >= dir.magnitude)
             {
                 changeState(typeof(ShootState));
                 return;
             }
-               
-            rb.MovePosition(rb.position + distance.normalized * speed * Time.fixedDeltaTime);
+
+            Vector2 targetSpeed = new Vector2(dirNormalized.x, dirNormalized.y) * 1;
+
+            targetSpeed = Vector2.Lerp(rb.velocity, targetSpeed, 1);
+
+            float accelRate = (targetSpeed.magnitude > 0.01f) ? 10 : 15;
+
+            Vector2 speedDif = targetSpeed - rb.velocity;
+            Vector2 movement = speedDif * accelRate;
+
+            rb.AddForce(movement, ForceMode2D.Force);
         }
     }
 }

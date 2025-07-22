@@ -24,10 +24,12 @@ public class FanShapeShooting : MonoBehaviour
             Vector2 shootDirection = 
                 new(Mathf.Cos(angle * Mathf.Deg2Rad + offsetRadian),
                     Mathf.Sin(angle * Mathf.Deg2Rad + offsetRadian));
-            GameObject bullet = Instantiate(bulletPrefab);
-            bullet.transform.position = transform.position;
-            Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-            rb.velocity = shootDirection * bulletSpeed;
+            GameObject go = Instantiate(bulletPrefab);
+            var bullet = go.GetComponent<Bullet>();
+            go.transform.position = transform.position;
+
+            bullet.Velocity = shootDirection * bulletSpeed;
+            bullet.Range = -1;
         }
     }
 }
