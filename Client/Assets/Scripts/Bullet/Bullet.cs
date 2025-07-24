@@ -51,9 +51,12 @@ public class Bullet : MonoBehaviour
         if (!string.IsNullOrEmpty(TargetTag) && collidableObject.CompareTag(TargetTag))
         {
             //GameUtil.Destroy(collidableObject);
-            Rigidbody2D mobRig = collidableObject.GetComponent<Rigidbody2D>();
-            mobRig.AddForce(Velocity.normalized * Knockback, ForceMode2D.Impulse);
+            Rigidbody2D unitRig = collidableObject.GetComponent<Rigidbody2D>();
+            unitRig.AddForce(Velocity.normalized * Knockback, ForceMode2D.Impulse);
             GameUtil.Destroy(gameObject);
+
+            UnitAbility ability = collidableObject.GetComponent<UnitAbility>();
+            ability.Health.Value -= Damage;
         }   
     }
 

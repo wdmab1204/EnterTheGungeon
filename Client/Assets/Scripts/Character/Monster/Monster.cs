@@ -8,6 +8,7 @@ namespace GameEngine
         private CharacterController player;
         private UnitStateMachine sm;
         private FanShapeShooting shootPattern;
+        private UnitAbility ability;
         
         void Start()
         {
@@ -16,6 +17,12 @@ namespace GameEngine
             sm = new(this.transform);
             sm.AddState(new WalkState(GetDistance), new ShootState(Shoot));
             sm.ChangeState(typeof(WalkState));
+            ability = GetComponent<UnitAbility>();
+            ability.Health.OnValueChanged += x =>
+            {
+                if (x <= 0)
+                    Destroy(gameObject);
+            };
         }
 
         private void Update()

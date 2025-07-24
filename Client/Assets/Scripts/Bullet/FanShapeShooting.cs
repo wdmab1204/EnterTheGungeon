@@ -29,7 +29,9 @@ public class FanShapeShooting : MonoBehaviour
             go.transform.position = transform.position;
 
             bullet.Velocity = shootDirection * bulletSpeed;
+            bullet.TargetTag = "Player";
             bullet.Range = -1;
+            bullet.Damage = 1;
         }
     }
 }
