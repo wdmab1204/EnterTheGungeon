@@ -2,7 +2,6 @@ using GameEngine.DataSequence.Graph;
 using GameEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace GameEngine
@@ -16,7 +15,11 @@ namespace GameEngine
         [SerializeField] private UI_Minimap minimapUI;
 
         private HashSet<RoomNode> visitedRoomSet = new();
-        private RoomNode currentVisitRoom;
+        private RoomNode CurrentVisitRoom
+        {
+            get => GameData.CurrentVisitRoom.Value;
+            set => GameData.CurrentVisitRoom.Value = value;
+        }
         private new FollowPlayer camera;
 
         private void Awake()
@@ -54,7 +57,7 @@ namespace GameEngine
                 {
                     Debug.Log($"Current Visit Room : {room.ID}");
                     visitedRoomSet.Add(room);
-                    currentVisitRoom = room;
+                    GameData.CurrentVisitRoom.Value = room;
                     foreach(var door in layoutData[room].Doors)
                         door.SetActive(true);
                     
@@ -68,16 +71,16 @@ namespace GameEngine
                 }
             }
 
-            if (currentVisitRoom == null)
+            if (CurrentVisitRoom == null)
                 return;
 
-            if (IsInRoom(currentVisitRoom, position, 1))
+            if (IsInRoom(CurrentVisitRoom, position, 1))
                 return;
 
-            foreach(var door in layoutData[currentVisitRoom].Doors)
+            foreach(var door in layoutData[CurrentVisitRoom].Doors)
                 door.SetActive(false);
 
-            currentVisitRoom = null;
+            CurrentVisitRoom = null;
 
             bool IsInRoom(RoomNode room, Vector3 position, int width)
             {

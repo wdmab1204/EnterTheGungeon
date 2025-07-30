@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace GameEngine
 {
@@ -16,6 +17,20 @@ namespace GameEngine
             float u_b = ((line1_To.x - line1_From.x) * (line1_From.y - line2_From.y) - (line1_To.y - line1_From.y) * (line1_From.x - line2_From.x)) / denominator;
 
             return u_a >= 0f && u_a <= 1f && u_b >= 0f && u_b <= 1f;
+        }
+
+        public static bool IsIntersectLinePolygon(Vector2 line_from, Vector2 line_to, List<Vector2> polygon)
+        {
+            int count = polygon.Count;
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 start = polygon[i];
+                Vector2 end = polygon[(i + 1) % count];
+                if (IsIntersectTwoLine(line_from, line_to, start, end))
+                    return true;
+            }
+
+            return false;
         }
 
         public static bool IsTriangleOrientedClockwise(Vector2 p1, Vector2 p2, Vector2 p3)

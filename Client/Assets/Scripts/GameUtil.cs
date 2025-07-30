@@ -146,5 +146,96 @@ namespace GameEngine
 #endif
             return camera.ScreenToWorldPoint(mousePosition);
         }
+
+        public static readonly Vector3Int[] clockWiseDirections = new Vector3Int[]
+        {
+            Vector3Int.up,
+            Vector3Int.right,
+            Vector3Int.down,
+            Vector3Int.left
+        };
+
+        public static List<List<Vector3Int>> CellsToOutline(HashSet<Vector3Int> pointSet)
+        {
+            HashSet<(Vector3Int, Vector3Int)> lineSet = new();
+            Dictionary<Vector3Int, Vector3Int> lineConnectMap = new();
+
+            foreach (var cellPosition in pointSet)
+            {
+                Vector3Int to = cellPosition;
+                for (int i = 0; i < 4; i++)
+                {
+                    Vector3Int from = to;
+                    to = from + clockWiseDirections[i];
+
+                    if (lineSet.Remove((from, to)) || lineSet.Remove((to, from)))
+                        continue;
+
+                    lineSet.Add((from, to));
+                }
+            }
+
+            foreach (var line in lineSet)
+            {
+                lineConnectMap[line.Item1] = line.Item2;
+            }
+
+            List<List<Vector3Int>> outlines = new();
+            HashSet<Vector3Int> visited = new();
+
+            foreach (var start in lineConnectMap.Keys)
+            {
+                if (visited.Contains(start))
+                    continue;
+
+                List<Vector3Int> outline = new();
+                Vector3Int current = start;
+                Vector3Int direction = Vector3Int.zero;
+
+                do
+                {
+                    visited.Add(current);
+
+                    if (!lineConnectMap.TryGetValue(current, out var next))
+                        break;
+
+                    var newDirection = next - current;
+
+                    if (direction == Vector3Int.zero)
+                    {
+                        direction = newDirection;
+                        outline.Add(current);  
+                    }
+                    else if (newDirection != direction)
+                    {
+                        outline.Add(current);
+                        direction = newDirection;
+                    }
+
+                    current = next;
+                }
+                while (!visited.Contains(current));
+
+                outline.Add(current); // 마지막 포인트 추가
+
+                if (outline.Count > 1)
+                    outlines.Add(outline);
+            }
+
+            return outlines;
+        }
+
+        public static HashSet<Vector3Int> AllGetTilePosition(Tilemap tilemap)
+        {
+            HashSet<Vector3Int> allPoints = new();
+
+            foreach (var p in tilemap.cellBounds.allPositionsWithin)
+            {
+                if (tilemap.HasTile(p))
+                    allPoints.Add(p);
+            }
+
+            return allPoints;
+        }
     }
 }

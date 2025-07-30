@@ -20,6 +20,17 @@ public class Bullet : MonoBehaviour
 
     private void Start()
     {
+#if UNITY_EDITOR
+        if (string.IsNullOrEmpty(TargetTag))
+            Debug.LogWarning($"{nameof(TargetTag)} string is empty. please check it");
+        if (Damage <= 0)
+            Debug.LogWarning($"{nameof(Damage)} is zero or negative integer. please check it");
+        if (Knockback < 0)
+            Debug.LogWarning($"{nameof(Knockback)} is negative integer. please check it");
+        if (Range == 0)
+            Debug.LogWarning($"{nameof(Range)} is zero. please check it");
+#endif
+
         rigidbody.velocity = Velocity;
 
         if (Range == -1)
