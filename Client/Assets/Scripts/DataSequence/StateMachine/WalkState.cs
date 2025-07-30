@@ -10,9 +10,11 @@ namespace GameEngine.DataSequence.StateMachine
         private float atkRange = 5;
         private Rigidbody2D rb;
         
-        public WalkState(Func<Vector2> getDistance)
+        public WalkState(Func<Vector2> getDistance, float speed, float atkRange)
         {
             this.getDistance = getDistance;
+            this.speed = speed;
+            this.atkRange = atkRange;
         }
 
         public override void Enter()
@@ -31,7 +33,7 @@ namespace GameEngine.DataSequence.StateMachine
                 return;
             }
 
-            Vector2 targetSpeed = new Vector2(dirNormalized.x, dirNormalized.y) * 1;
+            Vector2 targetSpeed = new Vector2(dirNormalized.x, dirNormalized.y) * speed;
 
             targetSpeed = Vector2.Lerp(rb.velocity, targetSpeed, 1);
 

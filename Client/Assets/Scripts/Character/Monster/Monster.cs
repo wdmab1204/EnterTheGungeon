@@ -1,7 +1,6 @@
 ﻿using GameEngine.DataSequence.StateMachine;
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 namespace GameEngine
@@ -33,7 +32,7 @@ namespace GameEngine
         protected virtual (List<UnitState> states, Type defaultState) GetStatesAndDefault()
         {
             var states = new List<UnitState>();
-            states.Add(new WalkState(GetDistance));
+            states.Add(new WalkState(GetDistance, 1f, 5f));
             states.Add(new ShootState(Shoot));
             return (states, typeof(WalkState));
         }
@@ -48,11 +47,20 @@ namespace GameEngine
             sm.FixedUpdate();
         }
 
-        private Vector2 GetDistance() => player.transform.position - transform.position;
+        protected Vector2 GetDistance() => player.transform.position - transform.position;
 
         private void Shoot()
         {
             shootPattern.Shoot(player.transform.position);
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                UnitAbility ability = collision.gameObject.GetComponent<UnitAbility>();
+                ability.Health.Value -= 1;
+            }
         }
     }
 }
