@@ -6,7 +6,7 @@ namespace GameEngine.DataSequence.StateMachine
     {
         private GameObject prefab;
         private Transform player;
-        private Transform muzzle;
+        private Transform myMob;
 
         private GameObject obj;
         private Rigidbody2D rig;
@@ -17,13 +17,14 @@ namespace GameEngine.DataSequence.StateMachine
         {
             this.prefab = prefab;
             this.player = player;
-            this.muzzle = muzzle;
+            this.myMob = muzzle;
         }
 
         public override void Enter()
         {
             obj = Object.Instantiate(prefab);
-            obj.transform.position = muzzle.position;
+            obj.GetComponent<GroupBullet>().owner = myMob;
+            obj.transform.position = myMob.position;
             rig = obj.GetComponent<Rigidbody2D>();
             rig.rotation = 45f;
 
@@ -38,7 +39,7 @@ namespace GameEngine.DataSequence.StateMachine
             }
             else
             {
-                rig.velocity = (player.position - muzzle.position).normalized * 2;
+                rig.velocity = (player.position - myMob.position).normalized * 2;
                 rig.angularVelocity = 100f;
                 changeState(typeof(TeleportState));
             }

@@ -1,6 +1,5 @@
 ﻿using GameEngine.Pipeline;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -10,6 +9,7 @@ namespace GameEngine.DataSequence.Graph
     {
         public int Width { get; set; }
         public int Height { get; set; }
+        public bool HasMob => roomInstance.Mobs.Count > 0;
 
         private RoomInstance roomInstance;
 

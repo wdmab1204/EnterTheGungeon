@@ -8,6 +8,7 @@ namespace GameEngine
     {
         public ReactiveProperty<int> MaxHealth = new();
         public ReactiveProperty<int> Health = new();
+        public ReactiveProperty<bool> DestroyState = new();
 
         [SerializeField] private int maxHelath;
         [SerializeField] private int health;
@@ -25,6 +26,11 @@ namespace GameEngine
             {
                 maxHelath = x;
             };
+        }
+
+        protected void OnDestroy()
+        {
+            DestroyState.Value = true;
         }
     }
 }

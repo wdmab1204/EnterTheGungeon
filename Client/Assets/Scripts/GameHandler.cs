@@ -1,4 +1,5 @@
 using GameEngine.DataSequence.Graph;
+using GameEngine.Pipeline;
 using GameEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,92 +9,115 @@ namespace GameEngine
 {
     public class GameHandler : MonoBehaviour
     {
-        DungeonGeneratorBase dungeonGenerator;
-        DungeonGeneratorLevel dungeonGeneratorLevel;
-        CharacterController playerMovementController;
-
         [SerializeField] private UI_Minimap minimapUI;
 
-        private HashSet<RoomNode> visitedRoomSet = new();
+        private DungeonGeneratorLevel dungeonGeneratorLevel;
+        private CharacterController playerController;
+        private new FollowPlayer camera;
+        private HashSet<RoomNode> visitedRooms = new();
+        private int currentMobCount;
+
         private RoomNode CurrentVisitRoom
         {
             get => GameData.CurrentVisitRoom.Value;
             set => GameData.CurrentVisitRoom.Value = value;
         }
-        private new FollowPlayer camera;
 
         private void Awake()
         {
-            dungeonGenerator = GameObject.Find("Dungeon Generator").GetComponent<DungeonGeneratorBase>();
-            dungeonGeneratorLevel = dungeonGenerator.Generate();
+            InitializeComponents();
+            InitializePlayer();
+            InitializeMinimap();
+        }
 
-            playerMovementController = GameObject.Find("Mine").GetComponent<CharacterController>();
-            SetPlayerPosition(playerMovementController.transform);
-            playerMovementController.onMove += OnUserMove;
-            OnUserMove(playerMovementController.transform.position);
+        private void InitializeComponents()
+        {
+            var generatorBase = GameObject.Find("Dungeon Generator").GetComponent<DungeonGeneratorBase>();
+            dungeonGeneratorLevel = generatorBase.Generate();
+
+            playerController = GameObject.Find("Mine").GetComponent<CharacterController>();
+            playerController.onMove += OnUserMove;
 
             camera = GameObject.Find("Main Camera").GetComponent<FollowPlayer>();
-            camera.transform.position = playerMovementController.transform.position;
-            camera.AddTransform(playerMovementController.transform);
+        }
 
+        private void InitializePlayer()
+        {
+            SetPlayerPosition(playerController.transform);
+            camera.transform.position = playerController.transform.position;
+            camera.AddTransform(playerController.transform);
+            OnUserMove(playerController.transform.position);
+        }
+
+        private void InitializeMinimap()
+        {
             minimapUI.Render(
                 dungeonGeneratorLevel.Rooms,
                 dungeonGeneratorLevel.RoadEdges,
-                () => playerMovementController.transform.position,
-                dungeonGeneratorLevel.GridCellSize);
-            playerMovementController.onMove += minimapUI.OnMovePlayer;
+                () => playerController.transform.position,
+                dungeonGeneratorLevel.GridCellSize
+            );
+            playerController.onMove += minimapUI.OnMovePlayer;
+        }
+
+        private bool IsInRoom(RoomNode room, Vector3 position, int padding)
+        {
+            var pos = room.ToVector3() + new Vector3(padding, padding);
+            var size = room.GetSize() - new Vector3(padding * 2, padding * 2);
+            return MathUtility.IsPointInRectangle(position, pos, size);
         }
 
         private void OnUserMove(Vector3 position)
         {
-            var layoutData = dungeonGeneratorLevel.LayoutData;
+            var layout = dungeonGeneratorLevel.LayoutData;
 
-            foreach (RoomNode room in dungeonGeneratorLevel.Rooms)
+            RoomNode newRoom = dungeonGeneratorLevel.Rooms.FirstOrDefault(room =>
+                !visitedRooms.Contains(room) && IsInRoom(room, position, 1));
+
+            if (newRoom != null)
             {
-                if (visitedRoomSet.Contains(room))
-                    continue;
-
-                if(IsInRoom(room, position, 1))
-                {
-                    Debug.Log($"Current Visit Room : {room.ID}");
-                    visitedRoomSet.Add(room);
-                    GameData.CurrentVisitRoom.Value = room;
-                    foreach(var door in layoutData[room].Doors)
-                        door.SetActive(true);
-                    
-                    foreach(var mob in layoutData[room].Mobs)
-                    {
-                        camera.AddTransform(mob.transform);
-                        mob.SetActive(true);
-                    }
-
-                    return;
-                }
+                EnterRoom(newRoom, layout);
+                return;
             }
 
-            if (CurrentVisitRoom == null)
-                return;
-
-            if (IsInRoom(CurrentVisitRoom, position, 1))
-                return;
-
-            foreach(var door in layoutData[CurrentVisitRoom].Doors)
-                door.SetActive(false);
-
-            CurrentVisitRoom = null;
-
-            bool IsInRoom(RoomNode room, Vector3 position, int width)
+            if (CurrentVisitRoom != null && !IsInRoom(CurrentVisitRoom, position, 1))
             {
-                Vector3 roomWorldPosition = room.ToVector3();
-                roomWorldPosition.x += width;
-                roomWorldPosition.y += width;
+                CurrentVisitRoom = null;
+            }
+        }
 
-                Vector3 roomArea = room.GetSize();
-                roomArea.x -= width * 2;
-                roomArea.y -= width * 2;
+        private void EnterRoom(RoomNode room, Dictionary<RoomNode, RoomInstance> layout)
+        {
+            Debug.Log($"Current Visit Room : {room.ID}");
+            visitedRooms.Add(room);
+            CurrentVisitRoom = room;
 
-                bool result = MathUtility.IsPointInRectangle(position, roomWorldPosition, roomArea);
-                return result;
+            if (room.HasMob)
+            {
+                foreach (var door in layout[room].Doors)
+                    door.SetActive(true);
+            }
+
+            currentMobCount = layout[room].Mobs.Count;
+            foreach (var mob in layout[room].Mobs)
+            {
+                camera.AddTransform(mob.transform);
+                mob.SetActive(true);
+                mob.GetComponent<UnitAbility>().DestroyState.OnValueChanged += isDestroyed =>
+                {
+                    if (!isDestroyed) return;
+                    currentMobCount--;
+                    OnMobCountChanged(currentMobCount);
+                };
+            }
+        }
+
+        private void OnMobCountChanged(int mobCount)
+        {
+            if (mobCount <= 0 && CurrentVisitRoom != null)
+            {
+                foreach (var door in dungeonGeneratorLevel.LayoutData[CurrentVisitRoom].Doors)
+                    door.SetActive(false);
             }
         }
 
@@ -102,7 +126,7 @@ namespace GameEngine
             RoomNode startRoom = dungeonGeneratorLevel.Rooms.FirstOrDefault(room => room.ID == 1000);
             Vector3 worldPosition = startRoom.GetCenter();
             playerTrans.position = worldPosition;
-            visitedRoomSet.Add(startRoom);
+            visitedRooms.Add(startRoom);
         }
     }
 }

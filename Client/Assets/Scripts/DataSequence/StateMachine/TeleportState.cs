@@ -1,18 +1,16 @@
 using GameEngine.DataSequence.Graph;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace GameEngine.DataSequence.StateMachine
 {
     public class TeleportState : UnitState
     {
         private List<Vector3Int> teleportableTileList = new();
-        private List<List<Vector2>> collideablePolygonList = new();
         private SpriteRenderer spriteRenderer;
         private BoxCollider2D collider;
+        private Rigidbody2D rigidbody;
         private Transform player;
         private RoomNode roomNode;
         private float teleportStartTime = 0.1f;
@@ -29,16 +27,13 @@ namespace GameEngine.DataSequence.StateMachine
             var collideableTilemap = roomNode.GetTilemaps()[1];
             spriteRenderer = myMob.GetComponent<SpriteRenderer>();
             collider = myMob.GetComponent<BoxCollider2D>();
+            rigidbody = myMob.GetComponent<Rigidbody2D>();
 
             foreach(Vector3Int floorTilePos in floorTilemap.cellBounds.allPositionsWithin)
             {
                 if(IsValid(floorTilePos))
                     teleportableTileList.Add(floorTilePos);
             }
-
-            var collideableTilePositions = GameUtil.AllGetTilePosition(collideableTilemap);
-            var collideableOutline = GameUtil.CellsToOutline(collideableTilePositions);
-            collideablePolygonList = collideableOutline.Select(x => x.Select(p => new Vector2(p.x, p.y)).ToList()).ToList();
 
             bool IsValid(Vector3Int tilePos)
             {
@@ -64,6 +59,7 @@ namespace GameEngine.DataSequence.StateMachine
         public override void Enter()
         {
             curTime = 0f;
+            rigidbody.velocity = Vector2.zero;
         }
 
         public override void TickUpdate(float time)
@@ -74,7 +70,6 @@ namespace GameEngine.DataSequence.StateMachine
                 spriteRenderer.flipX = (transform.position - player.position).x < 0;
                 collider.enabled = true;
 
-                //var randPos = teleportableTileList[UnityEngine.Random.Range(0, teleportableTileList.Count)];
                 var randPos = GetRandomPosition();
                 if (randPos == null)
                     return;
@@ -115,13 +110,6 @@ namespace GameEngine.DataSequence.StateMachine
 
             UnityEngine.Debug.LogError("Over Count Safety");
             return null;
-        }
-
-        private Vector3 GetLocalPositionFromWorld(Vector3 roomWorldPosition, Vector3 worldPosition)
-        {
-            Matrix4x4 worldToLocalMatrix = Matrix4x4.TRS(roomWorldPosition, Quaternion.identity, Vector3.one).inverse;
-            Vector3 localPosition = worldToLocalMatrix.MultiplyPoint3x4(worldPosition);
-            return localPosition;
         }
 
         private Vector3 GetWorldPositionFromLocal(Vector3 roomWorldPosition, Vector3 localPosition)
