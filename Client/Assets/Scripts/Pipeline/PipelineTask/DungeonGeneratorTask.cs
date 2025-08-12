@@ -235,7 +235,7 @@ namespace GameEngine.Pipeline
             GameGrid gameGrid = gridObject.AddComponent<GameGrid>();
             gameGrid.transform.position = gridWorldPosition;
             gameGrid.CreateGrid(roomEnumerable, gridCellSize, boundsInt);
-            gameGrid.isGizmos = PayLoad.ShowGizmos;
+            gameGrid.IsGizmos = PayLoad.ShowGizmos;
 
             gridObject.transform.parent = PayLoad.RootGameObject.transform;
 
@@ -252,8 +252,8 @@ namespace GameEngine.Pipeline
                 var node2 = edge.To;
 
                 gameGrid.Clear();
-                GridCell srcCell = gameGrid.GetCell(node1.GetCenter());
-                GridCell dstCell = gameGrid.GetCell(node2.GetCenter());
+                GridCell srcCell = gameGrid.GetCellFromWorldPosition(node1.GetCenter());
+                GridCell dstCell = gameGrid.GetCellFromWorldPosition(node2.GetCenter());
 
                 var pathResult = roadBuilder.GetMinPath(srcCell, dstCell);
                 if (pathResult == null)
@@ -268,7 +268,7 @@ namespace GameEngine.Pipeline
                     if (i - 1 < 0)
                     {
                         Vector3 nearestCellWorldPosition = GetNearestCellFromRoom(curCell.ToVector3(), node1.ToVector3(), node1.GetSize());
-                        prevCell = gameGrid.GetCell(nearestCellWorldPosition);
+                        prevCell = gameGrid.GetCellFromWorldPosition(nearestCellWorldPosition);
                     }
                     else
                     {
@@ -279,7 +279,7 @@ namespace GameEngine.Pipeline
                     if (i + 1 >= pathResultArray.Length)
                     {
                         Vector3 nearestCellWorldPosition = GetNearestCellFromRoom(curCell.ToVector3(), node2.ToVector3(), node2.GetSize());
-                        nextCell = gameGrid.GetCell(nearestCellWorldPosition);
+                        nextCell = gameGrid.GetCellFromWorldPosition(nearestCellWorldPosition);
                     }
                     else
                     {
@@ -310,8 +310,8 @@ namespace GameEngine.Pipeline
                 Vector3 startCellWorldPosition = GetNearestCellFromRoom(firstPathCellPosition, node1.ToVector3(), node1.GetSize());
                 Vector3 endCellWorldPosition = GetNearestCellFromRoom(lastPathCellPosition, node2.ToVector3(), node2.GetSize());
 
-                GridCell startCell = gameGrid.GetCell(startCellWorldPosition);
-                GridCell endCell = gameGrid.GetCell(endCellWorldPosition);
+                GridCell startCell = gameGrid.GetCellFromWorldPosition(startCellWorldPosition);
+                GridCell endCell = gameGrid.GetCellFromWorldPosition(endCellWorldPosition);
 
                 pathResultList.Insert(0, startCell);
                 pathResultList.Add(endCell);

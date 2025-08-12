@@ -13,7 +13,7 @@ namespace GameEngine.UI
         void Start()
         {
             slider = GetComponent<Slider>();
-            playerAbility = GameObject.Find("Mine").GetComponent<UnitAbility>();
+            playerAbility = GameData.Player.GetComponent<UnitAbility>();
             playerAbility.Health.OnValueChanged += OnHealthChanged;
             playerAbility.MaxHealth.OnValueChanged += OnMaxHealthChanged;
             

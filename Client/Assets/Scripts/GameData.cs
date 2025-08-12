@@ -8,8 +8,12 @@ namespace GameEngine
     {
         public static ReactiveProperty<int> AmmoCount = new();
         public static ReactiveProperty<int> AmmoSize = new();
-        public static GunData EquipGunData = new();
-
         public static ReactiveProperty<RoomNode> CurrentVisitRoom = new();
+        public static ReactiveProperty<int> Coin = new();
+
+        public static GunData EquipGunData { get; set; }
+        public static CharacterController Player { get; set; }
+
+        
     }
 }

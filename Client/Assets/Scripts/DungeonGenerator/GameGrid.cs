@@ -6,7 +6,7 @@ namespace GameEngine
 {
     public class GameGrid : MonoBehaviour
     {
-        public bool isGizmos;
+        public bool IsGizmos { get; set; }
 
         private GridCell[,] cellArray;
         public BoundsInt gridBoundsInt;
@@ -25,7 +25,7 @@ namespace GameEngine
             cellArray = new GridCell[gridBoundsInt.size.y, gridBoundsInt.size.x];
             foreach (var cellPosition in gridBoundsInt.allPositionsWithin)
             {
-                var cellWorldPosition = GetCellWorldPosition(cellPosition);
+                var cellWorldPosition = GetWorldPositionFromCell(cellPosition);
                 cellArray[cellPosition.y, cellPosition.x] = new GridCell(cellWorldPosition, cellPosition);
                 cellArray[cellPosition.y, cellPosition.x].IsWalkable = true;
             }
@@ -33,7 +33,7 @@ namespace GameEngine
             foreach (var room in roomEnumerable)
             {
                 var roomWorldPosition = room.ToVector3();
-                var roomCellPosition = GetCellPosition(roomWorldPosition);
+                var roomCellPosition = GetCellPositionFromWorld(roomWorldPosition);
                 int cellHeight = room.Height / gridCellSize;
                 int cellWidth = room.Width / gridCellSize;
 
@@ -82,23 +82,23 @@ namespace GameEngine
             return neighbors;
         }
 
-        public GridCell GetCell(Vector3 cellWorldPosition)
+        public GridCell GetCellFromWorldPosition(Vector3 cellWorldPosition)
         {
-            Vector3Int cellPosition = GetCellPosition(cellWorldPosition);
+            Vector3Int cellPosition = GetCellPositionFromWorld(cellWorldPosition);
             return cellArray[cellPosition.y, cellPosition.x];
         }
 
-        public Vector3 GetCellCenter(Vector3Int cellPosition)
+        public Vector3 GetCenterFromCellPosition(Vector3Int cellPosition)
         {
             return new Vector3(cellPosition.x + gridCellSize / 2f, cellPosition.y + gridCellSize / 2f);
         }
 
-        public Vector3 GetCellWorldCenter(Vector3 worldPosition)
+        public Vector3 GetCenterFromWorldPosition(Vector3 worldPosition)
         {
             return new Vector3(worldPosition.x + gridCellSize / 2f, worldPosition.y + gridCellSize / 2f);
         }
 
-        public Vector3 GetCellWorldPosition(Vector3Int cellPosition)
+        public Vector3 GetWorldPositionFromCell(Vector3Int cellPosition)
         {
             Matrix4x4 cellToLocalMatrix = Matrix4x4.TRS(gridLocalPosition, Quaternion.identity, new Vector3(gridCellSize, gridCellSize, gridCellSize));
             Vector3 localPosition = cellToLocalMatrix.MultiplyPoint3x4(cellPosition);
@@ -107,10 +107,9 @@ namespace GameEngine
             return worldPosition;
         }
 
-        public Vector3Int GetCellPosition(Vector3 worldPosition)
+        public Vector3Int GetCellPositionFromWorld(Vector3 worldPosition)
         {
-            Matrix4x4 worldToLocalMatrix = Matrix4x4.TRS(gridWorldPosition, Quaternion.identity, Vector3.one).inverse;
-            Vector3 localPosition = worldToLocalMatrix.MultiplyPoint3x4(worldPosition);
+            Vector3 localPosition = GetLocalPositionFromWorld(worldPosition);
             Matrix4x4 localToCellMatrix = Matrix4x4.TRS(gridLocalPosition, Quaternion.identity, new Vector3(gridCellSize, gridCellSize, gridCellSize)).inverse;
             Vector3 cellPosition = localToCellMatrix.MultiplyPoint3x4(localPosition);
             Vector3Int cellPositionInt = new Vector3Int((int)cellPosition.x, (int)cellPosition.y, (int)cellPosition.z);
@@ -118,9 +117,16 @@ namespace GameEngine
             return cellPositionInt;
         }
 
+        public Vector3 GetLocalPositionFromWorld(Vector3 worldPosition)
+        {
+            Matrix4x4 worldToLocalMatrix = Matrix4x4.TRS(gridWorldPosition, Quaternion.identity, Vector3.one).inverse;
+            Vector3 localPosition = worldToLocalMatrix.MultiplyPoint3x4(worldPosition);
+            return localPosition;
+        }
+
         private void OnDrawGizmos()
         {
-            if (isGizmos == false)
+            if (IsGizmos == false)
                 return;
 
             Gizmos.color = Color.yellow;
@@ -129,7 +135,7 @@ namespace GameEngine
 
             foreach(var cellPosition in gridBoundsInt.allPositionsWithin)
             {
-                var cellWorldPosition = GetCellWorldPosition(cellPosition);
+                var cellWorldPosition = GetWorldPositionFromCell(cellPosition);
                 var cellWorldCenter = new Vector3(cellWorldPosition.x + gridCellSize / 2f, cellWorldPosition.y + gridCellSize / 2f);
                 Gizmos.DrawWireCube(cellWorldCenter, cellSize);
             }
@@ -146,8 +152,8 @@ namespace GameEngine
                     continue;
 
                 Vector3Int cellPosition = cell.CellPosition;
-                Vector3 cellWorldPosition = GetCellWorldPosition(cellPosition);
-                Vector3 cellWorldCenter = GetCellWorldCenter(cellWorldPosition);
+                Vector3 cellWorldPosition = GetWorldPositionFromCell(cellPosition);
+                Vector3 cellWorldCenter = GetCenterFromWorldPosition(cellWorldPosition);
                 Gizmos.color = cell.CellType == CellType.Room ? Color.black : Color.red;
                 Gizmos.DrawCube(cellWorldCenter, cellSize);
             }

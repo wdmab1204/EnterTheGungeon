@@ -13,8 +13,9 @@ GameObject:
   - component: {fileID: 157006885982957655}
   - component: {fileID: 6634435771197049846}
   - component: {fileID: 8713577293741873419}
-  - component: {fileID: 1889788469532626899}
   - component: {fileID: 2715361620454854206}
+  - component: {fileID: 895031361769769082}
+  - component: {fileID: 4319559168638195780}
   m_Layer: 0
   m_Name: Monster
   m_TagString: Mob
@@ -115,7 +116,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96626f75d6e04a74a28af52d821d0507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2516032642968643193, guid: bd8ffea4861cc2b429ffcf7f9f62e9c6, type: 3}
 --- !u!114 &8713577293741873419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,33 +132,6 @@ MonoBehaviour:
   bulletCount: 3
   spreadAngle: 60
   bulletSpeed: 5
---- !u!50 &1889788469532626899
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6608021505465472060}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
 --- !u!61 &2715361620454854206
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -204,3 +177,46 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.94681454, y: 1.4548991}
   m_EdgeRadius: 0
+--- !u!114 &895031361769769082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6608021505465472060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4f29e1de8e7a8444a450a373ce31da0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 7021925592348437824, guid: c4f107da5df89d941afa8834fb7d119a, type: 3}
+  bulletCount: 3
+  spreadAngle: 60
+  bulletSpeed: 5
+--- !u!50 &4319559168638195780
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6608021505465472060}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4

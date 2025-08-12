@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using GameEngine.DataSequence.Graph;
+using System;
+using System.Collections.Generic;
 
 namespace GameEngine.DataSequence.Queue
 {
-    internal class PriorityQueue<T>
+    internal class PriorityQueue<T> where T : IComparable<T>
     {
         private SortedSet<T> sortedSet;
 

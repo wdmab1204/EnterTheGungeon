@@ -14,7 +14,7 @@ namespace GameEngine
         
         void Start()
         {
-            player = GameObject.FindObjectOfType<CharacterController>();
+            player = GameData.Player;
             shootPattern = GetComponent<FanShapeShooting>();
             sm = new(this.transform);
 
@@ -25,7 +25,7 @@ namespace GameEngine
             ability.Health.OnValueChanged += x =>
             {
                 if (x <= 0)
-                    Destroy(gameObject);
+                    Death();
             };
         }
 
@@ -61,6 +61,13 @@ namespace GameEngine
                 UnitAbility ability = collision.gameObject.GetComponent<UnitAbility>();
                 ability.Health.Value -= 1;
             }
+        }
+
+        private void Death()
+        {
+            //something do
+
+            Destroy(this.gameObject);
         }
     }
 }

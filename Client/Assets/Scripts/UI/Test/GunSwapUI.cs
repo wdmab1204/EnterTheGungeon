@@ -13,7 +13,7 @@ namespace GameEngine.Test
         {
             btn.onClick.AddListener(() =>
             {
-                var controller = GameObject.Find("Mine").GetComponent<GunController.GunController>();
+                var controller = GameData.Player.GetComponent<GunController.GunController>();
                 var id = int.Parse(inputField.text);
                 controller.Equip(id);
             });

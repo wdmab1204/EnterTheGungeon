@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -32,8 +33,14 @@ namespace GameEngine
         public static UnityEngine.Vector3Int ToVector3Int(this IGeomertyNode node)
             => new((int)node.X, (int)node.Y);
 
+        public static UnityEngine.Vector2Int ToVector2Int(this IGeomertyNode node)
+            => new((int)node.X, (int)node.Y);
+
         public static void Destroy(UnityEngine.Object obj)
         {
+            if (obj == null || obj.IsDestroyed())
+                return;
+
             if(Application.isPlaying)
                 GameObject.Destroy(obj);
             else
