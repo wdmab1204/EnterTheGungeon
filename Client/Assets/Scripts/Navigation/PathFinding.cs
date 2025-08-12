@@ -77,6 +77,20 @@ namespace GameEngine.Navigation
                     if (neighbour.IsWalkable == false || closedSet.Contains(neighbour))
                         continue;
 
+                    // 대각선 체크
+                    float dx = neighbour.X - node.X;
+                    float dy = neighbour.Y - node.Y;
+
+                    // 대각선 이동이라면 양 옆 직선 방향이 뚫려있는지 확인
+                    if (dx != 0 && dy != 0)
+                    {
+                        Node side1 = navGrid.GetNode((int)node.Y, (int)(node.X + dx));     // 가로 방향
+                        Node side2 = navGrid.GetNode((int)(node.Y + dy), (int)node.X);     // 세로 방향
+
+                        if (side1 == null || side2 == null || !side1.IsWalkable || !side2.IsWalkable)
+                            continue; // 코너 잘라먹기 방지
+                    }
+
                     float newCostToNeighbour = node.gCost + GetDistance(endNode, neighbour);
                     if(newCostToNeighbour < neighbour.gCost)
                     {
@@ -91,15 +105,19 @@ namespace GameEngine.Navigation
             }
 
 
-            Vector3[] path = new Vector3[0];
+            List<Vector3> path = null;
             if (success)
+            {
                 path = RetracePath(startNode, endNode);
+                //path.Add(end); //도착지점 보정
+            }
+                
 
-            PathResult pathResult = new PathResult(success, path);
+            PathResult pathResult = new PathResult(success, success ? path.ToArray() : null);
             return pathResult;
         }
 
-        Vector3[] RetracePath(Node startNode, Node endNode)
+        List<Vector3> RetracePath(Node startNode, Node endNode)
         {
             List<Vector3> path = new();
             Node curNode = endNode;
@@ -115,7 +133,7 @@ namespace GameEngine.Navigation
             }
 
             path.Reverse();
-            return path.ToArray();
+            return path;
         }
 
         float GetDistance(Node nodeA, Node nodeB)

@@ -11,11 +11,12 @@ namespace GameEngine.Item
         private Vector2 previousVelocity;
         private const float bounceDamping = 0.65f;
         private const float initialUpwardForce = 5f;
-        private const float speed = 3f;
+        private const float speed = 10f;
         private Vector3[] path;
         private bool isFollowState = false;
         private new BoxCollider2D collider;
         private BoxCollider2D playerCollider;
+        private WaitForSeconds pathUpdateInterval = new WaitForSeconds(.3f);
 
         public Transform FollowTarget { get; set; }
 
@@ -79,7 +80,7 @@ namespace GameEngine.Item
                     StopCoroutine(nameof(coFollowTarget));
                     StartCoroutine(nameof(coFollowTarget));
                 }
-                yield return new WaitForSeconds(.3f);
+                yield return pathUpdateInterval;
             }
         }
 

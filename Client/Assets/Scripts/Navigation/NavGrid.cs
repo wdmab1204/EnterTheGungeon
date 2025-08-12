@@ -71,9 +71,9 @@ namespace GameEngine.Navigation
             }
         }
 
-        public Node GetNode(Vector2Int pos)
+        public Node GetNode(int localY, int localX)
         {
-            return grid[pos.y, pos.x];
+            return grid[localY, localX];
         }
 
         public Node GetNode(Vector3 worldPosition)
