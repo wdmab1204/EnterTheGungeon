@@ -6,6 +6,13 @@ namespace GameEngine.Navigation
 {
     public delegate PathResult PathDelegate(Vector3 start, Vector3 end);
 
+    public class PathRequest
+    {
+        public Vector3 start;
+        public Vector3 end;
+        public BoxCollider2D collider;
+    }
+
     public class PathResult
     {
         public bool success;

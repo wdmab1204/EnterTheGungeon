@@ -1,4 +1,5 @@
 ﻿using GameEngine.DataSequence.StateMachine;
+using GameEngine.Navigation;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace GameEngine
         protected virtual (List<UnitState> states, Type defaultState) GetStatesAndDefault()
         {
             var states = new List<UnitState>();
-            states.Add(new WalkState(GetDistance, 1f, 5f));
+            states.Add(new WalkState(PathFindManager.GetPath, player.transform, 1f, 5f));
             states.Add(new ShootState(Shoot));
             return (states, typeof(WalkState));
         }

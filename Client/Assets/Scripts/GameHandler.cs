@@ -58,6 +58,7 @@ namespace GameEngine
             navGrid.transform.position = gameGrid.transform.position;
 
             pathFinder = new(navGrid);
+            PathFindManager.PathFinder = pathFinder;
         }
 
         private void InitializePlayer()
