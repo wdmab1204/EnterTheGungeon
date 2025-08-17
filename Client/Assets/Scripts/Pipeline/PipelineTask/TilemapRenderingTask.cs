@@ -88,7 +88,7 @@ namespace GameEngine.Pipeline
                 }
             }
 
-            Vector3 tilemapCenter = GameUtil.GetBoundsIntFromTilemaps(sourceTilemaps).center;
+            Vector3 tilemapCenter = GameUtility.GetBoundsIntFromTilemaps(sourceTilemaps).center;
 
             foreach (var sourceTilemap in sourceTilemaps)
             {

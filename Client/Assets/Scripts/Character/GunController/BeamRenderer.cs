@@ -62,7 +62,7 @@ namespace GameEngine.GunController
 
         private void Awake()
         {
-            lineRenderer = GameUtil.CreateLineRenderer(Color.red, .2f);
+            lineRenderer = GameUtility.CreateLineRenderer(Color.red, .2f);
             lineRenderer.transform.parent = this.transform;
         }
 

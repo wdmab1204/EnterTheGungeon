@@ -19,7 +19,7 @@ namespace GameEngine.UI
         public void SetGameObject(GameObject minimapObj)
         {
             RectTransform minimapRect = minimapObj.GetComponent<RectTransform>();
-            RectTransform layerGroup = GameUtil.FindChild<RectTransform>(minimapObj, "Layer Group");
+            RectTransform layerGroup = GameUtility.FindChild<RectTransform>(minimapObj, "Layer Group");
 
             minimapObj.transform.SetParent(zoomGroup);
             minimapRect.anchoredPosition = Vector2.zero;

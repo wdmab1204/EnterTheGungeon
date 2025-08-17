@@ -52,8 +52,8 @@ namespace GameEngine
 
             navGrid = GetComponentInChildren<NavGrid>();
             var gameGrid = dungeonGeneratorLevel.GameGrid;
-            var floorTilemap = GameUtil.FindChild<UnityEngine.Tilemaps.Tilemap>(gameGrid.gameObject, "Floor");
-            var collideableTilemap = GameUtil.FindChild<UnityEngine.Tilemaps.Tilemap>(gameGrid.gameObject, "Collideable");
+            var floorTilemap = GameUtility.FindChild<UnityEngine.Tilemaps.Tilemap>(gameGrid.gameObject, "Floor");
+            var collideableTilemap = GameUtility.FindChild<UnityEngine.Tilemaps.Tilemap>(gameGrid.gameObject, "Collideable");
             navGrid.CreateGrid(floorTilemap, collideableTilemap);
             navGrid.transform.position = gameGrid.transform.position;
 

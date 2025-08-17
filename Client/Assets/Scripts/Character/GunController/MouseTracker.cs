@@ -18,7 +18,7 @@ namespace GameEngine.Character
 
         private void Update()
         {
-            Vector3? mouseWorldPos = GameUtil.GetMouseWoirldPosition(mainCamera, Input.mousePosition);
+            Vector3? mouseWorldPos = GameUtility.GetMouseWoirldPosition(mainCamera, Input.mousePosition);
             if (mouseWorldPos == null)
                 return;
 

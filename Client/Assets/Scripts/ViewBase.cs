@@ -29,9 +29,9 @@ namespace GameEngine.UI
             for (int i = 0; i < names.Length; i++)
             {
                 if (typeof(T) == typeof(GameObject))
-                    objects[i] = GameUtil.FindChild(gameObject, names[i], true);
+                    objects[i] = GameUtility.FindChild(gameObject, names[i], true);
                 else
-                    objects[i] = GameUtil.FindChild<T>(gameObject, names[i], true);
+                    objects[i] = GameUtility.FindChild<T>(gameObject, names[i], true);
 
                 if (objects[i] == null)
                     Debug.LogError($"Failed to bind({names[i]})");

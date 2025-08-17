@@ -19,7 +19,7 @@ namespace GameEngine.Navigation
         {
             var result = handler.GetPath(start.position, end.position);
             if (result.success)
-                GameUtil.CreateLineRenderer(Color.red, .2f, result.path);
+                GameUtility.CreateLineRenderer(Color.red, .2f, result.path);
         }
     }
 

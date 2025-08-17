@@ -87,10 +87,10 @@ namespace GameEngine.UI
                 var rectTransform = roomRenderer.GetComponent<RectTransform>();
                 rectTransform.localPosition = room.ToVector3() - centerOffset;
 
-                var cellPositions = new HashSet<Vector3Int>(room.GetTilemaps().SelectMany(tilemap => GameUtil.AllGetTilePosition(tilemap)));
+                var cellPositions = new HashSet<Vector3Int>(room.GetTilemaps().SelectMany(tilemap => GameUtility.AllGetTilePosition(tilemap)));
                 roomRenderer.cellPositions = cellPositions.ToArray();
 
-                var outlines = GameUtil.CellsToOutline(cellPositions);
+                var outlines = GameUtility.CellsToOutline(cellPositions);
                 foreach(var outline in outlines)
                 {
                     outline.Add(outline[1]);

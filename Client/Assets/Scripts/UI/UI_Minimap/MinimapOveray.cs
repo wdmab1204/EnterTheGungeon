@@ -16,7 +16,7 @@ namespace GameEngine.UI
 
         public void SetGameObject(GameObject minimapObj)
         {
-            minimapLayer = GameUtil.FindChild<RectTransform>(minimapObj, "Layer Group");
+            minimapLayer = GameUtility.FindChild<RectTransform>(minimapObj, "Layer Group");
 
             RectTransform minimapRect = minimapObj.GetComponent<RectTransform>();
             minimapObj.transform.SetParent(mask, true);

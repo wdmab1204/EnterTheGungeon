@@ -97,7 +97,7 @@ namespace GameEngine.Pipeline
                 if (isBuilt)
                     roomPrefab = roomPrefabQueue.Dequeue();
                 var tilemaps = GetTilemaps(roomPrefab);
-                Vector3Int size = GameUtil.GetBoundsIntFromTilemaps(tilemaps).size;
+                Vector3Int size = GameUtility.GetBoundsIntFromTilemaps(tilemaps).size;
 
                 Vector3Int roomWorldPositionContainPadding = new((int)(roomWorldPosition.x - roomPadding), (int)(roomWorldPosition.y - roomPadding));
                 Vector3Int roomTopRight = new((int)(roomWorldPosition.x + size.x + roomPadding), (int)(roomWorldPosition.y + size.y + roomPadding));
@@ -411,7 +411,7 @@ namespace GameEngine.Pipeline
             {
                 prefab = PayLoad.HorizonDoor;
                 doorTilemaps = GetTilemaps(prefab);
-                size = GameUtil.GetBoundsIntFromTilemaps(doorTilemaps).size.x;
+                size = GameUtility.GetBoundsIntFromTilemaps(doorTilemaps).size.x;
                 if (direction.x > 0)
                     doorPosition = new(secondCellPosition.x - size, secondCellPosition.y);
                 else
@@ -421,7 +421,7 @@ namespace GameEngine.Pipeline
             {
                 prefab = PayLoad.VerticalDoor;
                 doorTilemaps = GetTilemaps(prefab);
-                size = GameUtil.GetBoundsIntFromTilemaps(doorTilemaps).size.y;
+                size = GameUtility.GetBoundsIntFromTilemaps(doorTilemaps).size.y;
                 if (direction.y > 0)
                     doorPosition = new(secondCellPosition.x, secondCellPosition.y - size);
                 else
@@ -445,7 +445,7 @@ namespace GameEngine.Pipeline
         {
             var gameObjectInstance = UnityEngine.Object.Instantiate(prefab, rootObject);
             foreach (var tilemap in GetTilemaps(gameObjectInstance))
-                GameUtil.Destroy(tilemap.gameObject);
+                GameUtility.Destroy(tilemap.gameObject);
             gameObjectInstance.transform.position = worldPosition;
 
             return gameObjectInstance;

@@ -57,14 +57,14 @@ public class Bullet : MonoBehaviour
         GameObject collidableObject = collision.gameObject;
 
         if (collidableObject.CompareTag("Collideable"))
-            GameUtil.Destroy(gameObject);
+            GameUtility.Destroy(gameObject);
 
         if (!string.IsNullOrEmpty(TargetTag) && collidableObject.CompareTag(TargetTag))
         {
             //GameUtil.Destroy(collidableObject);
             Rigidbody2D unitRig = collidableObject.GetComponent<Rigidbody2D>();
             unitRig.AddForce(Velocity.normalized * Knockback, ForceMode2D.Impulse);
-            GameUtil.Destroy(gameObject);
+            GameUtility.Destroy(gameObject);
 
             UnitAbility ability = collidableObject.GetComponent<UnitAbility>();
             ability.Health.Value -= Damage;
@@ -73,6 +73,6 @@ public class Bullet : MonoBehaviour
 
     private void OnBecameInvisible() 
     {
-        GameUtil.Destroy(gameObject);
+        GameUtility.Destroy(gameObject);
     }
 }

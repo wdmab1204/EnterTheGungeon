@@ -135,7 +135,7 @@ namespace GameEngine.Item
 
         protected override void DoInteractable()
         {
-            GameUtil.Destroy(GameObject);
+            GameUtility.Destroy(GameObject);
             GameData.Coin.Value += 1;
         }
     }

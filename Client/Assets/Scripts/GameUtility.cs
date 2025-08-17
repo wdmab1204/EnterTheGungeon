@@ -8,7 +8,7 @@ using UnityEngine.Tilemaps;
 
 namespace GameEngine
 {
-    public static class GameUtil
+    public static class GameUtility
     {
         public static Vector2Int GetCenterInt(this RectInt rect)
         {

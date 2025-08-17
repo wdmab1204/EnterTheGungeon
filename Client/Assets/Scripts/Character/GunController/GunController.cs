@@ -136,7 +136,7 @@ namespace GameEngine.GunController
 
             if (isMouseClick)
             {
-                var mouseWorldPosition = GameUtil.GetMouseWoirldPosition(mainCamera, Input.mousePosition);
+                var mouseWorldPosition = GameUtility.GetMouseWoirldPosition(mainCamera, Input.mousePosition);
                 if (mouseWorldPosition == null)
                     return;
                 Vector2 shootDirection = (mouseWorldPosition.Value - body.position).normalized;

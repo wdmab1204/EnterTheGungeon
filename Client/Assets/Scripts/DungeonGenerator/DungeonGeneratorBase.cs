@@ -39,14 +39,14 @@ namespace GameEngine
             {
                 foreach (Transform child in rootTransform)
                 {
-                    GameUtil.Destroy(child.gameObject);
+                    GameUtility.Destroy(child.gameObject);
                 }
             }
             else
             {
                 while (rootTransform.childCount != 0)
                 {
-                    GameUtil.Destroy(rootTransform.GetChild(0).gameObject);
+                    GameUtility.Destroy(rootTransform.GetChild(0).gameObject);
                 }
             }
 
