@@ -244,5 +244,7 @@ namespace GameEngine
 
             return allPoints;
         }
+
+        public static int GetRandomSeed() => UnityEngine.Random.Range(int.MinValue, int.MaxValue);
     }
 }

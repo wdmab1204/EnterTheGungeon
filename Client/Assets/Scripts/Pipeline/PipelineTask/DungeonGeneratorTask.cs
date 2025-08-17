@@ -79,11 +79,12 @@ namespace GameEngine.Pipeline
 
         private void CreateRandomRoom(DungeonGraph dungeonGraph)
         {
-            var rand = PayLoad.Random;
+            System.Random rand = new(PayLoad.Seed);
+            NormalDistribution normalDistribution = new NormalDistribution(rand, 0, 8);
             int sample = roomCount;
             int gridCellSize = PayLoad.GridCellSize;
 
-            roomPrefabQueue = InitializeRoomPrefabQueue(PayLoad.RoomTemplates, roomCount);
+            roomPrefabQueue = InitializeRoomPrefabQueue(rand, PayLoad.RoomTemplates, roomCount);
 
             List<(Tilemap[] tilemaps, Vector3 worldPosition)> tilemapRenderTasks = new();
 
@@ -93,7 +94,7 @@ namespace GameEngine.Pipeline
 
             while (sample > 0)
             {
-                var roomWorldPosition = GetRoomWorldPosition(rand, gridCellSize);
+                var roomWorldPosition = GetRoomWorldPosition(normalDistribution, gridCellSize);
                 if (isBuilt)
                     roomPrefab = roomPrefabQueue.Dequeue();
                 var tilemaps = GetTilemaps(roomPrefab);
@@ -122,17 +123,16 @@ namespace GameEngine.Pipeline
                 }
                 else
                 {
-                    rand.stdev += .1f;
+                    normalDistribution.stdev += .1f;
                 }
             }
 
             PayLoad.TilemapRenderTaskList.AddRange(tilemapRenderTasks);
         }
 
-        private Queue<GameObject> InitializeRoomPrefabQueue(IEnumerable<RoomData> roomDatas, int roomCount)
+        private Queue<GameObject> InitializeRoomPrefabQueue(System.Random random, IEnumerable<RoomData> roomDatas, int roomCount)
         {
             int totalGuaranteedCount = roomDatas.Sum(x => x.guaranteedCount);
-            System.Random random = new System.Random();
 
             if (totalGuaranteedCount > roomCount)
                 throw new System.InvalidOperationException("The minimum number of rooms is greater than the maximum number of rooms");

@@ -14,11 +14,13 @@ namespace GameEngine
 
         private PipelineRunner<DungeonGeneratorPayLoad> pipelineRunner = new();
 
-        public DungeonGeneratorLevel Generate()
+        public DungeonGeneratorLevel Generate() => Generate(GameUtility.GetRandomSeed());
+
+        public DungeonGeneratorLevel Generate(int seed)
         {
             var payLoad = new DungeonGeneratorPayLoad()
             {
-                Random = new DataSequence.Random.NormalDistribution(new System.Random(), 0, 8),
+                Seed = seed,
                 RoomTemplates = RoomTemplates.roomList,
                 VerticalRoad = RoomTemplates.verticalRoad,
                 HorizonRoad = RoomTemplates.horizonRoad,
@@ -59,6 +61,7 @@ namespace GameEngine
             pipelineRunner.Run(pipelineItems, payLoad);
             sw.Stop();
 
+            Debug.Log($"Seed : {GameData.Seed}");
             Debug.Log($"Total Seconds : {sw.ElapsedMilliseconds / 1000f}s");
             DungeonGeneratorLevel dungeonGeneratorLevel = new()
             {
