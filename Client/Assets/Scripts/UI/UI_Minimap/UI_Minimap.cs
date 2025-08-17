@@ -3,7 +3,6 @@ using GameEngine.UI.Minimap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GameEngine.UI
@@ -23,14 +22,6 @@ namespace GameEngine.UI
         private Vector3 initPlayerPosition;
         private Func<Vector3> getPlayerPosition;
         private IMinimapDisplay currentMinimapDisplay;
-
-        private static readonly Vector3Int[] clockWiseDirections = new Vector3Int[]
-        {
-            Vector3Int.up,
-            Vector3Int.right,
-            Vector3Int.down,
-            Vector3Int.left
-        };
 
         public enum Mode
         {
@@ -96,10 +87,10 @@ namespace GameEngine.UI
                 var rectTransform = roomRenderer.GetComponent<RectTransform>();
                 rectTransform.localPosition = room.ToVector3() - centerOffset;
 
-                var cellPositions = AllGetTilePosition(room);
+                var cellPositions = new HashSet<Vector3Int>(room.GetTilemaps().SelectMany(tilemap => GameUtil.AllGetTilePosition(tilemap)));
                 roomRenderer.cellPositions = cellPositions.ToArray();
 
-                var outlines = GetAllOutlinePoints(cellPositions);
+                var outlines = GameUtil.CellsToOutline(cellPositions);
                 foreach(var outline in outlines)
                 {
                     outline.Add(outline[1]);
@@ -113,81 +104,6 @@ namespace GameEngine.UI
                 }
             }
         }
-
-        private HashSet<Vector3Int> AllGetTilePosition(RoomNode room)
-        {
-            HashSet<Vector3Int> allPoints = new();
-
-            foreach (var tilemap in room.GetTilemaps())
-            {
-                foreach (var p in tilemap.cellBounds.allPositionsWithin)
-                {
-                    if (tilemap.HasTile(p))
-                        allPoints.Add(p);
-                }
-            }
-
-            return allPoints;
-        }
-
-        private List<List<Vector3Int>> GetAllOutlinePoints(HashSet<Vector3Int> pointSet)
-        {
-            HashSet<(Vector3Int, Vector3Int)> lineSet = new();
-            Dictionary<Vector3Int, Vector3Int> lineConnectMap = new();
-
-            // 1. 외곽선을 구성하는 선분 찾기
-            foreach (var cellPosition in pointSet)
-            {
-                Vector3Int to = cellPosition, from;
-                for (int i = 0; i < 4; i++)
-                {
-                    from = to;
-                    to = from + clockWiseDirections[i];
-
-                    if (lineSet.Remove((from, to)) || lineSet.Remove((to, from)))
-                        continue;
-
-                    lineSet.Add((from, to));
-                }
-            }
-
-            // 2. 연결 정보 구성
-            foreach (var line in lineSet)
-            {
-                lineConnectMap[line.Item1] = line.Item2;
-            }
-
-            // 3. 외곽선 여러 개 추적
-            List<List<Vector3Int>> outlines = new();
-            HashSet<Vector3Int> visited = new();
-
-            foreach (var start in lineConnectMap.Keys.ToList())
-            {
-                if (visited.Contains(start))
-                    continue;
-
-                List<Vector3Int> line = new();
-                Vector3Int current = start;
-
-                do
-                {
-                    visited.Add(current);
-                    line.Add(current);
-
-                    if (!lineConnectMap.TryGetValue(current, out var next))
-                        break;
-
-                    current = next;
-                }
-                while (!visited.Contains(current));
-
-                if (line.Count > 1)
-                    outlines.Add(line);
-            }
-
-            return outlines;
-        }
-
 
         private void RenderRoads(IEnumerable<RoomEdge> roads, int gridCellSize, Vector3 centerOffset)
         {

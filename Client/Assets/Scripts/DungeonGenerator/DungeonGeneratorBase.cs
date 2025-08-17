@@ -65,7 +65,8 @@ namespace GameEngine
                 Rooms = payLoad.DungeonGraph.Vertices,
                 RoadEdges = payLoad.DungeonGraph.Edges,
                 LayoutData = payLoad.LayoutData,
-                GridCellSize = payLoad.GridCellSize
+                GridCellSize = payLoad.GridCellSize,
+                GameGrid = payLoad.GameGrid,
             };
 
             return dungeonGeneratorLevel;

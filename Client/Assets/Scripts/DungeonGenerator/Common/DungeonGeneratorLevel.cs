@@ -9,6 +9,7 @@ namespace GameEngine
         public IEnumerable<RoomNode> Rooms { get; set; }
         public IEnumerable<RoomEdge> RoadEdges { get; set; }
         public Dictionary<RoomNode, RoomInstance> LayoutData { get; set; }
+        public GameGrid GameGrid { get; set; }
         public int GridCellSize { get; set; }
     }
 }

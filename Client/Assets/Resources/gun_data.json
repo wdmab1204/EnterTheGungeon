@@ -1,0 +1,188 @@
+{
+  "guns": [
+    {
+      "ID": 1,
+      "Name": "녹슨 사이드암",
+      "GunForm": 1,
+      "AmmoSize": 6,
+      "AmmoCount": -1,
+      "ReloadTime": 1.2,
+      "Speed": 16,
+      "Knockback": 10,
+      "Damage": 6,
+      "Delay": 0.2,
+      "Range": 16,
+      "Spread": 7,
+
+      "ShakeDuration": 0.1,
+      "ShakeIntensity": 0.02,
+
+      "TransformData": {
+
+        "Position": {
+          "x": 0.246,
+          "y": -0.122
+        },
+
+        "MuzzlePosition": {
+          "x": 1.145,
+          "y": 0.184
+        }
+      }
+    },
+
+    {
+      "ID": 2,
+      "Name": "저가형 리볼버",
+      "GunForm": 1,
+      "AmmoSize": 5,
+      "AmmoCount": -1,
+      "ReloadTime": 0.9,
+      "Speed": 23,
+      "Knockback": 10,
+      "Damage": 6,
+      "Delay": 0.15,
+      "Range": 18,
+      "Spread": 10,
+
+      "ShakeDuration": 0.1,
+      "ShakeIntensity": 0.02,
+
+      "TransformData": {
+
+        "Position": {
+          "x": 0.246,
+          "y": -0.122
+        },
+
+        "MuzzlePosition": {
+          "x": 0.864,
+          "y": 0.149
+        }
+      }
+    },
+
+    {
+      "ID": 3,
+      "Name": "머신 피스톨",
+      "GunForm": 2,
+      "AmmoSize": 30,
+      "AmmoCount": 600,
+      "ReloadTime": 1.2,
+      "Speed": 23,
+      "Knockback": 6,
+      "Damage": 3.2,
+      "Delay": 0.07,
+      "Range": 16,
+      "Spread": 10,
+
+      "ShakeDuration": 0.07,
+      "ShakeIntensity": 0.008,
+
+      "TransformData": {
+
+        "Position": {
+          "x": 0.246,
+          "y": -0.122
+        },
+
+        "MuzzlePosition": {
+          "x": 0.703,
+          "y": 0.183
+        }
+      }
+    },
+
+    {
+      "ID": 4,
+      "Name": "톰슨 서브머신건",
+      "GunForm": 2,
+      "AmmoSize": 30,
+      "AmmoCount": 350,
+      "ReloadTime": 0.78,
+      "Speed": 9,
+      "Knockback": 23,
+      "Damage": 5,
+      "Delay": 0.1,
+      "Range": -1,
+      "Spread": 10,
+
+      "ShakeDuration": 0.07,
+      "ShakeIntensity": 0.008,
+
+      "TransformData": {
+
+        "Position": {
+          "x": -0.025,
+          "y": 0
+        },
+
+        "MuzzlePosition": {
+          "x": 1.34,
+          "y": 0.151
+        }
+      }
+    },
+
+    {
+      "ID": 5,
+      "Name": "벌컨포",
+      "GunForm": 2,
+      "AmmoSize": 900,
+      "AmmoCount": 900,
+      "ReloadTime": 0.6,
+      "Speed": 35,
+      "Knockback": 15,
+      "Damage": 5,
+      "Delay": 0.05,
+      "Range": -1,
+      "Spread": 12,
+
+      "ShakeDuration": 0.05,
+      "ShakeIntensity": 0.015,
+
+      "TransformData": {
+
+        "Position": {
+          "x": -0.025
+        },
+
+        "MuzzlePosition": {
+          "x": 1.59
+        }
+      }
+    },
+
+    {
+      "ID": 6,
+      "Name": "사랑 듬뿍 산탄총",
+      "GunForm": 1,
+      "AmmoSize": 8,
+      "AmmoCount": 120,
+      "ReloadTime": 1.2,
+      "Speed": 23,
+      "Knockback": 30,
+      "Damage": 5,
+      "Delay": 0.45,
+      "Range": 60,
+      "Spread": 14,
+
+      "BulletPerShot": 5,
+
+      "ShakeDuration": 0.05,
+      "ShakeIntensity": 0.015,
+
+      "TransformData": {
+
+        "Position": {
+          "x": -0.025
+        },
+
+        "MuzzlePosition": {
+          "x": 1.59
+        }
+      }
+    }
+
+  ]
+}

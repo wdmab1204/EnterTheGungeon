@@ -25,8 +25,8 @@ namespace GameEngine.DataSequence.PathFinding
         {
             grid.Clear();
 
-            GridCell source = grid.GetCell(from);
-            destination = grid.GetCell(to);
+            GridCell source = grid.GetCellFromWorldPosition(from);
+            destination = grid.GetCellFromWorldPosition(to);
             return GetMinPath(source, destination);
         }
 
@@ -79,7 +79,7 @@ namespace GameEngine.DataSequence.PathFinding
                         continue;
 
                     //출발지점의 방과, 도착지점의 방을 제외한 모든 방은 탐색 대상에서 제외
-                    if (next.CellType == CellType.Room && next.ID != src.ID && next.ID != dst.ID)
+                    if (next.CellType == CellType.Room && next.ID != src.ID && next.ID != dst.ID) 
                         continue;
 
                     float nextHCost = Vector3.Distance(dst.ToVector3(), next.ToVector3());

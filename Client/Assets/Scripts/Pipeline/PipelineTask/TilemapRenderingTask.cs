@@ -43,6 +43,7 @@ namespace GameEngine.Pipeline
             CreateTilemap("Floor", rootTransform, 0);
             var collideableTilemap = CreateTilemap("Collideable", rootTransform, 1);
             collideableTilemap.tag = "Collideable";
+            collideableTilemap.layer = LayerMask.NameToLayer("Collideable");
             AddCollider(collideableTilemap);
         }
 
