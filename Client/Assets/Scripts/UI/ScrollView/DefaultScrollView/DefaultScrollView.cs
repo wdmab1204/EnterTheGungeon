@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GameEngine.UI
 {
-    public class DefaultScrollView : CacheObject, IScrollView<QuestCellModel>
+    public class DefaultScrollView : MonobehaviourExtension, IScrollView<QuestCellModel>
     {
         public void Initialize()
         {
@@ -13,6 +13,6 @@ namespace GameEngine.UI
         {
         }
 
-        public void SetVisible(bool visible) => gameObject.SetActive(visible);
+        public void SetVisible(bool visible) => GameObject.SetActive(visible);
     }
 }

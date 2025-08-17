@@ -2,11 +2,11 @@
 
 namespace GameEngine.UI
 {
-    public abstract class ScrollCellBase<T> : CacheObject
+    public abstract class ScrollCellBase<T> : MonobehaviourExtension
     {
         private Vector3[] corners = new Vector3[4];
         
-        public virtual void SetVisible(bool visible) => gameObject.SetActive(visible);
+        public virtual void SetVisible(bool visible) => GameObject.SetActive(visible);
         
         public int Index { get; set; }
         
@@ -18,13 +18,13 @@ namespace GameEngine.UI
         {
             get
             {
-                MyRT.GetLocalCorners(corners);
-                return MyRT.anchoredPosition + new Vector2(0.0f, corners[1].y);
+                RectTransform.GetLocalCorners(corners);
+                return RectTransform.anchoredPosition + new Vector2(0.0f, corners[1].y);
             }
             set
             {
-                MyRT.GetLocalCorners(corners);
-                MyRT.anchoredPosition = value - new Vector2(0.0f, corners[1].y);
+                RectTransform.GetLocalCorners(corners);
+                RectTransform.anchoredPosition = value - new Vector2(0.0f, corners[1].y);
             }
         }
 
@@ -32,13 +32,13 @@ namespace GameEngine.UI
         {
             get
             {
-                MyRT.GetLocalCorners(corners);
-                return MyRT.anchoredPosition + new Vector2(0.0f, corners[3].y);
+                RectTransform.GetLocalCorners(corners);
+                return RectTransform.anchoredPosition + new Vector2(0.0f, corners[3].y);
             }
             set
             {
-                MyRT.GetLocalCorners(corners);
-                MyRT.anchoredPosition = value - new Vector2(0.0f, corners[3].y);
+                RectTransform.GetLocalCorners(corners);
+                RectTransform.anchoredPosition = value - new Vector2(0.0f, corners[3].y);
             }
         }
     }

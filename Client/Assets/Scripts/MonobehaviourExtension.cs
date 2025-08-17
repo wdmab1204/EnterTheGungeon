@@ -27,6 +27,17 @@ namespace GameEngine
             }
         }
 
+        private RectTransform m_rectTransform;
+        public RectTransform RectTransform
+        {
+            get
+            {
+                if(m_rectTransform == null)
+                    m_rectTransform = GetComponent<RectTransform>();
+                return m_rectTransform;
+            }
+        }
+
         public ReactiveProperty<bool> DestroyState = new();
 
         protected virtual void OnDestroy()

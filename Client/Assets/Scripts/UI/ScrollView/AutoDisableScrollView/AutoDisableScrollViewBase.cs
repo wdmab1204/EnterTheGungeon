@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace GameEngine.UI
 {
-    public abstract class AutoDisableScrollViewBase<T> : CacheObject, IScrollView<T>
+    public abstract class AutoDisableScrollViewBase<T> : MonobehaviourExtension, IScrollView<T>
     {
         private ScrollRect scrollRect;
         private List<AutoDisableCellBase<T>> cellList = new();
@@ -34,7 +34,7 @@ namespace GameEngine.UI
             UpdateContentSize(list.Count);
         }
         
-        public void SetVisible(bool visible) => gameObject.SetActive(visible);
+        public void SetVisible(bool visible) => GameObject.SetActive(visible);
         
         private void UpdateContentSize(int dataCount)
         {
@@ -56,7 +56,7 @@ namespace GameEngine.UI
 
             cell.SetVisible(true);
             cell.Context = this.Context;
-            cell.MyTransform.SetParent(scrollRect.content.transform, false);
+            cell.RectTransform.SetParent(scrollRect.content.transform, false);
             cellList.Add(cell);
 
             return cell;
