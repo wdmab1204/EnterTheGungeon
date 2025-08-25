@@ -1,5 +1,6 @@
 using GameEngine.DataSequence.Queue;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace GameEngine.Navigation
@@ -33,6 +34,7 @@ namespace GameEngine.Navigation
         private Dictionary<Node, Node> parentDict = new();
 
         private NavGrid navGrid;
+        private int processId = 0;
 
         public PathFinding(NavGrid navGrid)
         {
@@ -42,23 +44,18 @@ namespace GameEngine.Navigation
         public PathResult FindPath(Vector3 start, Vector3 end)
         {
             int safety = 100_000;
+            processId++;
 
             openSet.Clear();
             closedSet.Clear();
             queue.Clear();
-
-            foreach (var key in parentDict.Keys)
-            {
-                key.gCost = float.MaxValue;
-                key.hCost = 0f;
-            }
-            parentDict.Clear();
+            parentDict.Clear(); 
 
             var startNode = navGrid.GetNode(start);
             var endNode = navGrid.GetNode(end);
             bool success = false;
 
-            if(startNode.IsWalkable == false || endNode.IsWalkable == false)
+            if(startNode == null || startNode.IsWalkable == false || endNode == null || endNode.IsWalkable == false)
             {
                 Debug.LogError("start or end is not walkable node");
                 PathResult result = new PathResult(false, null);
@@ -68,7 +65,7 @@ namespace GameEngine.Navigation
             queue.Enqueue(startNode);
             startNode.gCost = 0;
 
-            while (queue.IsEmpty() == false || safety-- > 0)
+            while (queue.IsEmpty() == false && safety-- > 0)
             {
                 var node = queue.Dequeue();
                 closedSet.Add(node);
@@ -83,6 +80,12 @@ namespace GameEngine.Navigation
                 {
                     if (neighbour.IsWalkable == false || closedSet.Contains(neighbour))
                         continue;
+
+                    if(neighbour.ProcessID != processId)
+                    {
+                        neighbour.gCost = float.MaxValue;
+                        neighbour.hCost = 0;
+                    }
 
                     // 대각선 체크
                     float dx = neighbour.X - node.X;
@@ -103,6 +106,7 @@ namespace GameEngine.Navigation
                     {
                         neighbour.gCost = newCostToNeighbour;
                         neighbour.hCost = GetDistance(neighbour, endNode);
+                        neighbour.ProcessID = processId;
                         parentDict[neighbour] = node;
 
                         if (!queue.Contain(neighbour))
@@ -119,9 +123,20 @@ namespace GameEngine.Navigation
                 //path.Add(end); //도착지점 보정
             }
                 
-
             PathResult pathResult = new PathResult(success, success ? path.ToArray() : null);
             return pathResult;
+        }
+
+        Node GetNode(int x, int y)
+        {
+            Node node = null;
+
+            lock (navGrid)
+            {
+                node = navGrid.GetNode(x, y);
+            }
+
+            return node;
         }
 
         List<Vector3> RetracePath(Node startNode, Node endNode)

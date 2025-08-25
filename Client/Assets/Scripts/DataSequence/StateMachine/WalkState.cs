@@ -44,7 +44,14 @@ namespace GameEngine.DataSequence.StateMachine
             else
             {
                 curTime = 0;
-                path = PathRequest(transform.position, player.position).path;
+                var result = PathRequest(transform.position, player.position);
+                if (result.success)
+                    path = result.path;
+                else
+                {
+                    path = null;
+                    rb.velocity = Vector2.zero;
+                }
                 targetIndex = 0;
             }
         }

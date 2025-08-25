@@ -16,6 +16,7 @@ namespace GameEngine.Navigation
         public int ID { get; set; }
         public float X { get; set; }
         public float Y { get; set; }
+        public int ProcessID { get; set; }
 
         public Node(Vector2Int position)
         {
@@ -44,21 +45,28 @@ namespace GameEngine.Navigation
         private Node[,] grid;
         private int width;
         private int height;
+        private Matrix4x4 localToWorldMatrix;
+        private Matrix4x4 worldToLocalMatrix;
+        private Dictionary<Node, List<Node>> neighbourCache = new();
         public bool IsGizmos { get; set; }
 
         public void CreateGrid(Tilemap floorTilemap, Tilemap collideableTilemap)
         {
             BoundsInt bounds = floorTilemap.cellBounds;
             Debug.Log("Floor Bounds : " + bounds);
-            width = bounds.size.x;
-            height = bounds.size.y;
+            width = bounds.position.x + bounds.size.x;
+            height = bounds.position.y + bounds.size.y;
             grid = new Node[height, width];
+
+            var myTransform = transform;
+            localToWorldMatrix = Matrix4x4.TRS(myTransform.position, myTransform.rotation, myTransform.localScale);
+            worldToLocalMatrix = localToWorldMatrix.inverse;
 
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Vector2Int cellPos2 = new(x + bounds.xMin, y + bounds.yMin);
+                    Vector2Int cellPos2 = new(x + bounds.xMin - bounds.position.x, y + bounds.yMin - bounds.position.y);
                     Vector3Int cellPos3 = (Vector3Int)cellPos2;
 
                     bool hasFloor = floorTilemap.HasTile(cellPos3);
@@ -73,22 +81,21 @@ namespace GameEngine.Navigation
 
         public Node GetNode(int localY, int localX)
         {
+            if (localY < 0 || localY >= height || localX < 0 || localX >= width)
+                return null;
+
             return grid[localY, localX];
         }
 
         public Node GetNode(Vector3 worldPosition)
         {
-            var myTransform = transform;
-            var worldToLocalMatrix = Matrix4x4.TRS(myTransform.position, myTransform.rotation, myTransform.localScale).inverse;
             var localPosition = worldToLocalMatrix.MultiplyPoint3x4(worldPosition);
 
-            return grid[(int)localPosition.y, (int)localPosition.x];
+            return GetNode((int)localPosition.y, (int)localPosition.x);
         }
 
         public Vector3 GetWorldPositionFromLocal(Vector3 localPosition, bool isCenter = false)
         {
-            var myTransform = transform;
-            var localToWorldMatrix = Matrix4x4.TRS(myTransform.position, myTransform.rotation, myTransform.localScale);
             var worldPosition = localToWorldMatrix.MultiplyPoint3x4(localPosition);
 
             if (isCenter)
@@ -102,7 +109,13 @@ namespace GameEngine.Navigation
 
         public IEnumerable<Node> GetNeighbours(Node node)
         {
-            List<Node> neighbours = new();
+            List<Node> neighbours = neighbourCache.GetValueOrDefault(node, null);
+            if (neighbours != null)
+            {
+                return neighbours;
+            }
+
+            neighbours = new();
 
             for (int y = -1; y <= 1; y++)
             {
