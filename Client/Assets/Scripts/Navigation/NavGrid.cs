@@ -40,13 +40,11 @@ namespace GameEngine.Navigation
         }
     }
 
-    public class NavGrid : MonoBehaviour
+    public class NavGrid : MonobehaviourExtension
     {
         private Node[,] grid;
         private int width;
         private int height;
-        private Matrix4x4 localToWorldMatrix;
-        private Matrix4x4 worldToLocalMatrix;
         private Dictionary<Node, List<Node>> neighbourCache = new();
         public bool IsGizmos { get; set; }
 
@@ -57,10 +55,6 @@ namespace GameEngine.Navigation
             width = bounds.position.x + bounds.size.x;
             height = bounds.position.y + bounds.size.y;
             grid = new Node[height, width];
-
-            var myTransform = transform;
-            localToWorldMatrix = Matrix4x4.TRS(myTransform.position, myTransform.rotation, myTransform.localScale);
-            worldToLocalMatrix = localToWorldMatrix.inverse;
 
             for (int x = 0; x < width; x++)
             {
@@ -89,13 +83,20 @@ namespace GameEngine.Navigation
 
         public Node GetNode(Vector3 worldPosition)
         {
-            var localPosition = worldToLocalMatrix.MultiplyPoint3x4(worldPosition);
-
+            var localPosition = GetLocalFromWorld(worldPosition);
             return GetNode((int)localPosition.y, (int)localPosition.x);
+        }
+
+        public Vector3 GetLocalFromWorld(Vector3 worldPosition)
+        {
+            var worldToLocalMatrix = Matrix4x4.TRS(Transform.position, Transform.rotation, Transform.localScale).inverse;
+            var localPosition = worldToLocalMatrix.MultiplyPoint3x4(worldPosition);
+            return localPosition;
         }
 
         public Vector3 GetWorldPositionFromLocal(Vector3 localPosition, bool isCenter = false)
         {
+            var localToWorldMatrix = Matrix4x4.TRS(Transform.position, Transform.rotation, Transform.localScale);
             var worldPosition = localToWorldMatrix.MultiplyPoint3x4(localPosition);
 
             if (isCenter)
@@ -133,31 +134,32 @@ namespace GameEngine.Navigation
                     neighbours.Add(grid[neighborY, neighborX]);
                 }
             }
+            neighbourCache[node] = neighbours;
 
             return neighbours;
         }
 
-        private void OnDrawGizmos()
-        {
-            if (grid == null)
-                return;
+        //private void OnDrawGizmos()
+        //{
+        //    if (grid == null)
+        //        return;
 
-            foreach (var tile in grid)
-            {
-                if (tile == null)
-                    continue;
+        //    foreach (var tile in grid)
+        //    {
+        //        if (tile == null)
+        //            continue;
 
-                if(tile.gCost > 200)
-                {
-                    Gizmos.color = tile.IsWalkable ? Color.blue : Color.red;
-                    Gizmos.DrawWireCube(GetWorldPositionFromLocal(tile.ToVector3(), true), Vector3.one);
-                }
-                else
-                {
-                    Gizmos.color = Color.Lerp(Color.white, Color.black, tile.gCost / 200);
-                    Gizmos.DrawCube(GetWorldPositionFromLocal(tile.ToVector3(), true), Vector3.one);
-                }
-            }
-        }
+        //        if(tile.gCost > 200)
+        //        {
+        //            Gizmos.color = tile.IsWalkable ? Color.blue : Color.red;
+        //            Gizmos.DrawWireCube(GetWorldPositionFromLocal(tile.ToVector3(), true), Vector3.one);
+        //        }
+        //        else
+        //        {
+        //            Gizmos.color = Color.Lerp(Color.white, Color.black, tile.gCost / 200);
+        //            Gizmos.DrawCube(GetWorldPositionFromLocal(tile.ToVector3(), true), Vector3.one);
+        //        }
+        //    }
+        //}
     }
 }

@@ -1,4 +1,4 @@
-﻿using GameEngine.DataSequence.StateMachine;
+﻿using Cysharp.Threading.Tasks;
 using GameEngine.Navigation;
 using System;
 using UnityEngine;
@@ -10,13 +10,14 @@ namespace GameEngine.DataSequence.StateMachine
         private float speed = 1;
         private float atkRange = 5;
         private Rigidbody2D rb;
-        private PathDelegate PathRequest;
+        private Func<Vector3, Vector3, UniTask<PathResult>> PathRequest;
         private Vector3[] path;
         private float curTime = 0, interval = .3f;
         private int targetIndex = 0;
+        private bool isRequestingPath;
         private Transform player;
 
-        public WalkState(PathDelegate PathRequest, Transform player, float speed, float atkRange)
+        public WalkState(Func<Vector3, Vector3, UniTask<PathResult>> PathRequest, Transform player, float speed, float atkRange)
         {
             this.PathRequest = PathRequest;
             this.player = player;
@@ -43,17 +44,31 @@ namespace GameEngine.DataSequence.StateMachine
             }
             else
             {
-                curTime = 0;
-                var result = PathRequest(transform.position, player.position);
-                if (result.success)
-                    path = result.path;
-                else
+                if (!isRequestingPath)
                 {
-                    path = null;
-                    rb.velocity = Vector2.zero;
+                    curTime = 0;
+                    isRequestingPath = true;
+                    RequestPathAsync(transform.position, player.position).Forget();
                 }
-                targetIndex = 0;
             }
+        }
+
+        private async UniTask RequestPathAsync(Vector3 from, Vector3 to)
+        {
+            var result = await PathRequest(from, to);
+
+            if (result.success)
+            {
+                path = result.path;
+            }
+            else
+            {
+                path = null;
+                rb.velocity = Vector2.zero;
+            }
+
+            targetIndex = 0;
+            isRequestingPath = false;
         }
 
         public override void FixedUpdate(float time)
@@ -61,8 +76,17 @@ namespace GameEngine.DataSequence.StateMachine
             if (path == null || path.Length == 0 || targetIndex >= path.Length)
                 return;
 
+
             Vector2 targetPos = path[targetIndex];
             Vector2 dir = (targetPos - (Vector2)transform.position);
+            Vector2 forward = (targetIndex + 1 < path.Length) ? path[targetIndex + 1] - path[targetIndex] : player.position - path[targetIndex];
+            if (Vector3.Dot(forward, dir) <= 0f)
+            {
+                targetIndex++;
+                return;
+            }
+
+            
             Vector2 dirNormalized = dir.normalized;
 
             if(atkRange >= (player.position - transform.position).magnitude)

@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -21,6 +22,13 @@ namespace GameEngine.Navigation
             if (result.success)
                 GameUtility.CreateLineRenderer(Color.red, .2f, result.path);
         }
+
+        public async UniTaskVoid FindPathAsync()
+        {
+            var result = await PathFindManager.GetPathAsync(start.position, end.position, new());
+            if (result.success)
+                GameUtility.CreateLineRenderer(Color.red, .2f, result.path);
+        }
     }
 
 #if UNITY_EDITOR
@@ -34,7 +42,7 @@ namespace GameEngine.Navigation
             PathDebugger debugger = (PathDebugger)target;
             if (GUILayout.Button("½ÇÇà: FindPath"))
             {
-                debugger.FindPath();
+                debugger.FindPathAsync().Forget();
             }
         }
     }

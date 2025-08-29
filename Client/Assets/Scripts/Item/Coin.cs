@@ -1,5 +1,8 @@
+using Cysharp.Threading.Tasks;
 using GameEngine.Navigation;
 using System.Collections;
+using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GameEngine.Item
@@ -16,7 +19,7 @@ namespace GameEngine.Item
         private bool isFollowState = false;
         private new BoxCollider2D collider;
         private BoxCollider2D playerCollider;
-        private WaitForSeconds pathUpdateInterval = new WaitForSeconds(.3f);
+        private CancellationTokenSource cancellationTokenSource = new();
 
         public Transform FollowTarget { get; set; }
 
@@ -46,7 +49,7 @@ namespace GameEngine.Item
                     rb.gravityScale = 0f;
                     collider.isTrigger = true;
                     Physics2D.IgnoreCollision(collider, playerCollider, false);
-                    StartCoroutine(nameof(coUpdatePath));
+                    UpdatePathAsync().Forget();
                     isFollowState = true;
                 }
             }
@@ -69,18 +72,22 @@ namespace GameEngine.Item
             }
         }
 
-        private IEnumerator coUpdatePath()
+        private async UniTask UpdatePathAsync()
         {
-            while (true)
+            while (this != null && this.gameObject.IsDestroyed() == false)
             {
-                var pathResult = PathRequest(Transform.position, FollowTarget.position);
-                if(this.path != pathResult.path)
+                var pathResult = await PathRequest(Transform.position, FollowTarget.position, cancellationTokenSource);
+
+                if (this == null || this.gameObject.IsDestroyed()) break;
+
+                if (pathResult.success && this.path != pathResult.path)
                 {
                     this.path = pathResult.path;
                     StopCoroutine(nameof(coFollowTarget));
                     StartCoroutine(nameof(coFollowTarget));
                 }
-                yield return pathUpdateInterval;
+
+                await UniTask.WaitForSeconds(.3f);
             }
         }
 
@@ -95,6 +102,12 @@ namespace GameEngine.Item
                     Transform.position = Vector3.MoveTowards(Transform.position, waypoint, speed * Time.deltaTime);
                     yield return null;
                 }
+            }
+
+            while(Vector3.Distance(Transform.position, FollowTarget.position) > 0.001f)
+            {
+                Transform.position = Vector3.MoveTowards(Transform.position, FollowTarget.position, speed * Time.deltaTime);
+                yield return null;
             }
         }
 
@@ -113,24 +126,31 @@ namespace GameEngine.Item
             rb.velocity = velocity;
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource.Dispose();
+        }
+
         private void OnDrawGizmos()
         {
-            //if (path == null)
-            //    return;
+            if (path == null)
+                return;
 
-            //for (int i = 0; i < path.Length; i++)
-            //{
-            //    if (i == 0)
-            //    {
-            //        Gizmos.color = Color.white;
-            //        Gizmos.DrawLine(transform.position, path[i]);
-            //    }
-            //    else
-            //    {
-            //        Gizmos.color = Color.white;
-            //        Gizmos.DrawLine(path[i - 1], path[i]);
-            //    }
-            //}
+            for (int i = 0; i < path.Length; i++)
+            {
+                if (i == 0)
+                {
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawLine(transform.position, path[i]);
+                }
+                else
+                {
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawLine(path[i - 1], path[i]);
+                }
+            }
         }
 
         protected override void DoInteractable()

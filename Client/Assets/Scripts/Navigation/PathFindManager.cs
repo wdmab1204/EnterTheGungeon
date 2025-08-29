@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using System.Threading;
 using Unity.Profiling;
 using UnityEngine;
 
@@ -14,7 +16,13 @@ namespace GameEngine.Navigation
             {
                 return PathFinder.FindPath(start, end);
             }
-            
+        }
+
+        public static async UniTask<PathResult> GetPathAsync(Vector3 start, Vector3 end, CancellationTokenSource token)
+        {
+            PathResult result;
+            result = await PathFinder.FindPathAsync(start, end, token);
+            return result;
         }
     }
 }

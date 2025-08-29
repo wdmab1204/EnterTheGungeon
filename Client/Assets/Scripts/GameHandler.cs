@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using GameEngine.DataSequence.Graph;
 using GameEngine.Item;
 using GameEngine.Navigation;
@@ -7,7 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
- 
+using UnityEngine.AI;
+
 namespace GameEngine
 {
     public class GameHandler : MonoBehaviour
@@ -31,7 +33,7 @@ namespace GameEngine
         private int currentMobCount;
         private NavGrid navGrid;
         private PathFinding pathFinder;
-        private HashSet<Coin> fieldCoins = new();   
+        private HashSet<Coin> fieldCoins = new();
 
         private void Awake()
         {
@@ -54,8 +56,8 @@ namespace GameEngine
             var gameGrid = dungeonGeneratorLevel.GameGrid;
             var floorTilemap = GameUtility.FindChild<UnityEngine.Tilemaps.Tilemap>(gameGrid.gameObject, "Floor");
             var collideableTilemap = GameUtility.FindChild<UnityEngine.Tilemaps.Tilemap>(gameGrid.gameObject, "Collideable");
-            navGrid.CreateGrid(floorTilemap, collideableTilemap);
             navGrid.transform.position = gameGrid.transform.position;
+            navGrid.CreateGrid(floorTilemap, collideableTilemap);
 
             pathFinder = new(navGrid);
             PathFindManager.PathFinder = pathFinder;
@@ -142,7 +144,7 @@ namespace GameEngine
             while (count-- > 0)
             {
                 var coinObject = UnityEngine.Object.Instantiate<Coin>(coinPrefab);
-                coinObject.PathRequest += GetPath;
+                coinObject.PathRequest += PathFindManager.GetPathAsync;
                 coinObject.transform.position = mobWorldPosition;
                 coinObject.GetComponent<MonobehaviourExtension>().DestroyState.OnValueChanged += isDestroy =>
                 {
@@ -196,6 +198,7 @@ namespace GameEngine
             {
                 UnityEngine.Debug.LogError($"Can not found destination. src :  {start}, dst : {end}");
             }
+
             return result;
         }
     }

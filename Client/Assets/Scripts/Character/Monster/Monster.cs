@@ -1,7 +1,9 @@
-﻿using GameEngine.DataSequence.StateMachine;
+﻿using Cysharp.Threading.Tasks;
+using GameEngine.DataSequence.StateMachine;
 using GameEngine.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace GameEngine
@@ -12,6 +14,8 @@ namespace GameEngine
         private UnitStateMachine sm;
         private FanShapeShooting shootPattern;
         private UnitAbility ability;
+        private CancellationTokenSource tokenSource = new();
+        private Vector3[] path;
         
         void Start()
         {
@@ -33,9 +37,16 @@ namespace GameEngine
         protected virtual (List<UnitState> states, Type defaultState) GetStatesAndDefault()
         {
             var states = new List<UnitState>();
-            states.Add(new WalkState(PathFindManager.GetPath, player.transform, 1f, 5f));
+            states.Add(new WalkState(GetPathAsync, player.transform, 1f, 5f));
             states.Add(new ShootState(Shoot));
             return (states, typeof(WalkState));
+        }
+
+        protected async UniTask<PathResult> GetPathAsync(Vector3 start, Vector3 end)
+        {
+            var result = await PathFindManager.GetPathAsync(start, end, tokenSource);
+            path = result.path;
+            return result;
         }
 
         private void Update()
@@ -67,8 +78,22 @@ namespace GameEngine
         private void Death()
         {
             //something do
-
+            tokenSource?.Cancel();
+            tokenSource?.Dispose();
             Destroy(this.gameObject);
         }
+
+        private void OnDrawGizmos()
+        {
+            if (path == null)
+                return;
+
+            for (int i = 0; i < path.Length - 1; i++)
+            {
+                Gizmos.color = Color.white;
+                Gizmos.DrawLine(path[i], path[i + 1]);
+            }
+        }
+
     }
 }
