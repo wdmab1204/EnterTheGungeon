@@ -45,7 +45,7 @@ namespace GameEngine
         private void InitializeComponents()
         {
             var generatorBase = GameObject.Find("Dungeon Generator").GetComponent<DungeonGeneratorBase>();
-            dungeonGeneratorLevel = generatorBase.Generate(GameData.Seed);
+            dungeonGeneratorLevel = generatorBase.Generate();
 
             PlayerController = GameObject.Find("Mine").GetComponent<CharacterController>();
             PlayerController.onMove += OnUserMove;

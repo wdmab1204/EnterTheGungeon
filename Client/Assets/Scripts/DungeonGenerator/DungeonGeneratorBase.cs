@@ -15,6 +15,7 @@ namespace GameEngine
         private PipelineRunner<DungeonGeneratorPayLoad> pipelineRunner = new();
 
         public DungeonGeneratorLevel Generate() => Generate(GameUtility.GetRandomSeed());
+        //public DungeonGeneratorLevel Generate() => Generate(100);
 
         public DungeonGeneratorLevel Generate(int seed)
         {
@@ -61,7 +62,7 @@ namespace GameEngine
             pipelineRunner.Run(pipelineItems, payLoad);
             sw.Stop();
 
-            Debug.Log($"Seed : {GameData.Seed}");
+            Debug.Log($"Seed : {seed}");
             Debug.Log($"Total Seconds : {sw.ElapsedMilliseconds / 1000f}s");
             DungeonGeneratorLevel dungeonGeneratorLevel = new()
             {
