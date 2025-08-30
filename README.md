@@ -1,5 +1,5 @@
 ### 이 문서는 구현 과정과 시행착오, 코드리뷰와 성능 분석을 기록한 상세 개발 기록입니다
-
+![Recording 2025-08-30 at 16 22 20](https://github.com/user-attachments/assets/95b35484-a8e9-476c-91b5-ca83c42ac873)
 # Enter the Gungeon
 ![image](https://github.com/user-attachments/assets/37c2967b-158c-4c13-91d2-9ed5a920728f)
 
@@ -58,9 +58,7 @@ https://juliageometry.github.io/DelaunayTriangulation.jl/stable/tutorials/operat
 
 ### 들로네 삼각분할 + MST를 이용한 던전 생성기
 
-//super triangle(사진)
-
-<img width="657" height="542" alt="image" src="https://github.com/user-attachments/assets/319ef0b8-412b-4b03-9943-ecdf277f3743" />
+<img width="595" height="613" alt="image" src="https://github.com/user-attachments/assets/aa8fb8af-2bf4-4d69-8e1d-cb6700406739" />
 
 
 
@@ -70,15 +68,17 @@ https://juliageometry.github.io/DelaunayTriangulation.jl/stable/tutorials/operat
 #### 처음에는 임의의 두 점을 연결한 직선을 기준으로 정하고 모든 점들이 한쪽으로 치우쳐져 있으면 외곽선으로 판단하는 Brute Force 방식을 생각했으나 시간복잡도가 클 것으로 예상되어 유명한 구현방법인 그레이엄 스캔(Graham’s scan)방식을 채택했습니다. 이 과정에서 점이 선을 기준으로 어느쪽에 있는지 판별하는 방법이 필요했는데 아래 주소를 통해 행렬식을 얻어 쉽게 구할 수 있었습니다.
 https://stackoverflow.com/questions/1560492/how-to-tell-whether-a-point-is-to-the-right-or-left-side-of-a-line
 
-<img width="657" height="542" alt="image" src="https://github.com/user-attachments/assets/bccd3db6-35cc-4eb6-b9e7-f8b172950f42" />
-<img width="657" height="542" alt="image" src="https://github.com/user-attachments/assets/a92cf38b-0ef9-48e7-b4a7-96db1730c9cc" />
+<img width="595" height="612" alt="image" src="https://github.com/user-attachments/assets/cf8543e3-3f13-4f8e-9725-6efe40d85c41" />
+
+<img width="578" height="593" alt="image" src="https://github.com/user-attachments/assets/7dfcfe6e-e02a-4e28-beb0-70cf74f2f788" />
 
 
 
 #### convex hull로 만들어진 볼록 다각형의 점들을 이용해서 삼각형으로 분할합니다. 단순하게 점 하나를 가지고 모든 점들과 연결하면 간단하게 삼각형이 만드는데 이게 가능한 이유는 볼록 다각형이기 때문인데 한곳이라도 오목한 곳이 있다면 분할 과정 중 선이 교차하게 되어 분할 조건이 성립하지 않기 때문입니다. 그 다음 나머지 볼록 다각형 안에 있는 점들은 만들어진 삼각형 리스트를 순회하여 점이 그 안에 포함되어있는지 조건을 확인합니다. 이 때 특정한 점이 삼각형안에 포함되는지 확인하는 방법은 아래의 행렬식을 사용했습니다.
 http://totologic.blogspot.com/2014/01/accurate-point-in-triangle-test.html
 
-<img width="657" height="542" alt="image" src="https://github.com/user-attachments/assets/d3a5be4e-2da8-4758-944a-6290bce477d5" />
+<img width="580" height="598" alt="image" src="https://github.com/user-attachments/assets/0f7d3e6a-a697-4eaa-b65c-6f4c4bbe6b70" />
+
 
 
 #### 들로네 삼각분할도 여러가지 알고리즘이 존재하지만 가장 유명한 Incremental은 동적으로 점이 생길 때 유용하고, 이미 convex hull로 예쁘지 않지만 여튼 삼각형들을 만들었기 때문에, 이미 만들어져있는 삼각형들을 들로네 삼각분할 조건에 맞게 재정립하는 Flip 알고리즘을 채용했습니다.
@@ -87,8 +87,8 @@ http://totologic.blogspot.com/2014/01/accurate-point-in-triangle-test.html
 
 #### 모든 삼각형의 Half Edge를 순회하여 Flip Condition 확인이 필요한데 행렬식을 이용해서 쉽게 조건식을 완성할 수 있었습니다. 최종적으로 모든 Flip Condition을 확인하고 수행한다면 들로네 삼각분할이 완성됩니다. //(외접원체크 두번하는 이유도 서술)
 https://stackoverflow.com/questions/39984709/how-can-i-check-wether-a-point-is-inside-the-circumcircle-of-3-points
+<img width="540" height="580" alt="image" src="https://github.com/user-attachments/assets/f6935ae9-4cb7-4064-ba66-2011b32b2e6d" />
 
-<img width="657" height="542" alt="image" src="https://github.com/user-attachments/assets/1174d116-8c67-426d-bcc3-78579020e22a" />
 
 #### 모든 방들을 방문할 수 있지만 같은 방을 다시 방문할 수 있는 루트(Cycle)가 존재합니다. 던전이 너무 복잡해지지 않기 위해 최소 신장 트리를 적용하여 최소한의 루트만 남깁니다.
 
@@ -96,15 +96,16 @@ https://stackoverflow.com/questions/39984709/how-can-i-check-wether-a-point-is-i
 
 #### 개선하기 전에 방과 방을 잇는 복도는 직선으로 구현하거나 ㄴ자 모양으로 나오도록 구현했습니다. 하지만 복도가 다른 방을 가로지르는 문제가 있었기 때문에 길찾기 알고리즘을 이용해서 던전의 구조를 파악하고 최적의 복도(경로)를 만드는 작업을 진행했습니다.
 
-//사진
 #### 처음에는 타일을 하나의 노드로 정의하고 A star로 방과 방을 잇는 최단 거리의 경로로 복도를 구현했습니다. 하지만 복도를 두껍게하고 벽을 세우는 과정에서 다시한번 방과 겹치는 이슈가 발생했는데 경로를 계산하는 과정에서 복도의 두께까지 가정하지 않았기 때문입니다. 노드마다 복도의 두께만큼 반경에 다른 타일이 있는지 검사하는 방법이 있지만 안그래도 많은 노드 개수에 추가 비용이 드는건 좋지 않다고 생각해 5x5 타일들을 하나의 노드로 재정의하는 방법을 채용했습니다. 5x5 타일 내에서 복도를 자유롭게 표현할 수 있고 노드의 크기도 커져 전체적인 노드 개수도 줄어들어 A*의 연산 속도고 개선되는 일석이조의 효과를 얻었습니다.
 
-<img width="657" height="542" alt="image" src="https://github.com/user-attachments/assets/2c79c87b-2f87-473a-bc8c-a4097fae11bb" />
+<img width="595" height="597" alt="image" src="https://github.com/user-attachments/assets/690a7572-f691-4f09-b74d-4c7d2e0bd1de" />
 
+<img width="637" height="602" alt="image" src="https://github.com/user-attachments/assets/956d59a3-9a16-4044-bfd4-df6ee0692bd9" />
 
-//그리드 적용 전과 후의 성능 기록
 
 ### 미니맵 구현
+<img width="614" height="606" alt="image" src="https://github.com/user-attachments/assets/6e68fea1-f3b1-422e-9d03-53face401eeb" />
+
 기능 : 유저가 입장한 던전의 모습을 한눈에 볼 수 있는 UI
 효과 : 복잡한 던전에서 길을 헤메지 않아 쉽게 게임 플레이 가능
 
@@ -118,6 +119,7 @@ https://www.youtube.com/watch?v=ku_thRxLXPw
 #### 타일마다 시계방향의 위치 벡터 4개를 저장하는데 순회 중 시작과 끝점이 같거나 서로 반대인 벡터가 있다면 그 벡터를 제거합니다. 그러면 최종적으로 외벽을 이루는 시계방향 벡터, 내벽을 이루는 반시계방향 벡터로 나뉘게 됩니다. 이를 응용해서 내벽을 그릴 때 외벽과 다른 색으로 하는것도 가능합니다.
 
 ### 던전 내비게이션 시스템
+<img width="626" height="602" alt="image" src="https://github.com/user-attachments/assets/26f8de5e-65bc-420f-9665-71895d1e2c1b" />
 
 #### 몬스터는 플레이어를 공격하기 위해, 동전은 플레이어에게 먹히기 위해 자동으로 추적해야 합니다. 단순한 길찾기이기 때문에 익숙한 A star 알고리즘을 사용했으나, 던전에 8마리의 몬스터가 동시에 길찾기를 사용했을 경우 한 프레임에 cpu 전체 사용량의 평균 49%나 차지한다는 점에서 적지 않은 충격을 먹었습니다. 프레임 드랍의 원인이 될 수 있기 때문에 반드시 개선이 필요하다고 생각해 두가지 방법을 고안했습니다.
 
@@ -131,6 +133,8 @@ https://www.youtube.com/watch?v=ku_thRxLXPw
 #### 처음에는 길찾기 요청을 Queue에 담아 프레임마다 순차적으로 처리하는 방식을 구상했습니다. 이 방법은 모든 몬스터의 경로 계산을 여러 프레임으로 분산시킬 수 있어 효율적이라 판단했습니다. 그러나 최악의 경우 특정 프레임에서 병목 현상이 발생할 가능성이 있었습니다. 이를 보완하기 위해 Thread를 활용한 병렬 계산을 고려했지만, Unity WebGL 환경에서는 MultiThread가 지원되지 않는 제약이 있었습니다. 최종적으로는 UniTask를 활용하여 경로 계산 비용을 여러 프레임으로 분산 처리함으로써, 성능을 유지하면서도 WebGL 환경에서도 안정적으로 동작하도록 구현했습니다.
 
 #### 초기 구현에서는 Grid의 Cell을 직접 참조한 뒤 방문한 Cell을 초기화하는 방식으로 경로 계산을 처리했습니다. 그러나 UniTask 기반 비동기 구조로 전환하면서 여러 작업에서 동시에 Cell을 참조하게 되었고, 이로 인해 계산 결과가 불안정해지는 문제가 발생했습니다. 문제를 해결하기 위해 깊은 복사 방식을 도입했지만, 매번 복사가 일어나면서 많은 Garbage가 생성되었습니다. 이에 class 대신 struct를 활용하여 불필요한 메모리 할당을 줄이고, 안정적인 계산과 성능 최적화를 동시에 달성할 수 있었습니다. 이를 통해 GC 발생 빈도를 크게 줄이고, Spike로 인한 프레임 드랍 가능성을 제거했습니다.
+
+![Recording 2025-08-30 at 16 33 59](https://github.com/user-attachments/assets/15795f38-583d-492d-b5ea-bc0ff6b2d8b8)
 
 ##### 몬스터가 경로를 역방향으로 이동하는 문제가 발생했습니다. 이는 경로 요청 시점의 몬스터 위치와 실제 경로 계산 완료 시점의 위치가 불일치하여, 몬스터가 과거 위치를 기준으로 경로를 따르면서 나타난 현상이었습니다. 해결 과정에서는 웨이포인트 중 현재 진행 방향과 반대에 위치한 지점을 무시하도록 로직을 수정하였습니다. 이를 위해 몬스터의 실제 이동 벡터와 다음 웨이포인트 방향 벡터 간의 내적 연산을 적용하여, 진행 방향과 일치하지 않는 경우 해당 웨이포인트를 제외하도록 구현하였습니다. 그 결과, 몬스터의 움직임이 자연스러워지고 불필요한 방향 전환으로 인한 이질감이 해소되었습니다.
 
