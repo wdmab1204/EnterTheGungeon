@@ -1,5 +1,5 @@
 ### 이 문서는 구현 과정과 시행착오, 코드리뷰와 성능 분석을 기록한 상세 개발 기록입니다
-![Recording 2025-08-30 at 16 22 20](https://github.com/user-attachments/assets/95b35484-a8e9-476c-91b5-ca83c42ac873)
+
 # Enter the Gungeon
 ![image](https://github.com/user-attachments/assets/37c2967b-158c-4c13-91d2-9ed5a920728f)
 
@@ -16,6 +16,8 @@
 
 
 ### 무작위 던전 생성기 [[코드 링크]](https://github.com/wdmab1204/EnterTheGungeon/blob/main/Client/Assets/Scripts/DungeonGenerator)
+![Recording 2025-08-30 at 20 38 27](https://github.com/user-attachments/assets/4bc42f22-3b55-4508-9cfe-27ca81968ae9)
+
 기능 : 유저가 던전에 입장할 때 마다 모양과 규칙이 다른 던전을 난수로 만들어내는 기능<br>
 효과 : 유저가 매 번 새로운 던전을 탐험<br>
 
@@ -94,17 +96,19 @@ https://stackoverflow.com/questions/39984709/how-can-i-check-wether-a-point-is-i
 
 ### 던전 전용 그리드 구현 및 A star를 이용한 복도 구현
 
+<img width="595" height="597" alt="image" src="https://github.com/user-attachments/assets/690a7572-f691-4f09-b74d-4c7d2e0bd1de" />
+
 #### 개선하기 전에 방과 방을 잇는 복도는 직선으로 구현하거나 ㄴ자 모양으로 나오도록 구현했습니다. 하지만 복도가 다른 방을 가로지르는 문제가 있었기 때문에 길찾기 알고리즘을 이용해서 던전의 구조를 파악하고 최적의 복도(경로)를 만드는 작업을 진행했습니다.
 
 #### 처음에는 타일을 하나의 노드로 정의하고 A star로 방과 방을 잇는 최단 거리의 경로로 복도를 구현했습니다. 하지만 복도를 두껍게하고 벽을 세우는 과정에서 다시한번 방과 겹치는 이슈가 발생했는데 경로를 계산하는 과정에서 복도의 두께까지 가정하지 않았기 때문입니다. 노드마다 복도의 두께만큼 반경에 다른 타일이 있는지 검사하는 방법이 있지만 안그래도 많은 노드 개수에 추가 비용이 드는건 좋지 않다고 생각해 5x5 타일들을 하나의 노드로 재정의하는 방법을 채용했습니다. 5x5 타일 내에서 복도를 자유롭게 표현할 수 있고 노드의 크기도 커져 전체적인 노드 개수도 줄어들어 A*의 연산 속도고 개선되는 일석이조의 효과를 얻었습니다.
 
-<img width="595" height="597" alt="image" src="https://github.com/user-attachments/assets/690a7572-f691-4f09-b74d-4c7d2e0bd1de" />
 
-<img width="637" height="602" alt="image" src="https://github.com/user-attachments/assets/956d59a3-9a16-4044-bfd4-df6ee0692bd9" />
+//최종 모습
 
 
 ### 미니맵 구현
-<img width="614" height="606" alt="image" src="https://github.com/user-attachments/assets/6e68fea1-f3b1-422e-9d03-53face401eeb" />
+
+![Recording 2025-08-30 at 20 55 55](https://github.com/user-attachments/assets/7f9b1c37-c952-4372-a793-7797c4da0d39)
 
 기능 : 유저가 입장한 던전의 모습을 한눈에 볼 수 있는 UI
 효과 : 복잡한 던전에서 길을 헤메지 않아 쉽게 게임 플레이 가능
@@ -119,7 +123,7 @@ https://www.youtube.com/watch?v=ku_thRxLXPw
 #### 타일마다 시계방향의 위치 벡터 4개를 저장하는데 순회 중 시작과 끝점이 같거나 서로 반대인 벡터가 있다면 그 벡터를 제거합니다. 그러면 최종적으로 외벽을 이루는 시계방향 벡터, 내벽을 이루는 반시계방향 벡터로 나뉘게 됩니다. 이를 응용해서 내벽을 그릴 때 외벽과 다른 색으로 하는것도 가능합니다.
 
 ### 던전 내비게이션 시스템
-<img width="626" height="602" alt="image" src="https://github.com/user-attachments/assets/26f8de5e-65bc-420f-9665-71895d1e2c1b" />
+![Recording 2025-08-30 at 21 09 45](https://github.com/user-attachments/assets/31f5c93a-6540-4d0c-924b-521f18aa3c59)
 
 #### 몬스터는 플레이어를 공격하기 위해, 동전은 플레이어에게 먹히기 위해 자동으로 추적해야 합니다. 단순한 길찾기이기 때문에 익숙한 A star 알고리즘을 사용했으나, 던전에 8마리의 몬스터가 동시에 길찾기를 사용했을 경우 한 프레임에 cpu 전체 사용량의 평균 49%나 차지한다는 점에서 적지 않은 충격을 먹었습니다. 프레임 드랍의 원인이 될 수 있기 때문에 반드시 개선이 필요하다고 생각해 두가지 방법을 고안했습니다.
 
