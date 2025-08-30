@@ -16,7 +16,7 @@ namespace GameEngine.Pipeline
     {
         public List<GameObject> Doors { get; private set; } = new();
         public List<GameObject> Mobs { get; private set; } = new();
-        public Tilemap[] Tilemaps { get; private set; }
+        public Dictionary<string, Tilemap> Tilemaps { get; private set; }
 
         public void AddDoor(GameObject door)
         {
@@ -30,7 +30,7 @@ namespace GameEngine.Pipeline
             Mobs.Add(mob);
         }
 
-        public void AddTilemaps(Tilemap[] tilemaps)
+        public void AddTilemaps(Dictionary<string, Tilemap> tilemaps)
         {
             this.Tilemaps = tilemaps;
         }
@@ -110,7 +110,10 @@ namespace GameEngine.Pipeline
                     roomNode.ID = roomPrefab.name == "Start Room" ? 1000 : id;
                     id++;
 
-                    roomInstance.AddTilemaps(tilemaps);
+                    //GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    //obj.transform.position = roomWorldPosition;
+
+                    roomInstance.AddTilemaps(tilemaps.ToDictionary(tile => tile.name, tile => tile));
 
                     var mobs = CreateInstance(roomPrefab, roomWorldPosition, roomInstanceRootObject.transform).
                         GetComponentsInChildren<Monster>();
@@ -182,7 +185,20 @@ namespace GameEngine.Pipeline
                 return;
             }
 
-            var triangles = Triangulation.TriangulateByFlippingEdges(dungeonGraph.Vertices.Select(v => v.ToVector3()).ToList());
+            //var triangles = Triangulation.TriangulatePoints(dungeonGraph.Vertices.Select(v => new Vertex(v.ToVector3())).ToList());
+            //var convexHullpoints = Polygon.GetConvexHull(dungeonGraph.Vertices.Select(v => new Vertex(v.ToVector3())).ToList());
+            //convexHullpoints.Add(convexHullpoints.First());
+            //GameUtility.CreateLineRenderer(Color.red, .2f, convexHullpoints.Select(x => x.position).ToArray());
+
+            //var triangles = Triangulation.TriangulateConvexPolygon(convexHullpoints);
+            var triangles = Triangulation.TriangulatePoints(dungeonGraph.Vertices.Select(v => new Vertex(v.ToVector3())).ToList());
+            //foreach (var tri in triangles)
+            //{
+            //    GameUtility.CreateLineRenderer(Color.red, .2f, new Vector3[] { tri.v1.position, tri.v2.position, tri.v3.position, tri.v1.position });
+            //}
+
+            //return;
+
             HashSet<RoomEdge> edges = new();
 
             foreach (var tri in triangles)
@@ -207,6 +223,7 @@ namespace GameEngine.Pipeline
             foreach (var edge in treeEdges)
             {
                 dungeonGraph.AddEdge(edge.From, edge);
+                //GameUtility.CreateLineRenderer(Color.yellow, .3f, new Vector3[] {edge.From.ToVector3(), edge.To.ToVector3()});
             }
         }
 

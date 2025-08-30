@@ -1,5 +1,7 @@
 ﻿using GameEngine.Pipeline;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -30,7 +32,8 @@ namespace GameEngine.DataSequence.Graph
             return new Vector3(Width, Height);
         }
 
-        public Tilemap[] GetTilemaps() => roomInstance.Tilemaps;
+        public IEnumerable<Tilemap> GetTilemaps() => roomInstance.Tilemaps.Values;
+        public Tilemap GetTilemap(string key) => roomInstance.Tilemaps[key];
 
         public bool Equals(RoomNode other)
         {

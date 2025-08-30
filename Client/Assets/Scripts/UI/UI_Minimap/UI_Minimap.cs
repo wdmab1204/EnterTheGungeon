@@ -87,10 +87,14 @@ namespace GameEngine.UI
                 var rectTransform = roomRenderer.GetComponent<RectTransform>();
                 rectTransform.localPosition = room.ToVector3() - centerOffset;
 
-                var cellPositions = new HashSet<Vector3Int>(room.GetTilemaps().SelectMany(tilemap => GameUtility.AllGetTilePosition(tilemap)));
-                roomRenderer.cellPositions = cellPositions.ToArray();
+                var floorTilemap = room.GetTilemap("Floor");
+                var collideableTilemap = room.GetTilemap("Collideable");
 
-                var outlines = GameUtility.CellsToOutline(cellPositions);
+                var floorTilemapCells = new HashSet<Vector3Int>(GameUtility.AllGetTilePosition(floorTilemap));
+                var collideableTilemapCells = new HashSet<Vector3Int>(GameUtility.AllGetTilePosition(collideableTilemap));
+                roomRenderer.cellPositions = floorTilemapCells.ToArray();
+
+                var outlines = GameUtility.CellsToOutline(collideableTilemapCells);
                 foreach(var outline in outlines)
                 {
                     outline.Add(outline[1]);

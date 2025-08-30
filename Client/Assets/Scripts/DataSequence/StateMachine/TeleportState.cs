@@ -23,8 +23,8 @@ namespace GameEngine.DataSequence.StateMachine
             this.player = player;
             this.roomNode = roomNode;
 
-            var floorTilemap = roomNode.GetTilemaps()[0];
-            var collideableTilemap = roomNode.GetTilemaps()[1];
+            var floorTilemap = roomNode.GetTilemap("Floor");
+            var collideableTilemap = roomNode.GetTilemap("Collideable");
             spriteRenderer = myMob.GetComponent<SpriteRenderer>();
             collider = myMob.GetComponent<BoxCollider2D>();
             rigidbody = myMob.GetComponent<Rigidbody2D>();
