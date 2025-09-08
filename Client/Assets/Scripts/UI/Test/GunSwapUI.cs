@@ -5,6 +5,8 @@ namespace GameEngine.Test
 {
     public class GunSwapUI : MonoBehaviour
     {
+#if UNITY_EDITOR
+
         [SerializeField] Button btn;
         [SerializeField] InputField inputField;
 
@@ -18,6 +20,11 @@ namespace GameEngine.Test
                 controller.Equip(id);
             });
         }
-
+#else
+        void Start()
+        {
+            this.gameObject.SetActive(false);
+        }
+#endif
     }
 }

@@ -4885,7 +4885,7 @@ GameObject:
   - component: {fileID: 464273949}
   - component: {fileID: 464273950}
   - component: {fileID: 464273951}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: muzzle_flash_resized_24x16
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6650,7 +6650,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 687908444}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7050,7 +7050,7 @@ GameObject:
   - component: {fileID: 752551135}
   - component: {fileID: 752551137}
   - component: {fileID: 752551136}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Reload_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7126,7 +7126,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -159032368, guid: 7a3d2652fd688d44eb0dd665741f5ce8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -8226,7 +8226,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6006574150273007528, guid: 6a468cadb7ba3444693c937c55795799, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1.4200172
+      value: 1.420021
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -30990,7 +30990,7 @@ GameObject:
   - component: {fileID: 1492663440}
   - component: {fileID: 1492663442}
   - component: {fileID: 1492663443}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Mine
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -31973,7 +31973,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1611854074}
   - component: {fileID: 1611854075}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: GunRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32875,7 +32875,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1670704376}
   - component: {fileID: 1670704377}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Reload_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32937,7 +32937,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 839676107, guid: 7a3d2652fd688d44eb0dd665741f5ce8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -74292,7 +74292,7 @@ GameObject:
   - component: {fileID: 1805748250}
   - component: {fileID: 1805748251}
   - component: {fileID: 1805748252}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
