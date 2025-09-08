@@ -1,7 +1,6 @@
 ### 이 문서는 Enter the Gungeon 구현 과정과 시행착오, 코드리뷰와 성능 분석을 기록한 상세 개발 기록입니다
 
-Enter the Gungeon
----
+# Enter the Gungeon
 ![image](https://github.com/user-attachments/assets/37c2967b-158c-4c13-91d2-9ed5a920728f) <br>
 
 몬스터들의 소굴인 던전 속에서 플레이어가 최대한 오래 살아남는 게임입니다.
@@ -17,19 +16,70 @@ Enter the Gungeon
 - 작업 기간 : 2024.10.15 ~ 현재 진행중
 - 기술 : C#, Unity Engine, UniTask
 
-<br>
-
 목차
 ---
-* 무작위 던전 생성기
-* 미니맵 구현
-* 던전 내비게이션 시스템
-* 참고 자료
+
+* [1. 무작위 던전 생성기](#1-무작위-던전-생성기)
+
+  * [1-1. Binary Space Partitioning(BSP) 알고리즘을 이용해 간단한 던전을 구현했습니다.](#1-1-binary-space-partitioningbsp-알고리즘을-이용해-간단한-던전을-구현했습니다)
+
+  * [1-2. Delaunay Triangulation + MST 조합을 채택했습니다.](#1-2-delaunay-triangulation--mst-조합을-채택했습니다)
+
+  * [1-3. 정규 분포를 활용해 방들의 위치를 정했습니다.](#1-3-정규-분포를-활용해-방들의-위치를-정했습니다)
+
+  * [1-4. Convex Hull을 이용해 던전의 외곽을 계산했습니다.](#1-4-convex-hull을-이용해-던전의-외곽을-계산했습니다)
+
+  * [1-5. Graham's scan 방식으로 Convex Hull을 개선했습니다.](#1-5-grahams-scan-방식으로-convex-hull을-개선했습니다)
+
+  * [1-6. 볼록 다각형의 점들을 이용하여 삼각형을 분할했습니다.](#1-6-볼록-다각형의-점들을-이용하여-삼각형을-분할했습니다)
+
+  * [1-7. Delaunay Triangulation을 수행하기 위해 Flip 알고리즘을 채택했습니다.](#1-7-delaunay-triangulation을-수행하기-위해-flip-알고리즘을-채택했습니다)
+
+  * [1-8. 무한 루프에 걸리는 이슈를 수정했습니다.](#1-8-무한-루프에-걸리는-이슈를-수정했습니다)
+
+  * [1-9. Minimum Spanning Tree(MST)를 사용해 간선을 최소화 했습니다.](#1-9-minimum-spanning-treemst를-사용해-간선을-최소화-했습니다)
+
+  <br>
+
+* [2. 던전 복도 로직 설계](#2-던전-복도-로직-설계)
+
+  * [2-1. A star를 이용해 복도를 구현했습니다.](#2-1-a-star를-이용해-복도를-구현했습니다)
+  
+  * [2-2. 복도의 모양을 최대한 직선을 유지하도록 구현했습니다.](#2-2-복도의-모양을-최대한-직선을-유지하도록-구현했습니다)
+
+  * [2-3. 복도의 두께를 고려하기 위해 던전 전용 그리드를 만들었습니다.](#2-3-복도의-두께를-고려하기-위해-던전-전용-그리드를-만들었습니다)
+
+  <br>
+
+* [3. 미니맵 구현](#3-미니맵-구현)
+
+  * [3-1. Custom UI Texture를 만들어 던전 기반 UI를 만들었습니다.](#3-1-custom-ui-texture를-만들어-던전-기반-ui를-만들었습니다)
+
+  * [3-2. 외곽라인을 추가해 던전의 경계를 명확하게 표시했습니다.](#3-2-외곽라인을-추가해-던전의-경계를-명확하게-표시했습니다)
+
+  * [3-3. 각 타일마다 벡터를 계산하여 외곽라인을 구현했습니다.](#3-3-각-타일마다-벡터를-계산하여-외곽라인을-구현했습니다)
+
+  <br>
+
+* [4. 던전 내비게이션 시스템](#4-던전-내비게이션-시스템)
+
+  * [4-1. A star를 이용해 몬스터와 코인의 이동 경로를 구현했습니다.](#4-1-a-star를-이용해-몬스터와-코인의-이동-경로를-구현했습니다)
+
+  * [4-2. UniTask를 이용해 길 찾기 비용을 분산시켰습니다.](#4-2-unitask를-이용해-길-찾기-비용을-분산시켰습니다)
+
+  * [4-3. 자원을 공유하여 계산이 틀어지는 문제를 수정했습니다.](#4-3-자원을-공유하여-계산이-틀어지는-문제를-수정했습니다)
+
+  * [4-4. 몬스터가 뒤로 가는 문제를 수정했습니다.](#4-4-몬스터가-뒤로-가는-문제를-수정했습니다)
+
+  <br>
+
+* [5. 참고 자료](#5-참고-자료)
+
 
 <br>
+<br>
 
-무작위 던전 생성기 [[코드 링크]](https://github.com/wdmab1204/EnterTheGungeon/blob/main/Client/Assets/Scripts/DungeonGenerator)
----
+## 1. 무작위 던전 생성기
 
 <p float="left">
   <img src="https://github.com/user-attachments/assets/4bc42f22-3b55-4508-9cfe-27ca81968ae9" width="80%"><br>
@@ -46,7 +96,7 @@ Enter the Gungeon
 
 <br>
 
-**Binary Space Partitioning(BSP) 알고리즘을 이용해 간단한 던전을 구현했습니다.**
+### 1-1. Binary Space Partitioning(BSP) 알고리즘을 이용해 간단한 던전을 구현했습니다.
 <p float="left">
   <img width="40%" alt="Image" src="https://github.com/user-attachments/assets/dc41c404-aeb4-420d-ac42-e9ea91c6e422"/>
 </p>
@@ -64,7 +114,7 @@ BSP는 방과 복도를 손쉽게 정의할 수 있어 빠른 프로토타이핑
 
 <br>
 
-**Delaunay Triangulation + MST 조합을 채택했습니다.**
+### 1-2. Delaunay Triangulation + MST 조합을 채택했습니다.
 
 <img width="40%" alt="image" src="https://github.com/user-attachments/assets/4447b641-5b4f-43ee-9469-27cd51ced40a" />
 
@@ -83,7 +133,7 @@ BSP는 방과 복도를 손쉽게 정의할 수 있어 빠른 프로토타이핑
 <br>
 
 
-**정규 분포를 활용해 방들의 위치를 정했습니다.**
+### 1-3. 정규 분포를 활용해 방들의 위치를 정했습니다.
 
 <img width="70%"  alt="image" src="https://github.com/user-attachments/assets/bbf5e235-2656-4d92-9d72-fd069e3642ea" />
 
@@ -99,7 +149,7 @@ BSP는 방과 복도를 손쉽게 정의할 수 있어 빠른 프로토타이핑
 
 <br>
 
-**Convex Hull을 이용해 던전의 외곽을 계산했습니다.**
+### 1-4. Convex Hull을 이용해 던전의 외곽을 계산했습니다.
 
 <p float="left">
   <img width="40%" alt="image" src="https://github.com/user-attachments/assets/aa8fb8af-2bf4-4d69-8e1d-cb6700406739" /><br>
@@ -115,17 +165,13 @@ BSP는 방과 복도를 손쉽게 정의할 수 있어 빠른 프로토타이핑
 
 <br>
 
-**Graham's scan 방식으로 Convex Hull을 개선했습니다.**
+### 1-5. Graham's scan 방식으로 Convex Hull을 개선했습니다.
 
 처음에는 임의의 두 점을 연결하는 직선을 기준으로 정하고 모든 점들이 한쪽으로 치우쳐져 있으면 외곽선으로 판단하는 Brute Force 방식을 생각했으나 N이 정점일 때 총 선분의 개수는 n(n-1)/2 즉 O(N^2)이고 동시에 모든 점을 순회해서 확인해야하니 추가로 O(N)이 발생하여 즉 O(N^2) * O(N) = O(N^3)이라는 Time Complexity가 발생합니다.
 
 매우 비효율적인 방법이기 때문에 개선안을 위한 자료 조사중 널리 알려지고 검증된 알고리즘인 Graham's scan을 채택했습니다.
 
 이 방법은 한 점을 기준으로 각도 순으로 정렬한 후 스택을 이용해 외곽을 형성하는 점들을 구하는 방식으로 O(n log n) Time Complexity가 발생합니다.
-
-<br>
-
-**외적을 이용해 Graham's scan을 구현했습니다.**
 
 ```csharp
 sortedList.Sort((v1, v2) =>
@@ -154,20 +200,13 @@ public static bool IsTriangleOrientedClockwise(Vector2 p1, Vector2 p2, Vector2 p
 }
 ```
 
-가장 왼쪽 하단의 점(P)을 기준으로 모든 점과 잇는 선분이 X축을 기준으로 이루는 극각을 오름차순으로 정렬해야하는데 임의의 점 A와 B를 놓고 벡터 PA와 PB의 외적을 이용하면 점P가 벡터AB의 왼쪽에 있는지 판단할 수 있습니다.
-
-이를 이용하여 정렬한 후 스택을 이용해 점 3개가 이루는 반시계 방향을 판단해서 최종적으로 외곽 점들만 걸러낼 수 있었습니다.
 <br>
-
-외적과 행렬식[^2]을 이용해 Graham's scan을 구현했습니다.
-
-det = $\begin{bmatrix}x1 &y1 & 1\\x2 & y2 & 1 \\x3 & y3 & 1 \end{bmatrix}$
 
 가장 왼쪽 하단의 점(P)을 기준으로 모든 점과 잇는 선분이 X축을 기준으로 이루는 극각을 오름차순으로 정렬해야하는데 임의의 점 A와 B를 놓고 벡터 PA와 PB의 외적을 이용하면 점P가 벡터AB의 왼쪽에 있는지 판단할 수 있습니다.
  
 정렬이 완료된 후에는 스택을 사용하여 최종 볼록 껍질을 이룰 선분들을 걸러냈습니다.
  
-그리고 새로운 점을 순회할 때마다 스택에 쌓인 최근 두 점과 함께 반시계 방향을 이루는지 검사했습니다. 
+그리고 새로운 점을 순회할 때마다 스택에 쌓인 최근 두 점과 함께 반시계 방향을 이루는지 행렬식[^2]을 이용해 검사했습니다. 
 
 만약 일직선이거나 오목할 경우 해당 점을 제외하고 다시 검사하는 방법으로 구현했습니다.
 
@@ -178,7 +217,7 @@ det = $\begin{bmatrix}x1 &y1 & 1\\x2 & y2 & 1 \\x3 & y3 & 1 \end{bmatrix}$
   <img src="https://github.com/user-attachments/assets/7dfcfe6e-e02a-4e28-beb0-70cf74f2f788" width="40%" />
 </p>
 
-**볼록 다각형의 점들을 이용하여 삼각형을 분할했습니다.**
+### 1-6. 볼록 다각형의 점들을 이용하여 삼각형을 분할했습니다.
 
 첫번째로 다각형의 한 점을 기준으로 잡고, 나머지 모든 점들과 선분을 연결하여 삼각형을 형성했습니다.
 
@@ -190,7 +229,7 @@ det = $\begin{bmatrix}x1 &y1 & 1\\x2 & y2 & 1 \\x3 & y3 & 1 \end{bmatrix}$
 
 <br>
 
-**Delaunay Triangulation을 수행하기 위해 Flip 알고리즘을 채택했습니다.**
+### 1-7. Delaunay Triangulation을 수행하기 위해 Flip 알고리즘을 채택했습니다.
 
 <img width="580" height="598" alt="image" src="https://github.com/user-attachments/assets/0f7d3e6a-a697-4eaa-b65c-6f4c4bbe6b70" />
 
@@ -209,7 +248,7 @@ Flip 조건을 달성하기 위해 아래와 같은 조건이 필요합니다.
 
 <br>
 
-**무한 루프에 걸리는 이슈를 수정했습니다.**
+### 1-8. 무한 루프에 걸리는 이슈를 수정했습니다.
 
 ```csharp
 //aPos, bPos, cPos를 점으로 가진 삼각형의 외접원 안에 dPos가 포함되는지 확인
@@ -236,12 +275,12 @@ Flip을 가정한 새로운 삼각형(예시 코드 기준 bPos, cPos, dPos가 �
 
 <br>
 
-**Minimum Spanning Tree(MST)를 사용해 간선을 최소화 했습니다.**
+### 1-9. Minimum Spanning Tree(MST)를 사용해 간선을 최소화 했습니다.
 
-<img width="75%" alt="image" src="https://github.com/user-attachments/assets/f6935ae9-4cb7-4064-ba66-2011b32b2e6d" />
+<img width="50%" alt="image" src="https://github.com/user-attachments/assets/f6935ae9-4cb7-4064-ba66-2011b32b2e6d" />
 
  
-#### 모든 방들을 방문할 수 있지만 같은 방을 다시 방문할 수 있는 루트(Cycle)가 존재합니다. 던전이 너무 복잡해지지 않기 위해 최소 신장 트리를 적용하여 최소한의 루트만 남깁니다.
+모든 방들을 방문할 수 있지만 같은 방을 다시 방문할 수 있는 루트(Cycle)가 존재합니다. 던전이 너무 복잡해지지 않기 위해 최소 신장 트리를 적용하여 최소한의 루트만 남깁니다.
 
 들로네 삼각분할로 생성된 그래프에는 Cycle(순환 경로)가 존재합니다. 
 
@@ -255,12 +294,11 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 
 
-### 던전 전용 그리드 구현 및 A star를 이용한 복도 구현
+## 2. 던전 복도 로직 설계
 
 <img width="50%" alt="image" src="https://github.com/user-attachments/assets/690a7572-f691-4f09-b74d-4c7d2e0bd1de" />
 
-
-**A star를 이용해 복도를 구현했습니다.**
+### 2-1. A star를 이용해 복도를 구현했습니다.
 
 초기 구현방식은 방과 방을 단순히 직선 혹은 ㄴ자 형태로 생성했습니다. 그러나 이 방식은 다른 방을 가로지르는 문제가 발생하여 그래프 데이터의 일관성이 깨지는 문제가 있었습니다.
 
@@ -270,7 +308,7 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 <br>
 
-**복도의 모양을 최대한 직선을 유지하도록 구현했습니다.**
+### 2-2. 복도의 모양을 최대한 직선을 유지하도록 구현했습니다.
 
 최단거리를 기준으로 탐색하다 보니 복도의 경로가 대각선으로 형성되는 경우가 많았습니다. 
 
@@ -282,7 +320,7 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 <br>
 
-**복도의 두께를 고려하기 위해 던전 전용 그리드를 만들었습니다.**
+### 2-3. 복도의 두께를 고려하기 위해 던전 전용 그리드를 만들었습니다.
 
 복도를 일정 두께로 표현하고 벽을 세우는 과정에서 경로 주변 타일과 겹치는 현상이 발생했습니다.
 
@@ -296,7 +334,15 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 <br>
 
-**성능 테스트**
+### 최종 모습
+<p float="left">
+  <img width="50%" alt="image" src="https://github.com/user-attachments/assets/4243eae5-e17f-4603-be79-6cd003eee283" />
+</p>
+
+
+<br>
+
+### 성능 테스트
 
 |  | 방 10개 | 방50개 | 방 100개 |
 | :-:  | :-: | :-: | :-:|
@@ -306,15 +352,14 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 <br>
 
-미니맵 구현
----
+## 3. 미니맵 구현
 
 ![Recording 2025-08-30 at 20 55 55](https://github.com/user-attachments/assets/7f9b1c37-c952-4372-a793-7797c4da0d39)
 
 기능 : 유저가 입장한 던전의 모습을 한눈에 볼 수 있는 UI<br>
 효과 : 복잡한 던전에서 길을 헤메지 않아 쉽게 게임 플레이 가능
 
-**Custom UI Texture를 만들어 던전 기반 UI를 만들었습니다.**
+### 3-1. Custom UI Texture를 만들어 던전 기반 UI를 만들었습니다.
 
 방들의 타일 정보와 A star 알고리즘으로 생성한 복도 데이터를 이용하여 전체 맵을 렌더링했습니다.
 
@@ -324,7 +369,7 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 <br>
 
-**외곽라인을 추가해 던전의 경계를 명확하게 표시했습니다.**
+### 3-2. 외곽라인을 추가해 던전의 경계를 명확하게 표시했습니다.
 
 하얀색으로만 그려진 던전의 모습은 너무 단조로워 벽이나 장애물이 설치된 타일은 검은색으로 칠해 보다 많은 정보를 제공하고 싶었습니다.
 
@@ -336,9 +381,10 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 <br>
 
-**각 타일마다 벡터를 계산하여 외곽라인을 구현했습니다.**
+### 3-3. 각 타일마다 벡터를 계산하여 외곽라인을 구현했습니다.
 
-//사진 추가<br>
+<img width="50%" alt="image" src="https://github.com/user-attachments/assets/5d3c2769-0437-4874-861a-7feda70fbd24" />
+
 
 자료 조사 중 한 유튜브 영상[^6]에서 아이디어를 얻었습니다.
 
@@ -350,11 +396,11 @@ Tree의 특징 중 하나인 *순회하지 않는다*는 점을 이용하여 Del
 
 <br>
 
-던전 내비게이션 시스템
----
+## 4. 던전 내비게이션 시스템
+
 ![Recording 2025-08-30 at 21 09 45](https://github.com/user-attachments/assets/31f5c93a-6540-4d0c-924b-521f18aa3c59)
 
-**A star를 이용해 몬스터와 코인의 이동 경로를 구현했습니다.**
+### 4-1. A star를 이용해 몬스터와 코인의 이동 경로를 구현했습니다.
 
 A star는 게임 알고리즘 중에 길찾기로 가장 유명한 알고리즘이기 때문에 깊은 고민 없이 적용했지만 문제가 발생했습니다.
 
@@ -374,7 +420,7 @@ A star는 게임 알고리즘 중에 길찾기로 가장 유명한 알고리즘�
 
 <br>
 
-**UniTask를 이용해 길 찾기 비용을 분산시켰습니다.**
+### 4-2. UniTask를 이용해 길 찾기 비용을 분산시켰습니다.
 
 한 프레임에 과한 CPU 사용량은 프레임 드랍을 유발하기 때문에 고치기 위한 여러 방법들을 생각했습니다.
 
@@ -392,7 +438,7 @@ A star는 게임 알고리즘 중에 길찾기로 가장 유명한 알고리즘�
 
 <br>
 
-**자원을 공유하여 계산이 틀어지는 문제를 수정했습니다.**
+### 4-3. 자원을 공유하여 계산이 틀어지는 문제를 수정했습니다.
 
 경로 탐색 과정에서 던전의 길찾기 전용 Grid 데이터를 참조하는데 기존에는 경로 계산을 마치면 모든 노드를 초기화했습니다.
 
@@ -411,9 +457,15 @@ A star는 게임 알고리즘 중에 길찾기로 가장 유명한 알고리즘�
 
 <br>
 
-**몬스터가 뒤로 가는 문제를 수정했습니다.**
+### 4-4. 몬스터가 뒤로 가는 문제를 수정했습니다.
 
-![Recording 2025-08-30 at 16 33 59](https://github.com/user-attachments/assets/15795f38-583d-492d-b5ea-bc0ff6b2d8b8)
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/15795f38-583d-492d-b5ea-bc0ff6b2d8b8" width="120" height="100" style="object-fit:cover;"/>
+  <img src="https://github.com/user-attachments/assets/478db38c-bc51-45d3-90ca-9e217731c0ef" width="120" height="100" style="object-fit:cover;"/>
+</p>
+
+###### (좌) 몬스터가 뒤로 가는 현상 &nbsp;&nbsp; | &nbsp;&nbsp; (우) 내적을 이용해 수정한 모습
+
 
 UniTask로 변경 후 몬스터가 일정 초 간격으로 경로의 반대방향으로 이동해 부자연스러운 움직임을 보였습니다.
 
@@ -425,8 +477,7 @@ UniTask로 변경 후 몬스터가 일정 초 간격으로 경로의 반대방�
 
 그 결과, 몬스터의 움직임이 자연스러워지고 불필요한 방향 전환으로 인한 이질감이 해소되었습니다.
 
-참고 자료
----
+## 5. 참고 자료
 **아이디어**
 - [Delaunay Triangulation + MST 아이디어 참고 자료](https://www.youtube.com/watch?v=rBY2Dzej03A)
 - [외곽선 구하는 방법](https://www.youtube.com/watch?v=ku_thRxLXPw)
@@ -459,4 +510,4 @@ UniTask로 변경 후 몬스터가 일정 초 간격으로 경로의 반대방�
 
 [^5]: [볼록 사각형인지 확인하는 방법](https://stackoverflow.com/questions/2122305/convex-hull-of-4-points)
 
-[^6]: [외곽선 구하는 방법](https://www.youtube.com/watch?v=ku_thRxLXPw)
+[^6]: [외곽선 구하는 방법](https://youtu.be/ku_thRxLXPw?si=VIaVR-vv4oRQw2iT&t=114)
