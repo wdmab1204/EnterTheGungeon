@@ -11,8 +11,8 @@ public class Mage : Monster
     protected override (List<UnitState> states, Type defaultState) GetStatesAndDefault()
     {
         var states = new List<UnitState>();
-        states.Add(new GroupShootState(prefab, transform, player.transform));
-        states.Add(new TeleportState(transform, player.transform, GameData.CurrentVisitRoom.Value));
+        states.Add(new GroupShootState(prefab, transform, player.Transform));
+        states.Add(new TeleportState(transform, player.Transform, GameData.CurrentVisitRoom.Value));
         return (states, typeof(TeleportState));
     }
 }

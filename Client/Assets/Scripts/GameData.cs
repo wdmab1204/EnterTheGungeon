@@ -12,7 +12,6 @@ namespace GameEngine
         public static ReactiveProperty<int> Coin = new();
 
         public static GunData EquipGunData { get; set; }
-        public static CharacterController Player { get; set; }
 
         public static int Seed { get; set; }
 

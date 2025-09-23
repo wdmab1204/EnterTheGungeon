@@ -13,7 +13,12 @@ namespace GameEngine.GunController
         Beam = 4
     }
 
-    public class GunController : MonoBehaviour
+    public interface IGunController
+    {
+        void Equip(int id);
+    }
+
+    public class GunController : MonoBehaviour, IGunController
     {
         [SerializeField] SpriteRenderer gunRenderer;
         [SerializeField] Transform body;

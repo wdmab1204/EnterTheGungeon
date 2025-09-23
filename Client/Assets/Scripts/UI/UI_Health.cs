@@ -1,3 +1,4 @@
+using GameEngine.DataSequence.DIContainer;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,14 +7,14 @@ namespace GameEngine.UI
 
     public class UI_Health : MonoBehaviour
     {
-        private UnitAbility playerAbility;
+        private IUnitAbility playerAbility; 
         private Slider slider;
 
         // Start is called before the first frame update
         void Start()
         {
             slider = GetComponent<Slider>();
-            playerAbility = GameData.Player.GetComponent<UnitAbility>();
+            playerAbility = DIContainer.Resolve<IUnitAbility>();
             playerAbility.Health.OnValueChanged += OnHealthChanged;
             playerAbility.MaxHealth.OnValueChanged += OnMaxHealthChanged;
             

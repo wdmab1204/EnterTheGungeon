@@ -1,3 +1,5 @@
+using GameEngine.DataSequence.DIContainer;
+using GameEngine.GunController;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +15,7 @@ namespace GameEngine.Test
         {
             btn.onClick.AddListener(() =>
             {
-                var controller = GameData.Player.GetComponent<GunController.GunController>();
+                var controller = DIContainer.Resolve<IGunController>();
                 var id = int.Parse(inputField.text);
                 controller.Equip(id);
             });

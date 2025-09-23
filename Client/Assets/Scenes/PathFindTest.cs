@@ -9,8 +9,8 @@ public class PathFindTest : MonoBehaviour
     {
         var navGrid = GameObject.Find("NavGrid").GetComponent<NavGrid>();
         var floorTilemap = GameObject.Find("Floor").GetComponent<Tilemap>();
-        navGrid.CreateGrid(floorTilemap, null);
-        PathFinding pathFinder = new(navGrid);
+        navGrid.CreateGrid(floorTilemap, Vector3.zero);
+        DungeonNavigation pathFinder = new(navGrid);
         PathFindManager.PathFinder = pathFinder;
     }
 }
