@@ -83,7 +83,7 @@ namespace GameEngine.DataSequence.PathFinding
                         continue;
 
                     float nextHCost = Vector3.Distance(dst.ToVector3(), next.ToVector3());
-                    if (IsTurning(parentMap.GetValueOrDefault(curNode, curNode).ToVector3(), curNode.ToVector3(), next.ToVector3()))
+                    if (IsTurning(parentMap.GetOrAdd(curNode, curNode).ToVector3(), curNode.ToVector3(), next.ToVector3()))
                     {
                         nextHCost += 50f;
                     }

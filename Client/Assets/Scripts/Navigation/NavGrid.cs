@@ -112,7 +112,7 @@ namespace GameEngine.Navigation
 
         public IEnumerable<Node> GetNeighbours(Node node)
         {
-            List<Node> neighbours = neighbourCache.GetValueOrDefault(node, null);
+            List<Node> neighbours = neighbourCache.GetOrAdd(node, null);
             if (neighbours != null)
             {
                 return neighbours;
