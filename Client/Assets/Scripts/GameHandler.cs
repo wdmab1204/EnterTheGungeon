@@ -1,4 +1,5 @@
 using GameEngine.DataSequence.DIContainer;
+using GameEngine.DataSequence.EventBus;
 using GameEngine.DataSequence.Graph;
 using GameEngine.GunController;
 using GameEngine.Item;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using EventBus = GameEngine.DataSequence.EventBus.EventBus;
 
 namespace GameEngine
 {
@@ -53,15 +55,15 @@ namespace GameEngine
             var floorTilemap = GameUtility.FindChild<UnityEngine.Tilemaps.Tilemap>(gameGrid.gameObject, "Floor");
             navGrid.CreateGrid(floorTilemap, gameGrid.transform.position);
             DIContainer.RegisterInstance<IPathFinder>(new DungeonNavigation(navGrid));
+
+            EventBus.Subscribe<Vector3>("PlayerMove", OnUserMove);
         }
 
         private void InitializeComponents()
         {
-            PlayerController.OnMove += OnUserMove;
+            //PlayerController.OnMove += OnUserMove;
 
             camera = GameObject.Find("Main Camera").GetComponent<FollowPlayer>();
-
-            PathFindManager.PathFinder = pathFinder;
         }
 
         private void InitializePlayer()
@@ -80,7 +82,7 @@ namespace GameEngine
                 () => PlayerController.Transform.position,
                 dungeonGeneratorLevel.GridCellSize
             );
-            PlayerController.OnMove += minimapUI.OnMovePlayer;
+            //PlayerController.OnMove += minimapUI.OnMovePlayer;
         }
 
         private bool IsInRoom(RoomNode room, Vector3 position, int padding)

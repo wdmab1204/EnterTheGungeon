@@ -1,4 +1,5 @@
 using GameEngine;
+using GameEngine.DataSequence.EventBus;
 using GameEngine.GunController;
 using System;
 using UnityEngine;
@@ -7,7 +8,6 @@ public interface ICharacterController
 {
     Transform Transform { get; }
     GameObject GameObject { get; }
-    event Action<Vector3> OnMove;
 }
 
 public class CharacterController : MonobehaviourExtension, ICharacterController
@@ -18,7 +18,7 @@ public class CharacterController : MonobehaviourExtension, ICharacterController
     private Vector2 movement;
     [SerializeField] private Bullet bulletPrefab;
 
-    public event Action<Vector3> OnMove;
+    //public event Action<Vector3> OnMove;
 
     private void Awake()
     {
@@ -39,7 +39,8 @@ public class CharacterController : MonobehaviourExtension, ICharacterController
         if (movement == Vector2.zero)
             return;
 
-        OnMove?.Invoke(transform.position);
+        EventBus.Publish("PlayerMove", transform.position);
+        //OnMove?.Invoke(transform.position);
     }
 
     void FixedUpdate()
