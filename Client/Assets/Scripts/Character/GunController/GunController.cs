@@ -118,7 +118,7 @@ namespace GameEngine.GunController
             if (Input.GetKeyDown(KeyCode.R))
                 IsReloadEnd = false;
 
-            if(IsReloadEnd == false && dataCache[myGunID].AmmoCount <= 0)
+            if(IsReloadEnd == false || ammoSize <= 0)
             {
                 reloadTime += Time.deltaTime;
                 ui_Reload.Play(dataCache[myGunID].ReloadTime);
@@ -129,7 +129,7 @@ namespace GameEngine.GunController
                     int prevAmmoSize = ammoSize;
                     ammoSize = 
                         dataCache[myGunID].AmmoCount == -1 ||
-                        ammoCount > dataCache[myGunID].AmmoSize ?
+                        ammoCount >= dataCache[myGunID].AmmoSize ?
                         dataCache[myGunID].AmmoSize : 0;
                     ammoCount = 
                         dataCache[myGunID].AmmoCount == -1 ? 
