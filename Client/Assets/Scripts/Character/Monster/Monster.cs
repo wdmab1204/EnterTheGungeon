@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using GameEngine.DataSequence.DIContainer;
 using GameEngine.DataSequence.StateMachine;
 using GameEngine.Navigation;
 using System;
@@ -10,7 +11,7 @@ namespace GameEngine
 {
     public class Monster : UnityEngine.MonoBehaviour
     {
-        protected CharacterController player;
+        protected ICharacterController player => DIContainer.Resolve<ICharacterController>();
         private UnitStateMachine sm;
         private FanShapeShooting shootPattern;
         private UnitAbility ability;
@@ -19,7 +20,6 @@ namespace GameEngine
         
         void Start()
         {
-            player = GameData.Player;
             shootPattern = GetComponent<FanShapeShooting>();
             sm = new(this.transform);
 
@@ -37,14 +37,14 @@ namespace GameEngine
         protected virtual (List<UnitState> states, Type defaultState) GetStatesAndDefault()
         {
             var states = new List<UnitState>();
-            states.Add(new WalkState(GetPathAsync, player.transform, 3f, 5f));
+            states.Add(new WalkState(GetPathAsync, player.Transform, 3f, 5f));
             states.Add(new ShootState(Shoot));
             return (states, typeof(WalkState));
         }
 
         protected async UniTask<PathResult> GetPathAsync(Vector3 start, Vector3 end)
         {
-            var result = await PathFindManager.GetPathAsync(start, end, tokenSource);
+            var result = await DIContainer.Resolve<IPathFinder>().FindPathAsync(start, end, tokenSource);
             path = result.path;
             return result;
         }
@@ -59,11 +59,9 @@ namespace GameEngine
             sm.FixedUpdate();
         }
 
-        protected Vector2 GetDistance() => player.transform.position - transform.position;
-
         private void Shoot()
         {
-            shootPattern.Shoot(player.transform.position);
+            shootPattern.Shoot(player.Transform.position);
         }
 
         private void OnCollisionEnter2D(Collision2D collision)

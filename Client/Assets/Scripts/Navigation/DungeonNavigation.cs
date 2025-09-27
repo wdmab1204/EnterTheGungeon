@@ -61,11 +61,18 @@ namespace GameEngine.Navigation
         }
     }
 
-    public class PathFinding
+    public interface IPathFinder
+    {
+        UniTask<PathResult> FindPathAsync(Vector3 start, Vector3 end, CancellationTokenSource token);
+        IEnumerator FindPathToCoroutine(Vector3 start, Vector3 end, Action<PathResult> callback);
+        PathResult FindPath(Vector3 start, Vector3 end);
+    }
+
+    public class DungeonNavigation : IPathFinder
     {
         private NavGrid navGrid;
 
-        public PathFinding(NavGrid navGrid)
+        public DungeonNavigation(NavGrid navGrid)
         {
             this.navGrid = navGrid;
         }

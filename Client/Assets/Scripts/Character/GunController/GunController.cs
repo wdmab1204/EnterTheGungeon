@@ -1,3 +1,4 @@
+using GameEngine.DataSequence.EventBus;
 using GameEngine.UI;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,12 @@ namespace GameEngine.GunController
         Beam = 4
     }
 
-    public class GunController : MonoBehaviour
+    public interface IGunController
+    {
+        void Equip(int id);
+    }
+
+    public class GunController : MonoBehaviour, IGunController
     {
         [SerializeField] SpriteRenderer gunRenderer;
         [SerializeField] Transform body;
@@ -28,8 +34,15 @@ namespace GameEngine.GunController
         private Camera mainCamera;
         private CameraShake camShake;
 
-        private bool IsReloadEnd = true;
+        private bool IsReloadEnd
+        {
+            get;
+            set;
+        } = true;
         private float reloadTime = 0f;
+
+        private int ammoSize;
+        private int ammoCount;
 
         private Dictionary<int, GunData> dataCache = new();
 
@@ -59,9 +72,15 @@ namespace GameEngine.GunController
             muzzle.localPosition = gunData.TransformData.MuzzlePosition;
             muzzleFlash.transform.localPosition = gunData.TransformData.MuzzlePosition;
 
-            GameData.EquipGunData = gunData;
-            GameData.AmmoSize.Value = gunData.AmmoSize;
-            GameData.AmmoCount.Value = gunData.AmmoCount;
+            ammoSize = gunData.AmmoSize;
+            ammoCount = gunData.AmmoCount;
+            
+            EventBus.Publish("AmmoSizeMax", gunData.AmmoSize);
+            EventBus.Publish("AmmoSize", gunData.AmmoSize);
+            EventBus.Publish("AmmoCount", gunData.AmmoCount);
+            //GameData.EquipGunData = gunData;
+            //GameData.AmmoSize.Value = gunData.AmmoSize;
+            //GameData.AmmoCount.Value = gunData.AmmoCount;
             currentGun = gunBase;
             currentForm = gunData.GunForm;
             myGunID = id;
@@ -93,13 +112,13 @@ namespace GameEngine.GunController
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            if (GameData.AmmoCount.Value == 0)
+            if (ammoCount == 0)
                 return;
 
             if (Input.GetKeyDown(KeyCode.R))
                 IsReloadEnd = false;
 
-            if(IsReloadEnd == false)
+            if(IsReloadEnd == false || ammoSize <= 0)
             {
                 reloadTime += Time.deltaTime;
                 ui_Reload.Play(dataCache[myGunID].ReloadTime);
@@ -107,14 +126,17 @@ namespace GameEngine.GunController
                 {
                     IsReloadEnd = true;
                     reloadTime = 0f;
-                    int prevAmmoSize = GameData.AmmoSize.Value;
-                    GameData.AmmoSize.Value = 
+                    int prevAmmoSize = ammoSize;
+                    ammoSize = 
                         dataCache[myGunID].AmmoCount == -1 ||
-                        GameData.AmmoCount.Value > dataCache[myGunID].AmmoSize ?
+                        ammoCount >= dataCache[myGunID].AmmoSize ?
                         dataCache[myGunID].AmmoSize : 0;
-                    GameData.AmmoCount.Value = 
+                    ammoCount = 
                         dataCache[myGunID].AmmoCount == -1 ? 
-                        -1 : GameData.AmmoCount.Value - (dataCache[myGunID].AmmoSize - prevAmmoSize);
+                        -1 : ammoCount - (dataCache[myGunID].AmmoSize - prevAmmoSize);
+
+                    EventBus.Publish("AmmoSize", ammoSize);
+                    EventBus.Publish("AmmoCount", ammoCount);
                 }
                     
                 return;
@@ -142,7 +164,7 @@ namespace GameEngine.GunController
                 Vector2 shootDirection = (mouseWorldPosition.Value - body.position).normalized;
 
 
-                if (GameData.AmmoSize.Value <= 0)
+                if (ammoSize <= 0)
                 {
                     IsReloadEnd = false;
                     return;
@@ -151,7 +173,13 @@ namespace GameEngine.GunController
                 // Shoot È£Ãâ
                 var result = currentGun.Shoot(shootDirection);
                 if (result)
-                    GameData.AmmoSize.Value -= 1;
+                {
+                    //GameData.AmmoSize.Value -= 1;
+                    ammoSize -= 1;
+                    EventBus.Publish("AmmoSize", ammoSize);
+                }
+                    
+                    
 
                 //Camera Shake
                 var shakeDuration = dataCache[myGunID].ShakeDuration;

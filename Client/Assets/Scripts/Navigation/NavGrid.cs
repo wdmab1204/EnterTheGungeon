@@ -48,8 +48,10 @@ namespace GameEngine.Navigation
         private Dictionary<Node, List<Node>> neighbourCache = new();
         public bool IsGizmos { get; set; }
 
-        public void CreateGrid(Tilemap floorTilemap, Tilemap collideableTilemap)
+        public void CreateGrid(Tilemap floorTilemap, Vector3 position)
         {
+            transform.position = position;
+
             BoundsInt bounds = floorTilemap.cellBounds;
             Debug.Log("Floor Bounds : " + bounds);
             width = bounds.position.x + bounds.size.x;
@@ -110,7 +112,7 @@ namespace GameEngine.Navigation
 
         public IEnumerable<Node> GetNeighbours(Node node)
         {
-            List<Node> neighbours = neighbourCache.GetValueOrDefault(node, null);
+            List<Node> neighbours = neighbourCache.GetOrAdd(node, null);
             if (neighbours != null)
             {
                 return neighbours;

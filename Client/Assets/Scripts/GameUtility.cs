@@ -71,7 +71,7 @@ namespace GameEngine
             return lineRenderer;
         }
 
-        public static TValue GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default)
+        public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default)
         {
             if (dictionary.TryGetValue(key, out TValue value))
                 return value;

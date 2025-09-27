@@ -1,9 +1,11 @@
+using GameEngine.DataSequence.EventBus;
 using GameEngine.DataSequence.Graph;
 using GameEngine.UI.Minimap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameEngine.UI
 {
@@ -126,6 +128,16 @@ namespace GameEngine.UI
                 roadRenderer.rectTransform.anchoredPosition = min - centerOffset;
                 roadRenderer.points = localPoints.ToArray();
             }
+        }
+
+        private void OnEnable()
+        {
+            EventBus.Subscribe<Vector3>("PlayerMove", OnMovePlayer);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.UnSubScribe<Vector3>("PlayerMove", OnMovePlayer);
         }
 
         private void Update()

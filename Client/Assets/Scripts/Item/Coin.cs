@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using GameEngine.DataSequence.DIContainer;
 using GameEngine.Navigation;
 using System.Collections;
 using System.Threading;
@@ -22,8 +23,6 @@ namespace GameEngine.Item
         private CancellationTokenSource cancellationTokenSource = new();
 
         public Transform FollowTarget { get; set; }
-
-        public event PathDelegate PathRequest;
 
         private void Start()
         {
@@ -76,7 +75,7 @@ namespace GameEngine.Item
         {
             while (this != null && this.gameObject.IsDestroyed() == false)
             {
-                var pathResult = await PathRequest(Transform.position, FollowTarget.position, cancellationTokenSource);
+                var pathResult = await DIContainer.Resolve<IPathFinder>().FindPathAsync(Transform.position, FollowTarget.position, cancellationTokenSource);
 
                 if (this == null || this.gameObject.IsDestroyed()) break;
 

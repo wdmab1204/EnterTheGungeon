@@ -3,10 +3,16 @@ using UnityEngine;
 
 namespace GameEngine
 {
-    public class UnitAbility : MonobehaviourExtension
+    public interface IUnitAbility
     {
-        public ReactiveProperty<int> MaxHealth = new();
-        public ReactiveProperty<int> Health = new();
+        ReactiveProperty<int> MaxHealth { get; set; }
+        ReactiveProperty<int> Health { get; set; }
+    }
+
+    public class UnitAbility : MonobehaviourExtension, IUnitAbility
+    {
+        public ReactiveProperty<int> MaxHealth { get; set; } = new ReactiveProperty<int>();
+        public ReactiveProperty<int> Health { get; set; } = new ReactiveProperty<int>();
 
         [SerializeField] private int maxHelath;
         [SerializeField] private int health;
