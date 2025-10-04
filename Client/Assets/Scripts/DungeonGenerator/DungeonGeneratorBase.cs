@@ -14,8 +14,8 @@ namespace GameEngine
 
         private PipelineRunner<DungeonGeneratorPayLoad> pipelineRunner = new();
 
-        public DungeonGeneratorLevel Generate() => Generate(GameUtility.GetRandomSeed());
-        //public DungeonGeneratorLevel Generate() => Generate(100);
+        //public DungeonGeneratorLevel Generate() => Generate(GameUtility.GetRandomSeed());
+        public DungeonGeneratorLevel Generate() => Generate(0);
 
         public DungeonGeneratorLevel Generate(int seed)
         {

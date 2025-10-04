@@ -8,37 +8,22 @@ using UnityEngine;
 
 namespace GameEngine.Item
 {
-    public class Coin : Interactable
+    public class Coin : BounceObject
     {
-        private Rigidbody2D rb;
-        private Vector2 originalPosition;
-        private Vector2 previousVelocity;
-        private const float bounceDamping = 0.65f;
-        private const float initialUpwardForce = 5f;
         private const float speed = 10f;
         private Vector3[] path;
         private bool isFollowState = false;
-        private new BoxCollider2D collider;
-        private BoxCollider2D playerCollider;
         private CancellationTokenSource cancellationTokenSource = new();
 
         public Transform FollowTarget { get; set; }
 
-        private void Start()
+        protected override void Start()
         {
-            rb = GetComponent<Rigidbody2D>();
-            rb.gravityScale = 1f;
-
-            collider = GetComponent<BoxCollider2D>();
-            playerCollider = player.GetComponent<BoxCollider2D>();
+            base.Start();
             Physics2D.IgnoreCollision(collider, playerCollider);
-
-            originalPosition = Transform.position;
-            float randomX = UnityEngine.Random.value > 0.5f ? 1f : -1f;
-            rb.velocity = new Vector2(randomX, initialUpwardForce);
         }
 
-        private void FixedUpdate()
+        protected override void FixedUpdate()
         {
             if (rb.velocity.sqrMagnitude < 0.5f && FollowTarget != null)
             {
@@ -54,20 +39,7 @@ namespace GameEngine.Item
             }
             else
             {
-                previousVelocity = rb.velocity;
-
-                if (Transform.position.y < originalPosition.y && rb.velocity.y < 0f)
-                {
-                    Vector2 v = rb.velocity;
-                    v.y *= -1f;
-                    v *= bounceDamping;
-                    rb.velocity = v;
-
-                    Vector2 pos = Transform.position;
-                    pos.y = originalPosition.y;
-                    Transform.position = pos;
-                }
-
+                base.FixedUpdate();
             }
         }
 
@@ -108,21 +80,6 @@ namespace GameEngine.Item
                 Transform.position = Vector3.MoveTowards(Transform.position, FollowTarget.position, speed * Time.deltaTime);
                 yield return null;
             }
-        }
-
-        private void OnCollisionEnter2D(Collision2D collision)
-        {
-            var velocity = previousVelocity;
-            foreach (var contact in collision.contacts)
-            {
-                var normal = contact.normal;
-                if (normal.x > 0f || normal.x < 0f)
-                    velocity.x *= -1;
-                if (normal.y > 0f || normal.y < 0f)
-                    velocity.y *= -1;
-                break;
-            }
-            rb.velocity = velocity;
         }
 
         protected override void OnDestroy()

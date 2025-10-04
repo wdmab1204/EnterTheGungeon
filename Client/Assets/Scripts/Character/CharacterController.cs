@@ -15,6 +15,7 @@ public class CharacterController : MonobehaviourExtension, ICharacterController
     public float moveSpeed = 5f;
     private Rigidbody2D myRb;
     private GunController myGun;
+    private InteractableController interactableController;
     private Vector2 movement;
     [SerializeField] private Bullet bulletPrefab;
 
@@ -24,15 +25,19 @@ public class CharacterController : MonobehaviourExtension, ICharacterController
     {
         myRb = GetComponent<Rigidbody2D>();
         myGun = GetComponent<GunController>();
+        interactableController = new InteractableController(Transform, 1f);
     }
 
     private void Start()
     {
-        myGun.Equip(3);
+        myGun.Equip(1);
     }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+            interactableController.CheckInteractable();
+
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
