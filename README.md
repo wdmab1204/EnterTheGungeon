@@ -1,4 +1,4 @@
-### 이 문서는 포트폴리오 : Enter the Gungeon 구현 과정과 겪은 시행착오와 성능 분석을 기록한 상세 개발 기록입니다
+### 이 문서는 포트폴리오 : Enter the Gungeon 구현 과정과 겪은 시행착오와 성능 분석, 그리고 고민했던 흔적들을 상세 기록한 개발 기술 문서입니다.
 
 # Enter the Gungeon
 ![image](https://github.com/user-attachments/assets/37c2967b-158c-4c13-91d2-9ed5a920728f) <br>
