@@ -1,7 +1,10 @@
 ### 이 문서는 포트폴리오 : Enter the Gungeon 구현 과정과 겪은 시행착오와 성능 분석, 그리고 고민했던 흔적들을 상세 기록한 개발 기술 문서입니다.
 
 # Enter the Gungeon
-![image](https://github.com/user-attachments/assets/37c2967b-158c-4c13-91d2-9ed5a920728f) <br>
+<p float="left">
+  <img src="https://github.com/user-attachments/assets/4bc42f22-3b55-4508-9cfe-27ca81968ae9" width="80%"><br>
+  <sub>실제 동작 화면입니다</sub>
+</p>
 
 몬스터들의 소굴인 던전 속에서 플레이어가 최대한 오래 살아남는 게임입니다.
 - 수학적 지식과 통계 이론, 그리고 탐색 알고리즘을 사용해 무작위 던전을 만듭니다.
