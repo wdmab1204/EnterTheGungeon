@@ -34,31 +34,39 @@ namespace GameEngine.GunController
         private Camera mainCamera;
         private CameraShake camShake;
 
-        private bool IsReloadEnd
-        {
-            get;
-            set;
-        } = true;
+        private bool IsReloadEnd = true;
         private float reloadTime = 0f;
 
         private int ammoSize;
         private int ammoCount;
 
-        private Dictionary<int, GunData> dataCache = new();
-
+        private GunDataContainer gunDataContainer;
+        private GunBaseFactory gunFactory;
         private void Awake()
         {
             mainCamera = Camera.main;
             camShake = mainCamera.GetComponent<CameraShake>();
-            var jsonString = Resources.Load<TextAsset>("gun_data").text;
-            foreach (var gunData in JsonUtility.FromJson<GunDataList>(jsonString).guns)
-                dataCache.Add(gunData.ID, gunData);
+
+            InitializeAndReadFileGunData();
+            InitializeAndCreateGunObj();
+        }
+
+        private void InitializeAndReadFileGunData()
+        {
+            gunDataContainer = new GunDataContainer("gun_data");
+            gunDataContainer.ReadFile();
+        }
+
+        private void InitializeAndCreateGunObj()
+        {
+            var obj = Resources.Load<GameObject>("Bullet_1");
+            gunFactory = new GunBaseFactory(obj, obj, obj, muzzle, muzzleFlash);
         }
 
         public void Equip(int id)
         {
-            var gunData = dataCache[id];
-            var gunBase = GetGunBase(gunData.GunForm);
+            var gunData = gunDataContainer.Get(id);
+            var gunBase = gunFactory.CreateGunBase(gunData.GunForm);
             if(gunBase == null)
             {
                 Debug.LogError($"Invalid Gun ID : {id}");
@@ -121,19 +129,19 @@ namespace GameEngine.GunController
             if(IsReloadEnd == false || ammoSize <= 0)
             {
                 reloadTime += Time.deltaTime;
-                ui_Reload.Play(dataCache[myGunID].ReloadTime);
-                if (reloadTime >= dataCache[myGunID].ReloadTime)
+                ui_Reload.Play(gunDataContainer.Get(myGunID).ReloadTime);
+                if (reloadTime >= gunDataContainer.Get(myGunID).ReloadTime)
                 {
                     IsReloadEnd = true;
                     reloadTime = 0f;
                     int prevAmmoSize = ammoSize;
                     ammoSize = 
-                        dataCache[myGunID].AmmoCount == -1 ||
-                        ammoCount >= dataCache[myGunID].AmmoSize ?
-                        dataCache[myGunID].AmmoSize : 0;
+                        gunDataContainer.Get(myGunID).AmmoCount == -1 ||
+                        ammoCount >= gunDataContainer.Get(myGunID).AmmoSize ?
+                        gunDataContainer.Get(myGunID).AmmoSize : 0;
                     ammoCount = 
-                        dataCache[myGunID].AmmoCount == -1 ? 
-                        -1 : ammoCount - (dataCache[myGunID].AmmoSize - prevAmmoSize);
+                        gunDataContainer.Get(myGunID).AmmoCount == -1 ? 
+                        -1 : ammoCount - (gunDataContainer.Get(myGunID).AmmoSize - prevAmmoSize);
 
                     EventBus.Publish("AmmoSize", ammoSize);
                     EventBus.Publish("AmmoCount", ammoCount);
@@ -182,8 +190,8 @@ namespace GameEngine.GunController
                     
 
                 //Camera Shake
-                var shakeDuration = dataCache[myGunID].ShakeDuration;
-                var shakeIndensity = dataCache[myGunID].ShakeIntensity;
+                var shakeDuration = gunDataContainer.Get(myGunID).ShakeDuration;
+                var shakeIndensity = gunDataContainer.Get(myGunID).ShakeIntensity;
                 camShake.Shake(shakeDuration, shakeIndensity);
             }
 
