@@ -8306,7 +8306,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6006574150273007528, guid: 6a468cadb7ba3444693c937c55795799, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1.420021
+      value: 1.4200172
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8663,7 +8663,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &865346959
 RectTransform:
   m_ObjectHideFlags: 0
@@ -77511,7 +77511,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2124058404
 RectTransform:
   m_ObjectHideFlags: 0
