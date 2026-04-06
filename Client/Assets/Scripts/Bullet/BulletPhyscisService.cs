@@ -67,17 +67,17 @@ public static class DebugDraw
     }
 
     public static void Cube(Vector3 center, Vector3 size, Color color, float duration = 0f)
-    {
-        Vector3 half = size * 0.5f;
+{
+    Vector3 half = size * 0.5f;
 
-        Vector3 tl = center + new Vector3(-half.x, half.y, 0f);
-        Vector3 tr = center + new Vector3(half.x, half.y, 0f);
-        Vector3 bl = center + new Vector3(-half.x, -half.y, 0f);
-        Vector3 br = center + new Vector3(half.x, -half.y, 0f);
+    Vector3 tl = center + new Vector3(-half.x,  half.y, 0f);
+    Vector3 tr = center + new Vector3( half.x,  half.y, 0f);
+    Vector3 bl = center + new Vector3(-half.x, -half.y, 0f);
+    Vector3 br = center + new Vector3( half.x, -half.y, 0f);
 
-        Debug.DrawLine(tl, tr, color, duration);
-        Debug.DrawLine(tr, br, color, duration);
-        Debug.DrawLine(br, bl, color, duration);
-        Debug.DrawLine(bl, tl, color, duration);
-    }
+    Debug.DrawLine(tl, tr, color, duration);
+    Debug.DrawLine(tr, br, color, duration);
+    Debug.DrawLine(br, bl, color, duration);
+    Debug.DrawLine(bl, tl, color, duration);
+}
 }
