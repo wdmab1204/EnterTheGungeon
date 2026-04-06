@@ -20,6 +20,7 @@ public class BulletRenderTest : MonoBehaviour
         int gridSize = Mathf.CeilToInt(Mathf.Sqrt(count)); // 정사각형 그리드
 
         int spawned = 0;
+        Vector3 target = new Vector3(gridSize / 2f, gridSize / 2f, 0f);
 
         for (int y = 0; y < gridSize; y++)
         {
@@ -32,17 +33,8 @@ public class BulletRenderTest : MonoBehaviour
                 Vector3 worldPos = cam.ViewportToWorldPoint(viewportPos);
                 worldPos.z = 0f;
 
-                bullets[spawned] = new BulletObjectData
-                {
-                    pos = worldPos,
-                    vel = Vector2.one
-                };
-
-                matrices[spawned] = Matrix4x4.TRS(
-                    worldPos,
-                    Quaternion.identity,
-                    Vector3.one
-                );
+                var clone = Instantiate(prefab);
+                clone.transform.position = worldPos;
 
                 spawned++;
             }
